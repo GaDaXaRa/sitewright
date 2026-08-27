@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { alternateTones } from '../src/lib/sectionTones'
+import { alternateTones } from '../src/lib/sectionTones.js'
 
 /**
  * Fixing a background per section breaks as soon as the collective runs out of content:

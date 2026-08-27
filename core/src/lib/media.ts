@@ -1,4 +1,4 @@
-import type { MediaLike } from './types'
+import type { MediaLike } from './types.js'
 
 /**
  * Helpers to read an image field coming from the CMS.

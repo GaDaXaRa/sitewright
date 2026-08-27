@@ -7,7 +7,8 @@ import {
   MAX_PER_IP,
   recordSubmission,
   requestIp,
-} from '../src/lib/rateLimit'
+  TOO_MANY_ERROR,
+} from '../src/lib/rateLimit.js'
 
 /**
  * Each submission sends two emails, one to the address typed in the form. Without these
@@ -37,11 +38,41 @@ describe('per-IP brake', () => {
   })
 })
 
+describe('the window itself', () => {
+  it('lasts a quarter of an hour, and the mark right on the edge is already out', () => {
+    expect(IP_WINDOW_MS).toBe(15 * 60 * 1000)
+
+    const result = recordSubmission([0, 1, 2], IP_WINDOW_MS)
+
+    // now - t < window: a mark exactly one window old no longer counts.
+    expect(result.marks).toEqual([1, 2, IP_WINDOW_MS])
+  })
+
+  it('says the same thing whichever ceiling was hit, and says something', () => {
+    expect(TOO_MANY_ERROR).toContain('Espera unos minutos')
+  })
+})
+
 describe('requestIp', () => {
   it('takes the client, which is the first of the forwarded chain', () => {
     const headers = new Headers({ 'x-forwarded-for': '10.0.0.1, 70.41.3.18, 150.172.238.178' })
 
     expect(requestIp(headers)).toBe('10.0.0.1')
+  })
+
+  it('trims the spaces a proxy leaves around the addresses', () => {
+    expect(requestIp(new Headers({ 'x-forwarded-for': '  10.0.0.1 , 70.41.3.18' }))).toBe('10.0.0.1')
+    expect(requestIp(new Headers({ 'x-real-ip': '  10.0.0.2  ' }))).toBe('10.0.0.2')
+  })
+
+  it('ignores an empty forwarded header instead of counting everyone as one visitor', () => {
+    expect(requestIp(new Headers({ 'x-forwarded-for': '', 'x-real-ip': '10.0.0.3' }))).toBe(
+      '10.0.0.3',
+    )
+    // A chain that starts with an empty entry is the same situation, one comma later.
+    expect(requestIp(new Headers({ 'x-forwarded-for': ', 70.41.3.18', 'x-real-ip': '10.0.0.3' }))).toBe(
+      '10.0.0.3',
+    )
   })
 
   it('falls back to x-real-ip, and to nothing at all in local development', () => {

@@ -7,20 +7,20 @@
  */
 
 // Identity of the site
-export { resolveSiteUrl } from './lib/site'
+export { resolveSiteUrl } from './lib/site.js'
 
 // Reading the CMS
-export { mediaUrl, mediaAbsoluteUrl, mediaAlt, mediaFocal } from './lib/media'
-export { relationId, relationPointsTo } from './lib/relations'
-export type { MediaLike, LegalSettings } from './lib/types'
+export { mediaUrl, mediaAbsoluteUrl, mediaAlt, mediaFocal } from './lib/media.js'
+export { relationId, relationPointsTo } from './lib/relations.js'
+export type { MediaLike, LegalSettings } from './lib/types.js'
 
 // Writing for people
-export { slugify } from './lib/slug'
-export { joinWithAnd } from './lib/list'
-export { escapeHtml } from './lib/html'
+export { slugify } from './lib/slug.js'
+export { joinWithAnd } from './lib/list.js'
+export { escapeHtml } from './lib/html.js'
 
 // Laying out a page
-export { alternateTones, type Tone } from './lib/sectionTones'
+export { alternateTones, type Tone } from './lib/sectionTones.js'
 
 // Dated content
 export {
@@ -30,10 +30,10 @@ export {
   formatEventDate,
   formatLineup,
   type DatedEvent,
-} from './lib/events'
+} from './lib/events.js'
 
 // Embedded media, behind consent
-export { parseEmbed, PROVIDER_NAMES, type Embed, type EmbedProvider } from './lib/embeds'
+export { parseEmbed, PROVIDER_NAMES, type Embed, type EmbedProvider } from './lib/embeds.js'
 
 // Image backup: deciding, not writing
 export {
@@ -44,7 +44,7 @@ export {
   type UploadedFile,
   type CopyDecision,
   type Rejection,
-} from './lib/originalCopy'
+} from './lib/originalCopy.js'
 
 // Brakes on a public form
 export {
@@ -57,7 +57,7 @@ export {
   MAX_GLOBAL,
   GLOBAL_WINDOW_MS,
   TOO_MANY_ERROR,
-} from './lib/rateLimit'
+} from './lib/rateLimit.js'
 
 // The legal pages, from what the client filled in
 export {
@@ -65,4 +65,4 @@ export {
   privacyPolicy,
   cookiePolicy,
   type LegalSection,
-} from './lib/legalTexts'
+} from './lib/legalTexts.js'

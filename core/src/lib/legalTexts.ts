@@ -1,4 +1,7 @@
-import type { LegalSettings } from './types'
+// Stryker disable StringLiteral: this file is prose. Mutating each sentence would only
+// demand tests that copy the text back, which prove nothing; what has to hold is which
+// sections appear and which data is left out, and that is under mutation.
+import type { LegalSettings } from './types.js'
 
 /**
  * The legal pages, written from what the client filled in under "Datos legales".
@@ -70,7 +73,7 @@ export function legalNotice(
         'Esta web se rige por la legislación española. Para cualquier controversia serán competentes los juzgados y tribunales del domicilio del titular.',
       ],
     },
-  ].filter((s) => s.paragraphs.length > 0)
+  ]
 }
 
 export function privacyPolicy(settings: LegalSettings | null | undefined): LegalSection[] {

@@ -47,7 +47,8 @@ export function requestIp(headers: Headers): string | null {
     const first = forwarded.split(',')[0]?.trim()
     if (first) return first
   }
-  return headers.get('x-real-ip')?.trim() || null
+  // `Headers.get` already trims the value, so nothing else is needed here.
+  return headers.get('x-real-ip') || null
 }
 
 /**

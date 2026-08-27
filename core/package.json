@@ -11,6 +11,14 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./payload": {
+      "types": "./dist/payload/index.d.ts",
+      "import": "./dist/payload/index.js"
+    },
+    "./ui": {
+      "types": "./dist/ui/index.d.ts",
+      "import": "./dist/ui/index.js"
     }
   },
   "files": [
@@ -24,8 +32,34 @@
     "test:mutacion": "stryker run"
   },
   "devDependencies": {
+    "@payloadcms/ui": "^3.88.0",
+    "@stryker-mutator/core": "^10.0.0",
+    "@stryker-mutator/vitest-runner": "^10.0.0",
     "@types/node": "^22.19.9",
+    "@types/react": "^19.2.14",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/blob": "^2.8.0",
+    "@vercel/speed-insights": "^2.0.0",
+    "next": "^16.3.0",
+    "payload": "^3.88.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
     "typescript": "5.7.3",
     "vitest": "4.1.10"
+  },
+  "peerDependencies": {
+    "@payloadcms/ui": ">=3.88",
+    "@vercel/blob": ">=2",
+    "next": ">=16",
+    "payload": ">=3.88",
+    "react": ">=19"
+  },
+  "peerDependenciesMeta": {
+    "@payloadcms/ui": {
+      "optional": true
+    },
+    "@vercel/blob": {
+      "optional": true
+    }
   }
 }

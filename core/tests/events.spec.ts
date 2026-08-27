@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatEventDate, formatLineup, groupByYear, isUpcoming, splitEvents } from '../src/lib/events'
+import { formatEventDate, formatLineup, groupByYear, isUpcoming, splitEvents } from '../src/lib/events.js'
 
 const at = (iso: string) => Date.parse(iso)
 
@@ -11,6 +11,18 @@ describe('when an event stops being upcoming', () => {
     // abandoned by lunchtime — the night's own date vanishing before the night.
     expect(isUpcoming(party, at('2027-03-06T02:00:00.000Z'))).toBe(true)
     expect(isUpcoming(party, at('2027-03-06T05:00:00.000Z'))).toBe(false)
+  })
+
+  it('is not upcoming when there is no date at all', () => {
+    expect(isUpcoming({}, at('2027-03-05T22:00:00.000Z'))).toBe(false)
+    expect(isUpcoming({ startsAt: null }, at('2027-03-05T22:00:00.000Z'))).toBe(false)
+  })
+
+  it('is still upcoming at the exact instant it ends, not a second before', () => {
+    const party = { startsAt: '2027-03-05T22:00:00.000Z', endsAt: '2027-03-06T04:00:00.000Z' }
+
+    expect(isUpcoming(party, at('2027-03-06T04:00:00.000Z'))).toBe(true)
+    expect(isUpcoming(party, at('2027-03-06T04:00:00.001Z'))).toBe(false)
   })
 
   it('with no end time, the start is the boundary', () => {

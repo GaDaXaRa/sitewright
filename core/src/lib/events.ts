@@ -1,4 +1,4 @@
-import { joinWithAnd } from './list'
+import { joinWithAnd } from './list.js'
 
 /** What any consumer needs from an event to place it in time. */
 export type DatedEvent = {

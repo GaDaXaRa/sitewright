@@ -30,8 +30,8 @@ export const PROVIDER_NAMES: Record<EmbedProvider, string> = {
   bandcamp: 'Bandcamp',
 }
 
-function youtubeId(url: URL): string | null {
-  if (url.hostname.endsWith('youtu.be')) return url.pathname.slice(1) || null
+function youtubeId(url: URL, host: string): string | null {
+  if (host === 'youtu.be') return url.pathname.slice(1) || null
   if (url.pathname === '/watch') return url.searchParams.get('v')
   const embedded = url.pathname.match(/^\/(?:embed|shorts|live)\/([^/]+)/)
   return embedded?.[1] ?? null
@@ -74,7 +74,7 @@ export function parseEmbed(raw: string | null | undefined): Embed | null {
   }
 
   if (host === 'youtube.com' || host === 'youtu.be' || host === 'music.youtube.com') {
-    const id = youtubeId(url)
+    const id = youtubeId(url, host)
     if (!id) return null
     return {
       provider: 'youtube',

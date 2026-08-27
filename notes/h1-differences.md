@@ -99,3 +99,55 @@ rutas del sitio** y **las etiquetas del negocio**. Ambas salen del blueprint.
   de Neon, desplegar una vez, **leer el alias real** y solo entonces fijar la URL pública.
 - El **blueprint necesita un campo por módulo para las rutas**, porque la revalidación, el
   sitemap y el menú dependen de ellas.
+
+
+---
+
+# H2 — lo que se extrajo, y lo que enseñó
+
+El núcleo existe: [`core/`](../core), 98 pruebas y **96,14% de mutación** con corte en 95%.
+Subsuelo lo consume; Organic Yoga **no se toca** hasta que el núcleo tenga rodaje.
+
+## Lo que se llevó
+
+- **Lógica pura** (`@sitewright/core`): identidad del dominio, imágenes, relaciones, slug,
+  listas, escapado, tonos de sección, contenido con fecha, embebidos, decisiones del
+  respaldo de imagen, frenos del formulario y las tres páginas legales.
+- **Payload** (`@sitewright/core/payload`): hooks de imagen, endpoint de restaurar,
+  colecciones `media` y `users` como fábricas, y la fábrica de revalidación.
+- **Cliente** (`@sitewright/core/ui`): consentimiento, analítica condicionada, embebidos y
+  los botones del panel.
+
+De un sitio de 4.255 líneas, el sitio se queda con su dominio, sus secciones y su CSS.
+
+## Lo que enseñó
+
+13. **Un enlace simbólico no vale como paquete local**: con la raíz de Turbopack fijada al
+    proyecto, `@sitewright/core` no se resolvía. Se instala con `--install-links`, que
+    además ensaya lo que pasará cuando esté publicado. Y **npm no refresca un `file:` con
+    la misma versión**: hay que borrar la copia antes de instalar.
+14. **El paquete tiene que ser ESM de verdad.** Con `moduleResolution: bundler`, TypeScript
+    emite imports sin extensión: Turbopack los traga y Node no, así que el sitio compilaba
+    pero sus pruebas no cargaban el núcleo. `NodeNext` y extensión `.js` en todos los
+    imports relativos.
+15. **Lo que se parametriza no es "el nombre del negocio", son tres cosas concretas**: las
+    rutas (revalidación, sitemap, menú), las etiquetas que lee el cliente (el ejemplo del
+    texto alternativo, los títulos de sección) y el identificador del sitio (la clave donde
+    se guarda el consentimiento). El resto viaja igual.
+16. **El núcleo no puede importar los tipos generados de un sitio.** Las formas mínimas
+    (`MediaLike`, `LegalSettings`) van declaradas en el núcleo, o añadir un campo en el CMS
+    de una web rompería la otra.
+17. **La mutación paga el viaje.** Destapó un `.filter()` en las páginas legales que no
+    podía quitar ninguna sección jamás: código muerto que nadie habría notado, y que la
+    cobertura daba por probado.
+18. **Los componentes de cliente sobreviven a `tsc`**: la directiva `'use client'` se
+    conserva en `dist/`, y el `importMap` de Payload acepta apuntar a `@sitewright/core/ui`.
+    El panel monta sin quedarse en blanco.
+
+## Lo que esto cambia del plan
+
+- **H3 se estrecha**: la plantilla ya no tiene que "extraer" nada, solo colocar lo que el
+  núcleo no puede saber. La lista de arriba (rutas, etiquetas, identificador) es
+  literalmente el esquema mínimo del blueprint.
+- **Publicar el núcleo deja de ser opcional**: `file:` no sobrevive a un despliegue en
+  Vercel, porque allí solo se sube el repositorio del sitio.
