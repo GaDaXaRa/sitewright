@@ -5,7 +5,7 @@ construida a mano sobre el chasis de [Organic Yoga](../../organicYoga). Esta es 
 prima de H2: **lo que aparezca como igual es candidato a núcleo; lo que aparezca como
 distinto se queda en el sitio.**
 
-Estado: la diana está en verde en local (lint, 66 pruebas, build) y sin desplegar.
+Estado: **desplegada** en https://subsuelo-rho.vercel.app (lint, typecheck, 68 pruebas y build en verde).
 
 ## 1. Igual en las dos webs — al núcleo tal cual
 
@@ -68,12 +68,34 @@ rutas del sitio** y **las etiquetas del negocio**. Ambas salen del blueprint.
 8. **Un gris elegido a ojo suspende el AA.** `#6f6a64` daba 3,67:1. Hay que medirlo, y por
    eso la auditoría de H4 debe medirlo sola.
 
+## 4 bis. Lo que enseñó el despliegue (dos intentos fallidos)
+
+9. **`payload migrate` no arranca si alguien ha corrido el modo dev contra esa base.** El
+   modo dev deja una fila `batch = -1` en `payload_migrations` y el build se queda
+   preguntando. Aquí pasó porque desarrollo y producción comparten rama de Neon. El
+   generador tiene que **crear dos ramas desde el principio**, y el despliegue debe
+   comprobar esa fila antes de construir (`scripts/fix-prod-migration.mjs` la limpia).
+10. **La dirección pública de un proyecto de Vercel no se puede adivinar.**
+    `<proyecto>.vercel.app` puede ser de otra persona (lo era), `<proyecto>-<equipo>.vercel.app`
+    está detrás del SSO del equipo, y la pública es `<proyecto>-<palabra>.vercel.app`. Hay
+    que **leer el alias real tras el primer despliegue** y solo entonces fijar
+    `NEXT_PUBLIC_SITE_URL`. Mientras tanto el sitio redirige a un dominio que no existe.
+11. **`next build` reutiliza su caché y puede dar en verde lo que Vercel da en rojo.** El
+    type-check tiene que ser su propio comando (`npm run typecheck`), y lo que escondía era
+    un error real: `.map(eventLine)` metía el índice del array en el parámetro `past`.
+12. **El almacén Blob no se crea desde la CLI**: es un paso de panel. Sin él, subir imágenes
+    falla en producción aunque todo lo demás funcione.
+
 ## 5. Lo que esto cambia del plan
 
 - La **biblioteca de módulos se confirma**, y aparece uno que no estaba: *medios embebidos
   con consentimiento*.
 - El **paquete legal es 100% núcleo** — más de lo que suponíamos.
-- La **auditoría (H4) necesita al menos dos comprobaciones nuevas**: contraste AA de la
-  paleta del blueprint y que ningún `iframe` de terceros se cargue antes del consentimiento.
+- La **auditoría (H4) necesita cuatro comprobaciones nuevas**: contraste AA de la paleta
+  del blueprint; que ningún `iframe` de terceros se cargue antes del consentimiento; que el
+  host del canonical **responda 200 y no un redirect** (habría cazado el sitio redirigiendo
+  a un dominio inexistente); y que no haya filas `batch = -1` en `payload_migrations`.
+- El **generador (H5) tiene un orden obligado** en el aprovisionamiento: crear las dos ramas
+  de Neon, desplegar una vez, **leer el alias real** y solo entonces fijar la URL pública.
 - El **blueprint necesita un campo por módulo para las rutas**, porque la revalidación, el
   sitemap y el menú dependen de ellas.
