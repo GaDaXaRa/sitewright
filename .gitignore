@@ -1,0 +1,26 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# builds
+.next/
+out/
+build/
+dist/
+
+# misc
+.DS_Store
+*.pem
+*.tsbuildinfo
+
+# local env files
+.env
+.env*.local
+.vercel
+
+# local AI assistant tooling (not part of the project)
+.agents/
+.claude/settings.local.json
+.neon
+skills-lock.json
