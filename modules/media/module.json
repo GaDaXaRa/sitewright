@@ -1,0 +1,19 @@
+{
+  "id": "media",
+  "title": "Medios",
+  "note": "Los reproductores de terceros no se cargan antes del consentimiento.",
+  "collection": "media",
+  "defaultLabels": {
+    "singular": "Pieza",
+    "plural": "Medios"
+  },
+  "routes": {
+    "index": "/medios"
+  },
+  "section": "medios",
+  "contributes": {
+    "jsonld": false,
+    "llms": true,
+    "seed": true
+  }
+}

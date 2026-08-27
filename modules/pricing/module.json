@@ -1,0 +1,19 @@
+{
+  "id": "pricing",
+  "title": "Precios",
+  "note": "Una tarifa sin precio cerrado se ofrece \"a convenir\" y no se publica como Offer.",
+  "collection": "pricing",
+  "defaultLabels": {
+    "singular": "Tarifa",
+    "plural": "Tarifas"
+  },
+  "routes": {
+    "index": "/tarifas"
+  },
+  "section": "tarifas",
+  "contributes": {
+    "jsonld": true,
+    "llms": true,
+    "seed": true
+  }
+}

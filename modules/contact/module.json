@@ -1,0 +1,17 @@
+{
+  "id": "contact",
+  "title": "Contacto",
+  "note": "Guarda el consentimiento con su fecha y rechaza el envío sin él.",
+  "collection": "contact",
+  "defaultLabels": {
+    "singular": "Solicitud",
+    "plural": "Solicitudes"
+  },
+  "routes": {},
+  "section": "contacto",
+  "contributes": {
+    "jsonld": false,
+    "llms": false,
+    "seed": true
+  }
+}

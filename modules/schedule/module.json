@@ -1,0 +1,19 @@
+{
+  "id": "schedule",
+  "title": "Agenda",
+  "note": "Deja de ser próximo cuando termina, no cuando empieza. Lo pasado se archiva por años.",
+  "collection": "schedule",
+  "defaultLabels": {
+    "singular": "Fecha",
+    "plural": "Fechas"
+  },
+  "routes": {
+    "index": "/agenda"
+  },
+  "section": "agenda",
+  "contributes": {
+    "jsonld": true,
+    "llms": true,
+    "seed": true
+  }
+}

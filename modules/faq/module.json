@@ -1,0 +1,19 @@
+{
+  "id": "faq",
+  "title": "Preguntas frecuentes",
+  "note": "Es el módulo que más rinde en GEO: responde con las palabras de quien pregunta.",
+  "collection": "faq",
+  "defaultLabels": {
+    "singular": "Pregunta frecuente",
+    "plural": "Preguntas frecuentes"
+  },
+  "routes": {
+    "index": "/preguntas-frecuentes"
+  },
+  "section": "faq",
+  "contributes": {
+    "jsonld": true,
+    "llms": true,
+    "seed": true
+  }
+}

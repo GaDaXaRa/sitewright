@@ -151,3 +151,42 @@ De un sitio de 4.255 líneas, el sitio se queda con su dominio, sus secciones y 
   literalmente el esquema mínimo del blueprint.
 - **Publicar el núcleo deja de ser opcional**: `file:` no sobrevive a un despliegue en
   Vercel, porque allí solo se sube el repositorio del sitio.
+
+
+---
+
+# H3 — chasis y módulos
+
+La plantilla compila y responde **estando vacía** (portada, tres páginas legales,
+`llms.txt`, sitemap, robots, panel y API), y los **nueve módulos** existen, se cablean y
+compilan juntos: se montó un sitio con todos activos y se construyó de verdad antes de dar
+esto por bueno ([`modules/example/`](../modules/example)).
+
+## La forma de un módulo
+
+`module.json` (etiquetas por defecto, rutas, sección, qué aporta) · `collection.ts` (fábrica
+parametrizada) · `Section.tsx` · `jsonld.ts` · `llms.ts` · `seed.ts`. Se **copian** al sitio,
+no se importan: es la decisión de núcleo fino, y a partir de ahí son del sitio.
+
+## Lo que enseñó
+
+19. **Lo que varía de un negocio a otro son etiquetas y rutas, y nada más.** Las nueve
+    fábricas terminaron con la misma firma —`{ labels, route }` más algún interruptor— y eso
+    confirma el esquema mínimo del blueprint.
+20. **Payload no acepta campos `readonly`.** El truco de `as const` para componer campos
+    opcionales rompe el tipo `Field[]`; hay que anotar `as Field[]`.
+21. **Turbopack no sigue un `node_modules` enlazado fuera de la raíz del proyecto**, así que
+    ni para verificar vale el atajo: la copia de prueba tuvo que vivir dentro del repositorio
+    con sus dependencias en enlaces duros.
+22. **Un módulo no es solo una colección**: es colección + sección + rutas + su aporte al
+    grafo y a `llms.txt` + su ejemplo. Separarlos habría dejado el trabajo de reunirlos en el
+    generador, que es justo donde no debe estar.
+
+## Lo que falta de H3
+
+- El **contenido de ejemplo** (`seed.ts`) de cada módulo: los manifiestos lo declaran y no
+  está escrito.
+- Las **páginas propias** de cada módulo (`/servicios/[slug]`, `/agenda`…): la sección ya
+  admite `contexto`, pero el armazón lo ensambla el generador en H5.
+- El **cupo de inscripciones** que se decidió en la entrevista: el módulo de contacto guarda
+  consentimiento y frena el abuso, pero no limita plazas.

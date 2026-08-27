@@ -27,3 +27,4 @@ skills-lock.json
 template/node_modules/
 template/.next/
 template/src/payload-types.ts
+.verify/

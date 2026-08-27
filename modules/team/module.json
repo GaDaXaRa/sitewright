@@ -1,0 +1,19 @@
+{
+  "id": "team",
+  "title": "Equipo",
+  "note": "Cada persona es un Person referenciado desde la organización, no un nombre repetido.",
+  "collection": "team",
+  "defaultLabels": {
+    "singular": "Miembro",
+    "plural": "Equipo"
+  },
+  "routes": {
+    "detail": "/equipo/[slug]"
+  },
+  "section": "equipo",
+  "contributes": {
+    "jsonld": true,
+    "llms": true,
+    "seed": true
+  }
+}

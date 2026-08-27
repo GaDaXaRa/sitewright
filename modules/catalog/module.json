@@ -1,0 +1,20 @@
+{
+  "id": "catalog",
+  "title": "Catálogo",
+  "note": "Servicios, proyectos, sesiones o actividades: el mismo módulo con otra etiqueta.",
+  "collection": "catalog",
+  "defaultLabels": {
+    "singular": "Servicio",
+    "plural": "Servicios"
+  },
+  "routes": {
+    "index": "/servicios",
+    "detail": "/servicios/[slug]"
+  },
+  "section": "catalogo",
+  "contributes": {
+    "jsonld": true,
+    "llms": true,
+    "seed": true
+  }
+}

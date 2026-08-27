@@ -1,0 +1,17 @@
+{
+  "id": "notices",
+  "title": "Avisos",
+  "note": "Solo se muestra el primero activo y en fecha. Cerrarlo se recuerda por aviso, no en general.",
+  "collection": "notices",
+  "defaultLabels": {
+    "singular": "Aviso",
+    "plural": "Avisos"
+  },
+  "routes": {},
+  "section": null,
+  "contributes": {
+    "jsonld": false,
+    "llms": false,
+    "seed": true
+  }
+}

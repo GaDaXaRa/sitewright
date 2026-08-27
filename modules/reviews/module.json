@@ -1,0 +1,17 @@
+{
+  "id": "reviews",
+  "title": "Opiniones",
+  "note": "Prensa, clientes o socios: la misma forma con otra etiqueta.",
+  "collection": "reviews",
+  "defaultLabels": {
+    "singular": "Opinión",
+    "plural": "Opiniones"
+  },
+  "routes": {},
+  "section": "opiniones",
+  "contributes": {
+    "jsonld": false,
+    "llms": false,
+    "seed": true
+  }
+}
