@@ -24,3 +24,6 @@ dist/
 .claude/settings.local.json
 .neon
 skills-lock.json
+template/node_modules/
+template/.next/
+template/src/payload-types.ts
