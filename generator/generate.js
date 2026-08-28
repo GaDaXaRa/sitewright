@@ -342,10 +342,39 @@ function siteSettings(template, bp, modules, wirings) {
 
 // ── scripts/seed.ts ─────────────────────────────────────────────────────────────────────
 
+/**
+ * The copy the interview drafted for the settings — cover title, intro, section headings.
+ *
+ * It goes through the seed like everything else so the site is reproducible: regenerating
+ * and reseeding gives the same site, and nothing has to be typed into the panel twice.
+ */
+function settingsContent(bp) {
+  const entries = Object.entries(bp.content?.settings ?? {})
+  return entries.length
+    ? entries.map(([key, value]) => `${key}: ${JSON.stringify(value)},`).join('\n      ') + '\n      '
+    : ''
+}
+
 function seedScript(bp, modules, wirings) {
+  // Written copy wins over the module's generic example: what the interview drafted for
+  // this business is worth more than "Primera actividad", and it is what the client will
+  // correct rather than write from scratch.
+  const written = (id) => {
+    const items = bp.content?.[id]
+    if (!Array.isArray(items) || !items.length) return null
+    const collection = { catalog: 'catalog', schedule: 'schedule', pricing: 'pricing', team: 'team', media: 'embeds', reviews: 'reviews', faq: 'faqs', notices: 'notices' }[id]
+    return `  const ${id}Count = await payload.count({ collection: '${collection}' })
+  if (${id}Count.totalDocs === 0) {
+    for (const data of ${JSON.stringify(items, null, 2).split('\n').join('\n    ')} as never[]) {
+      await payload.create({ collection: '${collection}', data })
+    }
+    payload.logger.info('${items.length} en ${collection}: textos del blueprint')
+  }`
+  }
+
   const blocks = wirings
     .filter((w) => w.seed)
-    .map((w) => w.seed({ ...modules[w.id], city: bp.identity.city }, bp))
+    .map((w) => written(w.id) ?? w.seed({ ...modules[w.id], city: bp.identity.city }, bp))
     .join('\n\n')
 
   return `import { getPayload } from 'payload'
@@ -376,7 +405,7 @@ export const seed = async () => {
     data: {
       siteName: site.name,
       ${bp.identity.tagline ? `tagline: '${bp.identity.tagline}',\n      ` : ''}${bp.identity.email ? `email: '${bp.identity.email}',\n      ` : ''}${bp.identity.city ? `city: '${bp.identity.city}',\n      ` : ''}${bp.identity.schemaType ? `schemaType: '${bp.identity.schemaType}',\n      ` : ''}legalHolder: '${bp.legal.holder}',
-      ${bp.legal.id ? `legalId: '${bp.legal.id}',\n      ` : ''}${bp.legal.address ? `legalAddress: '${bp.legal.address}',\n      ` : ''}analyticsConsent: true,
+      ${bp.legal.id ? `legalId: '${bp.legal.id}',\n      ` : ''}${bp.legal.address ? `legalAddress: '${bp.legal.address}',\n      ` : ''}${settingsContent(bp)}analyticsConsent: true,
     },
   })
 

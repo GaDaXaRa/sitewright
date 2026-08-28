@@ -136,6 +136,49 @@ export function checkImages(pages: Fetched[]): Finding[] {
   ]
 }
 
+// ── contenido ───────────────────────────────────────────────────────────────────────────
+
+const GATE_CONTENT = 'contenido'
+
+/**
+ * The example text the seed writes, still live on the site.
+ *
+ * It warns rather than fails: a site under construction is allowed to have placeholders,
+ * and a gate that blocks a legitimate work-in-progress deploy gets switched off. But
+ * shipping "Dos o tres líneas contando de qué va" to a real audience is the kind of thing
+ * nobody notices until a client does, because drafted copy reads exactly like written copy.
+ */
+export const PLACEHOLDERS = [
+  'Esto es un ejemplo',
+  'Dos o tres líneas contando',
+  'Nombre Apellido',
+  'Su papel aquí',
+  'Aquí va',
+  'Lugar por decidir',
+  'de ejemplo',
+  'cámbialo',
+]
+
+export function checkPlaceholders(pages: Fetched[]): Finding[] {
+  const found = pages.flatMap((page) =>
+    PLACEHOLDERS.filter((text) => page.body.includes(text)).map((text) => ({
+      text,
+      path: new URL(page.url).pathname,
+    })),
+  )
+
+  if (!found.length) return [ok(GATE_CONTENT, 'No queda texto de ejemplo publicado')]
+
+  const unique = [...new Set(found.map((f) => `"${f.text}" (${f.path})`))]
+  return [
+    warn(
+      GATE_CONTENT,
+      'No queda texto de ejemplo publicado',
+      `Sigue el relleno del seed: ${unique.slice(0, 3).join(', ')}${unique.length > 3 ? `, y ${unique.length - 3} más` : ''}.`,
+    ),
+  ]
+}
+
 // ── contraste ───────────────────────────────────────────────────────────────────────────
 
 const GATE_CONTRAST = 'contraste'

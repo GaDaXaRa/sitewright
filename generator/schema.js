@@ -107,11 +107,30 @@ export function validateBlueprint(blueprint) {
   required(fonts.display, 'design.fonts.display', errors)
   required(fonts.body, 'design.fonts.body', errors)
 
+  // ── content: optional, and checked only for the shape the seed expects.
+  const content = bp.content ?? {}
+  for (const [id, items] of Object.entries(content)) {
+    if (id === 'settings') continue
+    if (!MODULE_IDS.includes(id)) errors.push(`content.${id}: no es un módulo`)
+    else if (!modules[id]) errors.push(`content.${id}: el módulo no está activo`)
+    else if (!Array.isArray(items)) errors.push(`content.${id}: tiene que ser una lista`)
+  }
+
   // ── legal: the whole point of generating these pages is that they cannot be forgotten.
   const legal = bp.legal ?? {}
   required(legal.holder, 'legal.holder', errors, 'falta el titular de la web (RGPD)')
 
   return errors
+}
+
+/**
+ * Whether the copy in the blueprint is a draft nobody has approved yet.
+ *
+ * It matters because drafted copy reads exactly like written copy, and a site can go live
+ * with three paragraphs an assistant made up. The audit warns while this is true.
+ */
+export function isDraft(blueprint) {
+  return Boolean(blueprint.content) && blueprint.contentStatus !== 'revisado'
 }
 
 /** The order the sections are painted in, defaulting to the order the modules were written. */

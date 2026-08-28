@@ -312,3 +312,35 @@ escribir, un sitio sin titular legal. Diez pruebas con `node --test`, sin depend
     ejemplo.
 36. **La auditoría de esquema hay que pasarla contra producción**, no contra desarrollo: la
     rama de dev tendrá marcas por definición, y son inofensivas ahí.
+
+
+---
+
+# H6 — la entrevista
+
+La skill vive en [`.claude/skills/nuevo-sitio/SKILL.md`](../.claude/skills/nuevo-sitio/SKILL.md):
+seis fases, quince preguntas de techo, y termina escribiendo un blueprint, generando el
+sitio y pasándole la auditoría.
+
+Lo que la hace distinta de "una IA que hace webs" está en dos reglas:
+
+- **No preguntar lo que se puede deducir.** "Somos un colectivo de djs" ya dice que el
+  catálogo se llama Sesiones, que hay fechas y que el tipo es `MusicGroup`. Proponer y dejar
+  corregir es más rápido que interrogar.
+- **No inventar nunca** precios, fechas, direcciones, titulaciones ni años de experiencia:
+  lo que no consta va a la **hoja de encargo** que se entrega al final. Lo demás se redacta
+  en borrador, entra en el blueprint como `content` y la auditoría avisa mientras siga sin
+  revisar.
+
+## Lo que hizo falta por debajo
+
+- **El blueprint lleva los textos.** `content` por módulo y para los ajustes, sembrado por el
+  generador: así el sitio es reproducible y nadie teclea dos veces lo mismo en el panel.
+- **Una puerta nueva en la auditoría**: `contenido` avisa si sigue publicado el relleno del
+  seed. Avisa y no falla, porque una web en construcción puede tenerlo y una puerta que
+  bloquea un despliegue legítimo acaba desactivada.
+
+37. **El generador descartaba en silencio los textos de portada del blueprint.** Una
+    sustitución que no casaba, sin error y sin aviso: lo escrito en `content.settings`
+    simplemente no llegaba. Lo destapó comprobar la salida en vez de fiarme de que el código
+    hacía lo que decía. Es el argumento de siempre a favor de mirar el resultado.

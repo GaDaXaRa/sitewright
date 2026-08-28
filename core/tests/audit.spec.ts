@@ -9,6 +9,7 @@ import {
 } from '../src/audit/checks.js'
 import {
   checkConsentGating,
+  checkPlaceholders,
   checkContrast,
   checkImages,
   checkLegalPages,
@@ -31,6 +32,11 @@ const page = (extra: Partial<Fetched> = {}): Fetched => ({
 
 const failures = (findings: { status: string; what: string }[]) =>
   findings.filter((f) => f.status === 'fail').map((f) => f.what)
+
+const assertWarn = (findings: { status: string }[]) => {
+  expect(findings.filter((f) => f.status === 'fail')).toEqual([])
+  expect(findings.some((f) => f.status === 'warn')).toBe(true)
+}
 
 /**
  * The audit is the promise of this whole system, so what has to be tested is not that it
@@ -191,6 +197,23 @@ describe('imágenes', () => {
     expect(failures(checkImages([page({ body: '<img src="/a.webp" alt="" width="10"/>' })]))).toEqual(
       [],
     )
+  })
+})
+
+describe('contenido', () => {
+  it('avisa cuando sigue publicado el relleno del seed', () => {
+    const page1 = page({ body: '<p>Dos o tres líneas contando de qué va. Esto es un ejemplo.</p>' })
+    const findings = checkPlaceholders([page1])
+
+    // Avisa, no falla: una web en construcción puede tener relleno, y una puerta que
+    // bloquea un despliegue legítimo acaba desactivada.
+    assertWarn(findings)
+  })
+
+  it('pasa cuando los textos son de verdad', () => {
+    const real = page({ body: '<p>Damos clases de teatro los martes en el local de la calle Mayor.</p>' })
+
+    expect(checkPlaceholders([real]).every((f) => f.status === 'ok')).toBe(true)
   })
 })
 

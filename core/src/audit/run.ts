@@ -14,6 +14,7 @@ import {
   checkImages,
   checkLegalPages,
   checkLlmsTxt,
+  checkPlaceholders,
   checkWeight,
 } from './checks2.js'
 import { checkMigrations } from './migrations.js'
@@ -80,6 +81,7 @@ export async function runAudit(options: AuditOptions): Promise<Finding[]> {
     ...checkLegalPages(legalPages, home),
     ...checkConsentGating([...allPages, ...legalPages]),
     ...checkImages(allPages),
+    ...checkPlaceholders(allPages),
     ...checkWeight(allPages),
   ]
 
