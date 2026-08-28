@@ -79,12 +79,15 @@ export function useConsent() {
 export function ConsentProvider({
   storageKey,
   cookiesHref = '/cookies',
+  hasEmbeds = false,
   children,
 }: {
   /** Something stable and site-specific, e.g. "subsuelo". */
   storageKey: string
   /** Where the cookie policy lives on this site. */
   cookiesHref?: string
+  /** Whether this site embeds third-party players at all. */
+  hasEmbeds?: boolean
   children: React.ReactNode
 }) {
   KEY = `sitewright:${storageKey}:consent`
@@ -100,20 +103,31 @@ export function ConsentProvider({
       }}
     >
       {children}
-      {status === 'unknown' ? <ConsentBanner cookiesHref={cookiesHref} /> : null}
+      {status === 'unknown' ? (
+        <ConsentBanner cookiesHref={cookiesHref} hasEmbeds={hasEmbeds} />
+      ) : null}
     </ConsentContext.Provider>
   )
 }
 
-function ConsentBanner({ cookiesHref }: { cookiesHref: string }) {
+function ConsentBanner({
+  cookiesHref,
+  hasEmbeds,
+}: {
+  cookiesHref: string
+  hasEmbeds: boolean
+}) {
   const { accept, decline } = useConsent()
 
   return (
     <div className="consent" role="dialog" aria-label="Cookies" aria-live="polite">
+      {/* Says only what this site actually does: promising consent for players a site does
+          not have is a lie the visitor can check. */}
       <p>
-        Usamos cookies para medir las visitas y para los reproductores de SoundCloud, Mixcloud y
-        YouTube. Sin aceptar, la web funciona igual: los reproductores se sustituyen por un
-        enlace. <a href={cookiesHref}>Más detalles</a>.
+        {hasEmbeds
+          ? 'Usamos cookies para medir las visitas y para los reproductores de audio y vídeo. Sin aceptar, la web funciona igual: los reproductores se sustituyen por un enlace.'
+          : 'Usamos cookies solo para medir cuántas visitas recibe cada página. Sin aceptar, la web funciona igual.'}{' '}
+        <a href={cookiesHref}>Más detalles</a>.
       </p>
       <div className="consent-actions">
         <button type="button" className="btn btn-ghost" onClick={decline}>

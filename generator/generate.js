@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
-import { dirname, join, resolve } from 'node:path'
+import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { sectionOrder, validateBlueprint } from './schema.js'
 
@@ -594,14 +594,27 @@ mkdirSync(target, { recursive: true })
 // 1. The chassis, minus what belongs to the generator's own machinery.
 cpSync(join(ROOT, 'template'), target, {
   recursive: true,
-  filter: (src) => !/node_modules|\.next|payload-types\.ts|tsconfig\.tsbuildinfo/.test(src),
+  // The lockfile goes too: it pins `@sitewright/core` to the **template's** own path, and a
+  // generated site inheriting it sends npm looking for the core next to itself, with an
+  // ENOENT that names a directory nobody wrote. The first `npm install` writes a fresh one.
+  filter: (src) =>
+    !/node_modules|\.next|payload-types\.ts|tsconfig\.tsbuildinfo|package-lock\.json/.test(src),
 })
 
 const modules = bp.modules
 const order = sectionOrder(bp)
 const wirings = []
 for (const id of Object.keys(modules)) {
-  const { wiring } = await import(join(ROOT, 'modules', id, 'wiring.js'))
+  let wiring
+  try {
+    ;({ wiring } = await import(join(ROOT, 'modules', id, 'wiring.js')))
+  } catch (err) {
+    // A broken module leaves a directory that looks like a site and is only the empty
+    // chassis. Saying so beats letting somebody debug a "generated" site that never was.
+    rmSync(target, { recursive: true, force: true })
+    console.error(`\nEl módulo "${id}" no se pudo cargar, así que no se ha generado nada:\n\n${err}\n`)
+    process.exit(1)
+  }
   wirings.push(wiring)
   cpSync(join(ROOT, 'modules', id), join(target, 'src/modules', id), {
     recursive: true,
@@ -627,13 +640,23 @@ write(
   'src/app/(frontend)/styles.css',
   moduleStyles(applyPalette(read('src/app/(frontend)/styles.css'), bp.design), target, modules),
 )
-write('src/app/(frontend)/layout.tsx', applyFonts(read('src/app/(frontend)/layout.tsx'), bp.design))
+write(
+  'src/app/(frontend)/layout.tsx',
+  applyFonts(read('src/app/(frontend)/layout.tsx'), bp.design).replace(
+    '<ConsentProvider storageKey={site.id} cookiesHref={site.routes.cookies}>',
+    `<ConsentProvider storageKey={site.id} cookiesHref={site.routes.cookies}${modules.media ? ' hasEmbeds' : ''}>`,
+  ),
+)
 
 const pkg = JSON.parse(read('package.json'))
 pkg.name = bp.identity.id
 pkg.description = `Web de ${bp.identity.name}`
 pkg.scripts.audit = pkg.scripts.audit.replace('http://localhost:3000', bp.identity.url)
-pkg.dependencies['@sitewright/core'] = arg('core') ?? 'file:../sitewright/core'
+// Worked out from where the site actually lands, not assumed: a fixed '../sitewright/core'
+// only resolves for one layout, and when it does not, npm fails with a bare ENOENT that
+// says nothing about what is wrong.
+pkg.dependencies['@sitewright/core'] =
+  arg('core') ?? `file:${relative(target, join(ROOT, 'core'))}`
 write('package.json', JSON.stringify(pkg, null, 2) + '\n')
 
 console.log(`

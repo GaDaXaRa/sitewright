@@ -69,4 +69,7 @@ export default async function FaqPage() {
     }
     payload.logger.info('3 preguntas de ejemplo')
   }`,
+  // It has a page of its own, so it belongs in the menu: a route nothing links to is a
+  // page nobody reads, and it took a third site to notice.
+  navLink: (m) => ({ href: m.route, label: m.labels.plural }),
 }

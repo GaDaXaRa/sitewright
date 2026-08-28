@@ -344,3 +344,47 @@ Lo que la hace distinta de "una IA que hace webs" está en dos reglas:
     sustitución que no casaba, sin error y sin aviso: lo escrito en `content.settings`
     simplemente no llegaba. Lo destapó comprobar la salida en vez de fiarme de que el código
     hacía lo que decía. Es el argumento de siempre a favor de mirar el resultado.
+
+
+---
+
+# H7 — la prueba de fuego
+
+Un **portafolio personal** (una ilustradora), que nadie había usado de referencia y que
+activa un subconjunto distinto: cuatro módulos, sin agenda, sin equipo y sin precios. De
+blueprint a web auditada, con su base de datos y sus dos ramas: **la parte mecánica son seis
+minutos**. Lo valioso no es esa cifra, sino los siete fallos que salieron por el camino, que
+ya están arreglados y que ninguna cantidad de compilar habría enseñado.
+
+## Lo que se atascó
+
+38. **El seed del catálogo no contemplaba `dated`.** Con fechas activadas, `publishedAt` es
+    obligatorio y el seed no lo ponía: el sitio generado **no pasaba su propio `typecheck`**,
+    aunque el seed corriera igual (tsx no comprueba tipos).
+39. **La auditoría daba un error de Postgres en crudo** cuando la base de producción todavía
+    no se ha desplegado nunca. Eso no es un fallo del sitio: es el estado normal antes del
+    primer despliegue, y ahora se dice así.
+40. **El banner de cookies prometía consentimiento para reproductores que ese sitio no
+    tiene.** Un texto fijo hablando de SoundCloud y YouTube en una web de ilustración. El
+    consentimiento ahora dice solo lo que el sitio hace de verdad.
+41. **La página de preguntas frecuentes no estaba enlazada desde ningún sitio.** Existía, se
+    generaba, entraba en el sitemap y no había forma de llegar a ella pinchando. Hizo falta
+    un tercer sitio para verlo.
+42. **Un residuo de una edición dejó un módulo con sintaxis rota, y el generador escribió un
+    sitio a medias sin quejarse**: el directorio parecía generado y era la plantilla vacía.
+    Ahora, si un módulo no carga, borra lo escrito y lo dice.
+43. **La ruta al núcleo estaba fijada a un layout concreto.** `file:../sitewright/core` solo
+    resuelve si el sitio es hermano del repositorio; se calcula desde donde cae el sitio.
+44. **El sitio heredaba el `package-lock.json` de la plantilla**, que apunta al núcleo desde
+    la plantilla: npm buscaba en un directorio que nadie había escrito y fallaba con un
+    ENOENT que no explicaba nada. El lock ya no se copia.
+
+## Lo que confirmó
+
+- **Tres webs, tres caras distintas**: oscura y de cartel para el colectivo, clara y con
+  serifa para la asociación, cálida y editorial para el portafolio. El enfoque de tokens más
+  variantes aguanta sin que se note la plantilla.
+- **Las secciones que no hay, no se notan**: el portafolio no tiene agenda ni equipo ni
+  precios, y la portada no tiene huecos — el reparto de tonos se hace sobre lo que se pinta.
+- **La auditoría hace de red de verdad**: en las tres webs ha cazado algo real, y en esta
+  avisó del relleno del seed que sigue publicado, que es exactamente su trabajo.

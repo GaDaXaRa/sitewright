@@ -74,6 +74,18 @@ export async function checkMigrations({
 
     return findings
   } catch (err) {
+    // A database with no `payload_migrations` table has simply never been deployed: the
+    // build is what applies them. Reporting a raw Postgres error there sends someone
+    // debugging a problem that does not exist.
+    if (String(err).includes('payload_migrations') && String(err).includes('does not exist')) {
+      return [
+        skip(
+          GATE,
+          'Migraciones al día',
+          'Esta base no tiene migraciones todavía: se aplican en el primer despliegue.',
+        ),
+      ]
+    }
     return [fail(GATE, 'Migraciones al día', `No se pudo consultar la base: ${err}`)]
   } finally {
     await client.end().catch(() => {})

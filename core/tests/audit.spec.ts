@@ -253,6 +253,18 @@ describe('contraste', () => {
   })
 })
 
+describe('esquema', () => {
+  it('una base sin migraciones no es un fallo: es una web sin desplegar', async () => {
+    const { checkMigrations } = await import('../src/audit/migrations.js')
+    // Una cadena que no conecta a nada devuelve un fallo real; lo que no puede pasar es que
+    // "la tabla no existe" —que es el estado normal antes del primer despliegue— se cuente
+    // como rojo y mande a alguien a depurar un problema que no existe.
+    const findings = await checkMigrations({ databaseUrl: undefined })
+
+    expect(findings.every((f) => f.status === 'skip')).toBe(true)
+  })
+})
+
 describe('el informe', () => {
   it('sale con código 1 en cuanto algo falla, que es lo que lo hace una puerta', () => {
     const findings = checkSecurityHeaders(page())

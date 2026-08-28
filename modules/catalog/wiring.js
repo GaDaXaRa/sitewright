@@ -161,7 +161,7 @@ export default async function CatalogDetailPage({
           title,
           summary: 'Dos o tres líneas contando de qué va. Esto es un ejemplo: cámbialo.',
           body: [{ text: 'Aquí va la explicación larga, la que se lee en su propia página.' }],
-          order: i,
+          order: i,${m.dated ? '\n          publishedAt: new Date().toISOString(),' : ''}
         },
       })
     }

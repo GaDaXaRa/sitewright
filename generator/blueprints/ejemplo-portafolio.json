@@ -1,0 +1,96 @@
+{
+  "identity": {
+    "id": "marta-ibanez",
+    "name": "Marta Ibáñez",
+    "url": "https://martaibanez.example",
+    "schemaType": "Person",
+    "email": "hola@martaibanez.example",
+    "city": "Valencia",
+    "tagline": "Ilustración editorial y cartelería"
+  },
+  "modules": {
+    "catalog": {
+      "labels": { "singular": "Proyecto", "plural": "Proyectos" },
+      "route": "/proyectos",
+      "title": "Trabajos",
+      "dated": true
+    },
+    "reviews": {
+      "labels": { "singular": "Cliente", "plural": "Clientes" },
+      "title": "Con quién he trabajado"
+    },
+    "faq": {
+      "labels": { "singular": "Pregunta frecuente", "plural": "Preguntas frecuentes" },
+      "route": "/preguntas-frecuentes",
+      "title": "Cómo trabajo"
+    },
+    "contact": {
+      "labels": { "singular": "Encargo", "plural": "Encargos" },
+      "title": "Encargos",
+      "askCity": false,
+      "kinds": {
+        "editorial": "Ilustración editorial",
+        "poster": "Cartel",
+        "book": "Libro o portada",
+        "other": "Otra cosa"
+      }
+    }
+  },
+  "design": {
+    "scheme": "light",
+    "altExample": "Ilustración a doble página para una revista",
+    "palette": {
+      "ground": "#fbfaf7",
+      "ground2": "#f3f0e9",
+      "surface": "#ffffff",
+      "surface2": "#f6f3ec",
+      "ink": "#141312",
+      "inkSoft": "#4b4844",
+      "inkFaint": "#6d6963",
+      "line": "#e2ddd3",
+      "accent": "#b3402c",
+      "accentSoft": "#c9553f"
+    },
+    "fonts": {
+      "display": { "family": "Fraunces", "weights": ["600", "700"] },
+      "body": { "family": "Public Sans", "weights": ["400", "500", "600"] }
+    },
+    "sections": ["catalog", "reviews", "faq", "contact"]
+  },
+  "legal": {
+    "holder": "Marta Ibáñez Soler",
+    "id": "00000000X",
+    "address": "Valencia"
+  },
+  "contentStatus": "borrador",
+  "content": {
+    "settings": {
+      "heroEyebrow": "Ilustración · Valencia",
+      "heroTitle": "Marta Ibáñez",
+      "heroText": "Dibujo para revistas, carteles y portadas. Trabajo por encargo y contesto a todo.",
+      "seoTitle": "Marta Ibáñez — ilustradora editorial en Valencia",
+      "seoDescription": "Ilustración editorial, cartelería y portadas de libro. Trabajo por encargo desde Valencia para editoriales, revistas y festivales.",
+      "contactText": "Cuéntame qué necesitas y para cuándo. Si el encargo no me encaja, te digo con quién hablar."
+    },
+    "faq": [
+      {
+        "question": "¿Cómo se pide un encargo?",
+        "answer": "Escribiéndome por el formulario con la idea, el formato y la fecha. Contesto en dos o tres días con un presupuesto.",
+        "order": 0,
+        "active": true
+      },
+      {
+        "question": "¿Trabajas fuera de Valencia?",
+        "answer": "Sí, la mayoría de encargos son a distancia. Solo hace falta vernos si el proyecto lo pide.",
+        "order": 1,
+        "active": true
+      },
+      {
+        "question": "¿Cuánto se tarda?",
+        "answer": "Una ilustración suelta, una o dos semanas. Un encargo con varias piezas, depende: lo hablamos antes de empezar.",
+        "order": 2,
+        "active": true
+      }
+    ]
+  }
+}
