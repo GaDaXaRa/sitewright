@@ -25,6 +25,12 @@ export const site = {
     privacy: '/privacidad',
     cookies: '/cookies',
   } as Record<string, string>,
+
+  /** The menu: one entry per module with a page of its own. */
+  nav: [] as { href: string; label: string }[],
+
+  /** The one loud action, when the site has one. */
+  cta: null as { href: string; label: string } | null,
 } as const
 
 /** Routes whose content is generated and therefore goes stale with any edit. */

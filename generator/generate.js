@@ -32,10 +32,18 @@ const fontWeights = (font, fallback) =>
 
 // ── site.config.ts ──────────────────────────────────────────────────────────────────────
 
-function siteConfig(bp, modules) {
+function siteConfig(bp, modules, wirings) {
   const routes = Object.entries(modules)
     .filter(([, m]) => m.route)
     .map(([id, m]) => `    ${id}: '${m.route}',`)
+
+  // The menu belongs to the site, not to a page: the home and every inner page paint the
+  // same one, and an inner page that quietly loses it is a dead end.
+  const nav = wirings
+    .map((w) => w.navLink?.(modules[w.id]))
+    .filter(Boolean)
+    .map((link) => `    { href: '${link.href}', label: '${link.label}' },`)
+  const cta = wirings.map((w) => w.navCta?.(modules[w.id])).find(Boolean)
 
   return `/**
  * Everything the core cannot know, in one file. Written by the generator from the blueprint
@@ -52,6 +60,12 @@ ${routes.join('\n')}
     privacy: '/privacidad',
     cookies: '/cookies',
   } as Record<string, string>,
+
+  nav: [
+${nav.join('\n')}
+  ] as { href: string; label: string }[],
+
+  cta: ${cta ? `{ href: '${cta.href}', label: '${cta.label}' }` : 'null'} as { href: string; label: string } | null,
 } as const
 
 /** Routes whose content is generated and therefore goes stale with any edit. */
@@ -239,9 +253,8 @@ ${overlays.map((w) => `      ${w.overlayRender()}`).join('\n')}
       <Nav
         name={settings.siteName}
         logoUrl={mediaUrl(settings.logo)}
-        links={[
-${navLinks.join('\n')}
-        ]}${cta ? `\n        cta={{ href: '${cta.href}', label: '${cta.label}' }}` : ''}
+        links={[...site.nav]}
+        cta={site.cta ?? undefined}
       />
 
       <Hero
@@ -258,12 +271,7 @@ ${cta ? `        actions={[{ href: '${cta.href}', label: '${cta.label}' }]}\n` :
 
 ${sectioned.map((w) => `      ${w.sectionRender(modules[w.id], bp)}`).join('\n\n')}
 
-      <Footer
-        settings={settings}
-        links={[
-${navLinks.join('\n')}
-        ]}
-      />
+      <Footer settings={settings} links={[...site.nav]} />
     </>
   )
 }
@@ -485,6 +493,21 @@ function applyPalette(css, design) {
   return out
 }
 
+/**
+ * Each module's own styles, appended to the site's stylesheet.
+ *
+ * The section belongs to the module, and so do the class names it renders: shipping one
+ * without the other is how a catalogue ends up on a live page as an unstyled list of links.
+ */
+function moduleStyles(css, target, modules) {
+  const parts = Object.keys(modules)
+    .map((id) => join(ROOT, 'modules', id, 'section.css'))
+    .filter((path) => existsSync(path))
+    .map((path) => readFileSync(path, 'utf8'))
+
+  return parts.length ? `${css}\n${parts.join('\n')}` : css
+}
+
 function applyFonts(layout, design) {
   const display = fontImport(design.fonts.display)
   const body = fontImport(design.fonts.body)
@@ -553,7 +576,7 @@ for (const id of Object.keys(modules)) {
   wirings.push(wiring)
   cpSync(join(ROOT, 'modules', id), join(target, 'src/modules', id), {
     recursive: true,
-    filter: (src) => !/module\.json|wiring\.js|package\.json/.test(src),
+    filter: (src) => !/module\.json|wiring\.js|package\.json|section\.css/.test(src),
   })
   // Titles default to the plural label: the client's own word for the thing.
   modules[id].title = modules[id].title ?? modules[id].labels.plural
@@ -562,7 +585,7 @@ for (const id of Object.keys(modules)) {
 const read = (path) => readFileSync(join(target, path), 'utf8')
 const write = (path, content) => writeFileSync(join(target, path), content)
 
-write('src/site.config.ts', siteConfig(bp, modules))
+write('src/site.config.ts', siteConfig(bp, modules, wirings))
 write('src/payload.config.ts', payloadConfig(read('src/payload.config.ts'), bp, modules, wirings))
 write('src/globals/SiteSettings.ts', siteSettings(read('src/globals/SiteSettings.ts'), bp, modules, wirings))
 write('src/lib/data.ts', dataLoader(bp, modules, wirings))
@@ -571,7 +594,10 @@ write('src/app/llms.txt/route.ts', llmsRoute(bp, modules, wirings))
 write('src/app/sitemap.ts', sitemap(read('src/app/sitemap.ts'), bp, modules, wirings))
 write('scripts/seed.ts', seedScript(bp, modules, wirings))
 const pages = writeModulePages(target, bp, modules, wirings, write)
-write('src/app/(frontend)/styles.css', applyPalette(read('src/app/(frontend)/styles.css'), bp.design))
+write(
+  'src/app/(frontend)/styles.css',
+  moduleStyles(applyPalette(read('src/app/(frontend)/styles.css'), bp.design), target, modules),
+)
 write('src/app/(frontend)/layout.tsx', applyFonts(read('src/app/(frontend)/layout.tsx'), bp.design))
 
 const pkg = JSON.parse(read('package.json'))

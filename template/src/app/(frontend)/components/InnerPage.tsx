@@ -2,6 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import type { SiteSetting } from '@/payload-types'
 import { mediaUrl } from '@sitewright/core'
+import { site } from '@/site.config'
 
 import Nav from './Nav'
 import Footer from './Footer'
@@ -26,7 +27,12 @@ export default function InnerPage({
 }) {
   return (
     <>
-      <Nav name={settings?.siteName ?? 'Subsuelo'} logoUrl={mediaUrl(settings?.logo)} />
+      <Nav
+        name={settings?.siteName ?? site.name}
+        logoUrl={mediaUrl(settings?.logo)}
+        links={[...site.nav]}
+        cta={site.cta ?? undefined}
+      />
 
       <article className="inner">
         <header className="inner-head">

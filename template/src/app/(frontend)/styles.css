@@ -343,20 +343,25 @@ img {
 .hero-bg {
   position: absolute;
   inset: 0;
+  /* Built from the tokens, not from fixed colours: with a light palette the hardcoded dark
+     gradient left the title unreadable, and no gate catches that — the contrast check
+     measures tokens, not text over a gradient. */
   background:
     radial-gradient(120% 80% at 15% 100%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 60%),
-    linear-gradient(160deg, #17171c, #0b0b0d);
+    linear-gradient(160deg, var(--surface-2), var(--ground));
 }
 
 .hero-overlay {
   position: absolute;
   inset: 0;
   z-index: 1;
+  /* A veil of the page's own ground, so the title keeps its contrast over a photo whether
+     the site is dark or light. */
   background: linear-gradient(
     180deg,
-    rgba(11, 11, 13, 0.55) 0%,
-    rgba(11, 11, 13, 0.35) 40%,
-    rgba(11, 11, 13, 0.92) 100%
+    color-mix(in srgb, var(--ground) 55%, transparent) 0%,
+    color-mix(in srgb, var(--ground) 35%, transparent) 40%,
+    color-mix(in srgb, var(--ground) 92%, transparent) 100%
   );
 }
 

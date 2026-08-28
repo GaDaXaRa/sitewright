@@ -281,9 +281,30 @@ escribir, un sitio sin titular legal. Diez pruebas con `node --test`, sin depend
   saludando al cliente en su web nueva es lo primero que tendría que ir a apagar), y las
   tarifas traen una **"a convenir"** a propósito, que es el caso que nunca debe publicarse
   como Offer y así la auditoría lo ve desde el primer día.
-- **De blueprint a web desplegada**: sigue sin probarse. Necesita una base de datos, y eso
-  se destraba con una API key de Neon (ver abajo).
+- **De blueprint a web desplegada**: **probado**. Con una API key de Neon se creó el proyecto
+  `raiz-ejemplo` con sus dos ramas, se generó el sitio del blueprint, se migró, se sembró, se
+  arrancó y **pasó la auditoría: 34 puertas, cero fallos**, con la comprobación de esquema
+  hecha contra la rama de producción.
 
 31. **`neonctl` funciona sin navegador con `NEON_API_KEY`**, así que un agente puede crear
     proyecto y ramas sin depender de un login interactivo. Es lo que faltaba para cerrar el
     hito de verdad.
+
+
+## Lo que enseñó cerrar los huecos
+
+32. **La paleta no llegaba al hero.** El degradado de respaldo y el velo estaban escritos con
+    colores fijos oscuros, así que en una paleta clara el titular quedaba ilegible — y
+    **ninguna puerta lo caza**: el contraste mide tokens, no texto sobre un degradado. Ahora
+    ambos se construyen con `color-mix` sobre los tokens del sitio.
+33. **Un módulo tiene que traer su CSS.** Las secciones de catálogo y precios pintaban clases
+    que la hoja base no tenía y salían como una lista de enlaces subrayados. Cada módulo trae
+    su `section.css` y el generador lo añade a la hoja del sitio.
+34. **El menú es del sitio, no de la portada.** Las páginas interiores lo perdían y quedaban
+    sin salida. Vive en `site.config.ts`, y lo pintan igual la portada y el armazón interior.
+35. **La marca de modo dev aparece en cuanto arrancas `npm run dev` contra la rama de
+    producción**, y le pasa a cada sitio nuevo. La cura no es limpiarla: son **dos ramas desde
+    el minuto uno**, que es lo que ahora prescribe `provision.js` y lo que se hizo en el
+    ejemplo.
+36. **La auditoría de esquema hay que pasarla contra producción**, no contra desarrollo: la
+    rama de dev tendrá marcas por definición, y son inofensivas ahí.

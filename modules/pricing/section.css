@@ -1,0 +1,52 @@
+/* Precios: una tarjeta por tarifa, con la destacada marcada por el acento. */
+.prices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: clamp(16px, 2.5vw, 28px);
+}
+
+.price {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: clamp(20px, 3vw, 28px);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+
+.price-highlighted {
+  border-color: var(--accent);
+}
+
+.price h3 {
+  font-size: 20px;
+}
+
+.price-amount {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(24px, 3vw, 32px);
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.price-text {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 15.5px;
+}
+
+.price-includes {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--ink-soft);
+  font-size: 15px;
+  display: grid;
+  gap: 4px;
+}
+
+.price .btn {
+  margin-top: auto;
+  align-self: flex-start;
+}
