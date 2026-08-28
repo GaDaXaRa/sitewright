@@ -19,6 +19,16 @@ export { slugify } from './lib/slug.js'
 export { joinWithAnd } from './lib/list.js'
 export { escapeHtml } from './lib/html.js'
 
+// The site's icon
+export {
+  buildIcons,
+  defaultIconSvg,
+  initials,
+  CMS_ICON_ROUTE,
+  type IconSettings,
+  type IconDescriptor,
+} from './lib/icons.js'
+
 // Laying out a page
 export { alternateTones, type Tone } from './lib/sectionTones.js'
 

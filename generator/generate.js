@@ -3,6 +3,7 @@ import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } fr
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { sectionOrder, validateBlueprint } from './schema.js'
+import { defaultIconSvg } from '../core/dist/index.js'
 
 /**
  * From a blueprint to a site on disk.
@@ -648,6 +649,19 @@ write(
   ),
 )
 
+// The default icon, from what the blueprint already knows. It is a placeholder — the
+// client replaces it from the panel — but a placeholder with the site's initials and colour
+// beats inheriting somebody else's favicon, which is what every generated site did until a
+// third one made it obvious.
+write(
+  'public/icon.svg',
+  defaultIconSvg({
+    name: bp.identity.name,
+    accent: bp.design.palette.accent,
+    ground: bp.design.palette.ground,
+  }),
+)
+
 const pkg = JSON.parse(read('package.json'))
 pkg.name = bp.identity.id
 pkg.description = `Web de ${bp.identity.name}`
@@ -669,7 +683,7 @@ Sitio generado en ${target}
 Lo que falta, y no lo hace el generador:
 
   1. cp .env.example .env  y pon DATABASE_URL (una rama de Neon para este sitio)
-  2. npm install --install-links && npm run generate:types
+  2. npm install && npm run generate:types && npm run icons
   3. npm run migrate:create -- initial && npm run migrate
   4. npm run seed        (usuario del panel y ajustes)
   5. npm run dev         y escribe los textos en /admin

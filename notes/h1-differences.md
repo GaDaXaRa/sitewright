@@ -407,3 +407,30 @@ ya están arreglados y que ninguna cantidad de compilar habría enseñado.
 47. **Un `export` repetido en el `~/.zshrc` gana el último, no el primero.** Al leer la
     primera coincidencia estaba usando el token viejo mientras la terminal usaba el nuevo:
     mismo fichero, dos verdades distintas.
+
+
+---
+
+# El icono del sitio (v0.2 del núcleo)
+
+Todos los sitios generados heredaban el favicon de la web de la que salió la plantilla. Se
+arregla en dos piezas, y la restricción que manda es vieja conocida:
+
+- **La dirección tiene que ser estable.** Dentro de la carpeta de la app, Next le pone un
+  hash que cambia en cada despliegue, y Google necesita una URL fija para asociar el icono
+  al sitio: mientras no la tiene, enseña el globo genérico. Por eso los ficheros viven en
+  `public/` y la subida del CMS **no** se sirve desde su dirección del almacén —que cambia
+  con cada subida— sino desde una ruta fija, `/icono.png`.
+- **El cliente lo cambia sin desplegar**: un campo `favicon` en Ajustes y esa ruta sirviendo
+  sus bytes.
+
+El generador escribe `public/icon.svg` con las iniciales del nombre sobre el color de acento
+del blueprint, y `npm run icons` lo convierte en `favicon.ico` (48×48, que es lo que Google
+pide), `apple-icon.png`, `icon-192.png` e `icon-512.png`.
+
+48. **Un `metadata` estático y un `generateMetadata` no pueden convivir** en el mismo
+    segmento: Next lo rechaza. Lo que no depende del CMS se queda en una constante privada
+    y se mezcla dentro de `generateMetadata`.
+49. **npm sirve la versión cacheada aunque el `package.json` pida otra.** Tras publicar
+    0.2.0, la plantilla siguió instalando 0.1.0 hasta pedirla explícitamente con
+    `--prefer-online`. Media hora de "pero si ya está publicado".

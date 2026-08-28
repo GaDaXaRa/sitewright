@@ -10,6 +10,7 @@
     "devsafe": "rm -rf .next && cross-env NODE_OPTIONS=--no-deprecation next dev",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
+    "icons": "node scripts/icons.mjs",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
     "typecheck": "cross-env NODE_OPTIONS=--no-deprecation tsc --noEmit",
     "migrate": "cross-env NODE_OPTIONS=--no-deprecation payload migrate",
@@ -36,7 +37,6 @@
     "@payloadcms/storage-vercel-blob": "3.88.0",
     "@payloadcms/translations": "3.88.0",
     "@payloadcms/ui": "3.88.0",
-    "sitewright-core": "^0.1.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/blob": "^2.8.0",
     "@vercel/speed-insights": "^2.0.0",
@@ -47,7 +47,8 @@
     "payload": "3.88.0",
     "react": "19.2.6",
     "react-dom": "19.2.6",
-    "sharp": "0.35.3"
+    "sharp": "0.35.3",
+    "sitewright-core": "^0.2.0"
   },
   "devDependencies": {
     "@playwright/test": "1.58.2",

@@ -19,6 +19,16 @@ export const SiteSettings: GlobalConfig = {
     { name: 'tagline', label: 'Eslogan', type: 'text' },
     { name: 'logo', label: 'Logo', type: 'upload', relationTo: 'media' },
     {
+      name: 'favicon',
+      label: 'Icono del navegador',
+      type: 'upload',
+      relationTo: 'media',
+      admin: {
+        description:
+          'El cuadradito que sale en la pestaña y en los resultados de Google. Cuadrado y de 512x512 como mínimo; si lo dejas vacío se usa el que se generó con las iniciales.',
+      },
+    },
+    {
       // What the business *is*, in the vocabulary search engines use. Getting it right is
       // what puts dates in the events box or a studio on the map, instead of leaving the
       // pages as anonymous documents.

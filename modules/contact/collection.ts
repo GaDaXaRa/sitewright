@@ -142,6 +142,10 @@ export function contactCollection({
           },
         ] as Field[])
       : []),
+    // `interestIn` names a collection ('catalog' | 'pricing') that only exists in the
+    // generated project when that module is enabled — Payload's own CollectionSlug type
+    // for this specific site won't know about it otherwise, so the cast goes through
+    // `unknown`: relationTo is only ever set from this same module list, never from input.
     ...(interestIn
       ? ([
           {
@@ -151,7 +155,7 @@ export function contactCollection({
             relationTo: interestIn,
             admin: { description: 'Lo que eligió en el formulario.' },
           },
-        ] as Field[])
+        ] as unknown as Field[])
       : []),
     ...(askCity ? ([{ name: 'city', label: 'Ciudad', type: 'text' }] as Field[]) : []),
     ...(askDate

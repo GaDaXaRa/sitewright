@@ -2,6 +2,7 @@ import React from 'react'
 import type { Metadata } from 'next'
 import { Public_Sans } from 'next/font/google'
 import { SITE_URL } from '@/lib/site'
+import { buildIcons } from 'sitewright-core'
 import { loadSettings } from '@/lib/data'
 import { site } from '@/site.config'
 import { ConsentProvider } from 'sitewright-core/ui'
@@ -19,7 +20,14 @@ const body = Public_Sans({
 
 const display = body
 
-export const metadata: Metadata = {
+/**
+ * Everything in the metadata that does not depend on the CMS.
+ *
+ * It is not exported: Next refuses a segment that exports both `metadata` and
+ * `generateMetadata`, and the icons have to be resolved per request because the client can
+ * change them from the panel.
+ */
+const base: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: site.name,
@@ -27,21 +35,13 @@ export const metadata: Metadata = {
   },
   applicationName: site.name,
   alternates: { canonical: '/' },
-  // Fixed addresses on purpose. With the icon inside the app folder, Next gives it a hash
-  // that changes on every deploy, and Google needs a stable address to associate the
-  // favicon with the site — otherwise the results show the generic globe. The .ico is
-  // 48x48, the size Google asks for.
-  icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: '48x48', type: 'image/x-icon' },
-      { url: '/icon.svg', type: 'image/svg+xml' },
-      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
-      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
-    ],
-    apple: [{ url: '/apple-icon.png', sizes: '180x180', type: 'image/png' }],
-  },
   openGraph: { type: 'website', locale: 'es_ES', siteName: site.name, url: '/' },
   twitter: { card: 'summary_large_image' },
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await loadSettings()
+  return { ...base, icons: buildIcons(settings) }
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
