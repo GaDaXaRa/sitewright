@@ -10,6 +10,7 @@ export type Person = {
   role?: string | null
   photo?: unknown
   bio?: { text: string }[] | null
+  links?: { label: string; url: string }[] | null
 }
 
 export default function TeamSection({

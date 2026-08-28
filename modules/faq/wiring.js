@@ -12,4 +12,61 @@ export const wiring = {
   jsonldNodes: () => `...(faqs.length ? [faqNode(faqs)] : [])`,
   llmsImport: "import { faqSection } from '@/modules/faq/llms'",
   llmsSection: (m) => `faqSection(faqs, '${m.title}')`,
+
+  indexPage: (m) => ({
+    path: `src/app/(frontend)${m.route}/page.tsx`,
+    source: `import React from 'react'
+import type { Metadata } from 'next'
+
+import InnerPage from '../components/InnerPage'
+import JsonLd from '../components/JsonLd'
+import FaqSection from '@/modules/faq/Section'
+import { faqNode } from '@/modules/faq/jsonld'
+import { loadSiteContent } from '@/lib/data'
+import { buildHomeJsonLd } from '@/lib/jsonLd'
+
+export const revalidate = 300
+
+export const metadata: Metadata = {
+  title: '${m.labels.plural}',
+  alternates: { canonical: '${m.route}' },
+}
+
+export default async function FaqPage() {
+  const { settings, faqs } = await loadSiteContent()
+
+  return (
+    <>
+      <JsonLd
+        data={buildHomeJsonLd(settings, faqs.length ? [faqNode(faqs, '${m.route}#faq')] : [])}
+      />
+      <InnerPage settings={settings} title="${m.labels.plural}">
+        {faqs.length ? (
+          <FaqSection faqs={faqs} title="" context="page" />
+        ) : (
+          <section className="section">
+            <div className="container">
+              <p className="empty">Todavía no hay preguntas publicadas.</p>
+            </div>
+          </section>
+        )}
+      </InnerPage>
+    </>
+  )
+}
+`,
+  }),
+
+  seed: () => `  const faqsCount = await payload.count({ collection: 'faqs' })
+  if (faqsCount.totalDocs === 0) {
+    const examples = [
+      { question: '¿Cómo se contrata?', answer: 'Escribiendo por el formulario. Contestamos en un par de días.' },
+      { question: '¿Cuánto cuesta?', answer: 'Depende de lo que necesites. En Tarifas está lo habitual.' },
+      { question: '¿Dónde estáis?', answer: 'Aquí va la respuesta, con las palabras de quien pregunta.' },
+    ]
+    for (const [i, example] of examples.entries()) {
+      await payload.create({ collection: 'faqs', data: { ...example, order: i, active: true } })
+    }
+    payload.logger.info('3 preguntas de ejemplo')
+  }`,
 }

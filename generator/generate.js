@@ -332,6 +332,132 @@ function siteSettings(template, bp, modules, wirings) {
     : template
 }
 
+// ── scripts/seed.ts ─────────────────────────────────────────────────────────────────────
+
+function seedScript(bp, modules, wirings) {
+  const blocks = wirings
+    .filter((w) => w.seed)
+    .map((w) => w.seed({ ...modules[w.id], city: bp.identity.city }, bp))
+    .join('\n\n')
+
+  return `import { getPayload } from 'payload'
+import config from '../src/payload.config'
+import { site } from '../src/site.config'
+
+/**
+ * Example content, so the site can be looked at before ${bp.identity.name} has written a
+ * word — and so the client sees what a filled-in field is supposed to look like.
+ *
+ * Idempotent by collection: running it twice duplicates nothing. **Never against
+ * production**: it leaves a dev-mode mark in \`payload_migrations\` that stops
+ * \`payload migrate\` during the build.
+ */
+export const seed = async () => {
+  const payload = await getPayload({ config: await config })
+
+  const users = await payload.count({ collection: 'users' })
+  if (users.totalDocs === 0) {
+    const email = process.env.SEED_EMAIL || \`admin@\${site.id}.es\`
+    const password = process.env.SEED_PASSWORD || 'cambiame-ahora'
+    await payload.create({ collection: 'users', data: { email, password } })
+    payload.logger.info(\`Usuario creado: \${email}\`)
+  }
+
+  await payload.updateGlobal({
+    slug: 'site-settings',
+    data: {
+      siteName: site.name,
+      ${bp.identity.tagline ? `tagline: '${bp.identity.tagline}',\n      ` : ''}${bp.identity.email ? `email: '${bp.identity.email}',\n      ` : ''}${bp.identity.city ? `city: '${bp.identity.city}',\n      ` : ''}${bp.identity.schemaType ? `schemaType: '${bp.identity.schemaType}',\n      ` : ''}legalHolder: '${bp.legal.holder}',
+      ${bp.legal.id ? `legalId: '${bp.legal.id}',\n      ` : ''}${bp.legal.address ? `legalAddress: '${bp.legal.address}',\n      ` : ''}analyticsConsent: true,
+    },
+  })
+
+${blocks}
+
+  payload.logger.info('Seed completado.')
+  process.exit(0)
+}
+
+await seed()
+`
+}
+
+// ── module pages ────────────────────────────────────────────────────────────────────────
+
+function writeModulePages(target, bp, modules, wirings, write) {
+  const written = []
+  for (const w of wirings) {
+    for (const build of [w.indexPage, w.detailPage]) {
+      if (!build) continue
+      const page = build(modules[w.id], bp)
+      mkdirSync(join(target, dirname(page.path)), { recursive: true })
+      write(page.path, page.source)
+      written.push(page.path)
+    }
+  }
+  return written
+}
+
+// ── sitemap ─────────────────────────────────────────────────────────────────────────────
+
+function sitemap(template, bp, modules, wirings) {
+  const fixed = Object.values(modules)
+    .filter((m) => m.route)
+    .map(
+      (m) =>
+        `    {\n      url: \`\${SITE_URL}${m.route}\`,\n      lastModified: new Date(),\n      changeFrequency: 'weekly',\n      priority: 0.8,\n    },`,
+    )
+    .join('\n')
+
+  // Modules with a page per document need the database, so they go inside the try/catch:
+  // with it unreachable the fixed pages must still come out.
+  const perDocument = wirings
+    .filter((w) => w.detailPage)
+    .map((w) => {
+      const m = modules[w.id]
+      const collection = w.id === 'team' ? 'team' : 'catalog'
+      return `      const ${w.id}Docs = await payload.find({ collection: '${collection}', limit: 200, depth: 0 })
+      for (const doc of ${w.id}Docs.docs) {
+        if (doc.slug) {
+          entries.push({
+            url: \`\${SITE_URL}${m.route}/\${doc.slug}\`,
+            lastModified: doc.updatedAt ? new Date(doc.updatedAt) : new Date(),
+            changeFrequency: 'monthly',
+            priority: 0.7,
+          })
+        }
+      }`
+    })
+    .join('\n\n')
+
+  let out = template.replace(
+    "  // The generator adds one entry per module page here.",
+    fixed,
+  )
+
+  if (perDocument) {
+    out = out.replace(
+      `import type { MetadataRoute } from 'next'`,
+      `import type { MetadataRoute } from 'next'\nimport { getPayload } from 'payload'\nimport config from '@/payload.config'`,
+    ).replace(
+      `  // Modules with a page per document (a member, a project) add their entries here, inside
+  // a try/catch: with the database unavailable, the fixed pages must still be returned.
+`,
+      `  try {
+    const payload = await getPayload({ config: await config })
+
+${perDocument}
+  } catch {
+    // With the database unavailable, at least the fixed pages are returned.
+  }
+
+`,
+    )
+  }
+
+  return out
+}
+
 // ── design ──────────────────────────────────────────────────────────────────────────────
 
 function applyPalette(css, design) {
@@ -427,7 +553,7 @@ for (const id of Object.keys(modules)) {
   wirings.push(wiring)
   cpSync(join(ROOT, 'modules', id), join(target, 'src/modules', id), {
     recursive: true,
-    filter: (src) => !/module\.json|wiring\.js/.test(src),
+    filter: (src) => !/module\.json|wiring\.js|package\.json/.test(src),
   })
   // Titles default to the plural label: the client's own word for the thing.
   modules[id].title = modules[id].title ?? modules[id].labels.plural
@@ -442,6 +568,9 @@ write('src/globals/SiteSettings.ts', siteSettings(read('src/globals/SiteSettings
 write('src/lib/data.ts', dataLoader(bp, modules, wirings))
 write('src/app/(frontend)/page.tsx', homePage(bp, modules, wirings, order))
 write('src/app/llms.txt/route.ts', llmsRoute(bp, modules, wirings))
+write('src/app/sitemap.ts', sitemap(read('src/app/sitemap.ts'), bp, modules, wirings))
+write('scripts/seed.ts', seedScript(bp, modules, wirings))
+const pages = writeModulePages(target, bp, modules, wirings, write)
 write('src/app/(frontend)/styles.css', applyPalette(read('src/app/(frontend)/styles.css'), bp.design))
 write('src/app/(frontend)/layout.tsx', applyFonts(read('src/app/(frontend)/layout.tsx'), bp.design))
 
@@ -456,6 +585,7 @@ console.log(`
 Sitio generado en ${target}
 
   ${Object.keys(modules).length} módulos: ${Object.keys(modules).join(', ')}
+  ${pages.length} páginas propias: ${pages.map((p) => p.replace('src/app/(frontend)', '')).join(', ')}
   Paleta y tipografías aplicadas · rutas y etiquetas escritas en src/site.config.ts
 
 Lo que falta, y no lo hace el generador:

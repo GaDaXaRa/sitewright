@@ -13,4 +13,19 @@ export const wiring = {
   // Not a section: it is an overlay, so it is painted before everything and takes no tone.
   overlay: true,
   overlayRender: () => `<NoticePopup notice={notice} siteId={site.id} />`,
+
+  // Created switched **off**: a pop-up that greets the client on their own new site, with
+  // example text in it, is the first thing they would have to hunt down.
+  seed: () => `  const noticesCount = await payload.count({ collection: 'notices' })
+  if (noticesCount.totalDocs === 0) {
+    await payload.create({
+      collection: 'notices',
+      data: {
+        title: 'Aviso de ejemplo',
+        text: 'Escribe aquí lo que quieras anunciar y marca "Activo" cuando toque.',
+        active: false,
+      },
+    })
+    payload.logger.info('1 aviso de ejemplo (desactivado)')
+  }`,
 }

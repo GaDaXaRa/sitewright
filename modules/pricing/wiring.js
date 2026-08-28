@@ -15,4 +15,53 @@ export const wiring = {
   llmsImport: "import { pricingSection } from '@/modules/pricing/llms'",
   llmsSection: (m) => `pricingSection(pricing, '${m.title}')`,
   navLink: (m) => ({ href: m.route, label: m.labels.plural }),
+
+  indexPage: (m, bp) => ({
+    path: `src/app/(frontend)${m.route}/page.tsx`,
+    source: `import React from 'react'
+import type { Metadata } from 'next'
+
+import InnerPage from '../components/InnerPage'
+import JsonLd from '../components/JsonLd'
+import PricingSection from '@/modules/pricing/Section'
+import { pricingNodes } from '@/modules/pricing/jsonld'
+import { loadSiteContent } from '@/lib/data'
+import { buildHomeJsonLd } from '@/lib/jsonLd'
+
+export const revalidate = 300
+
+export const metadata: Metadata = {
+  title: '${m.labels.plural}',
+  alternates: { canonical: '${m.route}' },
+}
+
+export default async function PricingPage() {
+  const { settings, pricing } = await loadSiteContent()
+
+  return (
+    <>
+      <JsonLd data={buildHomeJsonLd(settings, pricingNodes(pricing, '${m.route}', '${m.title}'))} />
+      <InnerPage settings={settings} title="${m.labels.plural}">
+        <PricingSection prices={pricing} title=""${bp.modules.contact ? ' ctaHref="/#contacto"' : ''} />
+      </InnerPage>
+    </>
+  )
+}
+`,
+  }),
+
+  seed: (m) => `  const pricingCount = await payload.count({ collection: 'pricing' })
+  if (pricingCount.totalDocs === 0) {
+    const examples = [
+      { name: 'Básica', price: 20, period: 'al mes', order: 0 },
+      { name: 'Completa', price: 35, period: 'al mes', order: 1, highlighted: true },
+      // One "a convenir" on purpose: it is the case that must never be published as an
+      // Offer, and having it in the seed means the audit sees it from day one.
+      { name: 'A medida', priceKind: 'agreed' as const, order: 2 },
+    ]
+    for (const example of examples) {
+      await payload.create({ collection: 'pricing', data: { ...example, active: true } })
+    }
+    payload.logger.info('3 ${m.labels.plural.toLowerCase()} de ejemplo')
+  }`,
 }

@@ -269,11 +269,21 @@ escribir, un sitio sin titular legal. Diez pruebas con `node --test`, sin depend
     orden no se puede adivinar: la dirección pública de un proyecto de Vercel solo se sabe
     **después** del primer despliegue.
 
-## Lo que falta de H5
+## Los tres huecos, cerrados (dos de tres)
 
-- **Contenido de ejemplo por módulo** (`seed.ts`): sigue declarado y sin escribir, así que un
-  sitio recién generado nace vacío del todo.
-- **Las páginas propias de cada módulo** (`/actividades/[slug]`, `/calendario`): el menú las
-  enlaza y todavía no existen, así que hoy darían 404.
-- **De blueprint a web desplegada**: lo generado compila, pero no se ha ejecutado contra una
-  base de datos ni desplegado. Falta una rama de Neon para el sitio de ejemplo.
+- **Páginas propias**: hechas. Cada módulo trae su índice y, cuando tiene sentido, su ficha
+  (`indexPage` / `detailPage` en su `wiring.js`). El sitio de ejemplo compila con
+  `/actividades`, `/actividades/[slug]`, `/calendario`, `/cuotas`, `/junta/[slug]` y
+  `/preguntas-frecuentes`, y el sitemap las incluye — las de ficha dentro del `try`, porque
+  necesitan base de datos y las fijas tienen que salir igual sin ella.
+- **Contenido de ejemplo**: hecho. Cada módulo aporta su `seed`, y el generador los reúne.
+  Dos decisiones dentro: el aviso emergente nace **desactivado** (un pop-up de ejemplo
+  saludando al cliente en su web nueva es lo primero que tendría que ir a apagar), y las
+  tarifas traen una **"a convenir"** a propósito, que es el caso que nunca debe publicarse
+  como Offer y así la auditoría lo ve desde el primer día.
+- **De blueprint a web desplegada**: sigue sin probarse. Necesita una base de datos, y eso
+  se destraba con una API key de Neon (ver abajo).
+
+31. **`neonctl` funciona sin navegador con `NEON_API_KEY`**, así que un agente puede crear
+    proyecto y ramas sin depender de un login interactivo. Es lo que faltaba para cerrar el
+    hito de verdad.
