@@ -1,0 +1,250 @@
+import { describe, it, expect } from 'vitest'
+import type { Fetched } from '../src/audit/types.js'
+import {
+  checkCanonicalAnswers,
+  checkIdentity,
+  checkSecurityHeaders,
+  checkSitemapAndRobots,
+  checkStructuredData,
+} from '../src/audit/checks.js'
+import {
+  checkConsentGating,
+  checkContrast,
+  checkImages,
+  checkLegalPages,
+  checkLlmsTxt,
+  contrastRatio,
+  cssTokens,
+} from '../src/audit/checks2.js'
+import { exitCode, renderReport } from '../src/audit/report.js'
+
+const SITE = 'https://ejemplo.es'
+
+const page = (extra: Partial<Fetched> = {}): Fetched => ({
+  url: `${SITE}/`,
+  status: 200,
+  finalUrl: `${SITE}/`,
+  headers: {},
+  body: '',
+  ...extra,
+})
+
+const failures = (findings: { status: string; what: string }[]) =>
+  findings.filter((f) => f.status === 'fail').map((f) => f.what)
+
+/**
+ * The audit is the promise of this whole system, so what has to be tested is not that it
+ * runs: it is that **it catches the specific things that went wrong in production**. Every
+ * case below is one of those.
+ */
+describe('identidad', () => {
+  it('caza el canonical apuntando a otro dominio', () => {
+    // Organic Yoga spent weeks telling Google the good version was a *.vercel.app subdomain.
+    const html = '<link rel="canonical" href="https://sitio-abc123.vercel.app/"/>'
+    expect(failures(checkIdentity(page({ body: html }), SITE))).toContain(
+      'El canonical apunta al dominio del sitio',
+    )
+  })
+
+  it('pasa cuando el canonical es el del sitio', () => {
+    const html = `<link rel="canonical" href="${SITE}/"/>`
+    expect(failures(checkIdentity(page({ body: html }), SITE))).toEqual([])
+  })
+
+  it('caza que no haya canonical en absoluto', () => {
+    expect(failures(checkIdentity(page({ body: '<html></html>' }), SITE))).toHaveLength(1)
+  })
+
+  it('caza el dominio canónico que se redirige a sí mismo', () => {
+    // The loop that took the first deploy down: the middleware matched the *.vercel.app
+    // suffix, and the canonical host was one.
+    const redirected = page({ status: 308, finalUrl: `${SITE}/` })
+    expect(failures(checkCanonicalAnswers(redirected))).toHaveLength(1)
+    expect(failures(checkCanonicalAnswers(page()))).toEqual([])
+  })
+
+  it('caza un sitemap que nombra otro host', () => {
+    const sitemap = page({ body: '<loc>https://otro.es/</loc><loc>https://ejemplo.es/x</loc>' })
+    const robots = page({ body: `Sitemap: ${SITE}/sitemap.xml` })
+    expect(failures(checkSitemapAndRobots(sitemap, robots, SITE))).toContain(
+      'El sitemap solo nombra el dominio del sitio',
+    )
+  })
+})
+
+describe('seguridad', () => {
+  it('caza cada cabecera que falta', () => {
+    expect(failures(checkSecurityHeaders(page()))).toHaveLength(4)
+  })
+
+  it('pasa con las cuatro puestas', () => {
+    const headers = {
+      'x-content-type-options': 'nosniff',
+      'referrer-policy': 'strict-origin-when-cross-origin',
+      'content-security-policy': "frame-ancestors 'none'",
+      'permissions-policy': 'camera=(), microphone=(), geolocation=()',
+    }
+    expect(failures(checkSecurityHeaders(page({ headers })))).toEqual([])
+  })
+
+  it('no se conforma con una CSP que no diga frame-ancestors', () => {
+    const headers = { 'content-security-policy': "default-src 'self'" }
+    expect(failures(checkSecurityHeaders(page({ headers })))).toContain(
+      'Cabecera content-security-policy',
+    )
+  })
+})
+
+describe('datos estructurados', () => {
+  const ld = (graph: object[]) =>
+    `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': graph })}</script>`
+
+  it('caza una referencia @id que no existe en el grafo', () => {
+    const html = ld([
+      { '@type': 'Organization', '@id': `${SITE}/#organization` },
+      { '@type': 'Event', '@id': `${SITE}/e1`, performer: [{ '@id': `${SITE}/miembros/x#person` }] },
+    ])
+    expect(failures(checkStructuredData(page({ body: html }), SITE))).toContain(
+      'Las referencias del grafo resuelven',
+    )
+  })
+
+  it('pasa cuando cada referencia está declarada', () => {
+    const html = ld([
+      { '@type': 'Organization', '@id': `${SITE}/#organization` },
+      { '@type': 'Person', '@id': `${SITE}/equipo/ana#person` },
+      { '@type': 'Event', '@id': `${SITE}/e1`, performer: [{ '@id': `${SITE}/equipo/ana#person` }] },
+    ])
+    expect(failures(checkStructuredData(page({ body: html }), SITE))).toEqual([])
+  })
+
+  it('caza un @id de otro dominio', () => {
+    const html = ld([{ '@type': 'Organization', '@id': 'https://otro.es/#organization' }])
+    expect(failures(checkStructuredData(page({ body: html }), SITE))).toContain(
+      'Los @id son del dominio del sitio',
+    )
+  })
+
+  it('caza que no haya marcado ninguno', () => {
+    expect(failures(checkStructuredData(page({ body: '<html></html>' }), SITE))).toHaveLength(1)
+  })
+
+  it('avisa de una oferta sin precio, que los buscadores descartan', () => {
+    const html = ld([{ '@type': 'Service', offers: { '@type': 'Offer', priceCurrency: 'EUR' } }])
+    const findings = checkStructuredData(page({ body: html }), SITE)
+    expect(findings.some((f) => f.status === 'warn')).toBe(true)
+  })
+})
+
+describe('geo', () => {
+  it('caza lo que se coló y el CMS nunca dijo', () => {
+    const llms = page({ body: '# Sitio\n- Tarifa: undefined €' })
+    expect(failures(checkLlmsTxt(llms))).toContain('No se cuela nada que el CMS no dijo')
+  })
+
+  it('caza que no exista', () => {
+    expect(failures(checkLlmsTxt(page({ status: 404 })))).toHaveLength(1)
+  })
+})
+
+describe('legal y consentimiento', () => {
+  const legal = ['/aviso-legal', '/privacidad', '/cookies'].map((path) =>
+    page({ url: `${SITE}${path}` }),
+  )
+
+  it('caza una página legal que no existe', () => {
+    const missing = [...legal.slice(0, 2), page({ url: `${SITE}/cookies`, status: 404 })]
+    const home = page({ body: legal.map((p) => `<a href="${new URL(p.url).pathname}">x</a>`).join('') })
+    expect(failures(checkLegalPages(missing, home))).toContain('Existe /cookies')
+  })
+
+  it('caza una página legal que existe pero no se enlaza', () => {
+    const home = page({ body: '<a href="/aviso-legal">x</a><a href="/privacidad">x</a>' })
+    expect(failures(checkLegalPages(legal, home))).toContain(
+      'Las páginas legales se enlazan desde la portada',
+    )
+  })
+
+  it('caza un reproductor de terceros servido antes de aceptar', () => {
+    // The gate that turns the cookie banner from theatre into something real.
+    const withPlayer = page({
+      body: '<iframe src="https://w.soundcloud.com/player/?url=x" title="p"></iframe>',
+    })
+    expect(failures(checkConsentGating([withPlayer]))).toHaveLength(1)
+  })
+
+  it('deja pasar el marcador de posición, que no es un iframe', () => {
+    const blocked = page({ body: '<div class="embed-blocked">Aceptar y reproducir</div>' })
+    expect(failures(checkConsentGating([blocked]))).toEqual([])
+  })
+})
+
+describe('imágenes', () => {
+  it('caza una imagen sin texto alternativo', () => {
+    const html = '<img src="/a.webp" alt="Una foto"/><img src="/b.webp"/>'
+    expect(failures(checkImages([page({ body: html })]))).toContain(
+      'Las imágenes llevan texto alternativo',
+    )
+  })
+
+  it('acepta el alt vacío de una imagen decorativa', () => {
+    expect(failures(checkImages([page({ body: '<img src="/a.webp" alt="" width="10"/>' })]))).toEqual(
+      [],
+    )
+  })
+})
+
+describe('contraste', () => {
+  it('mide el gris que suspendió de verdad', () => {
+    // #6f6a64 sobre #0b0b0d daba 3,67:1 y estaba en el pie, las migas y las etiquetas.
+    expect(contrastRatio('#6f6a64', '#0b0b0d')!).toBeCloseTo(3.67, 1)
+    expect(contrastRatio('#8b857d', '#0b0b0d')!).toBeGreaterThan(4.5)
+  })
+
+  it('lee los tokens del CSS aunque haya varios bloques', () => {
+    const css = ':root { --ground: #0b0b0d; --ink: #f2efe9; }\n@media x { :root { --ground: #fff; } }'
+    expect(cssTokens(css)).toMatchObject({ ground: '#0b0b0d', ink: '#f2efe9' })
+  })
+
+  it('falla la paleta que suspende y pasa la que no', () => {
+    const bad = ':root { --ground: #0b0b0d; --ink: #f2efe9; --ink-faint: #6f6a64; }'
+    const good = ':root { --ground: #0b0b0d; --ink: #f2efe9; --ink-faint: #8b857d; }'
+
+    expect(failures(checkContrast(bad))).toContain('--ink-faint sobre --ground')
+    expect(failures(checkContrast(good))).toEqual([])
+  })
+
+  it('no inventa una medida cuando el token no está', () => {
+    const findings = checkContrast(':root { --ground: #0b0b0d; }')
+
+    expect(failures(findings)).toEqual([])
+    // And it says so instead of vanishing: a check that disappears reads like one that
+    // passed. Organic Yoga names its tokens --washi and --sumi, and the gate went silent.
+    expect(findings.every((f) => f.status === 'skip')).toBe(true)
+  })
+
+  it('mide las parejas que se le pasen, para una paleta con otros nombres', () => {
+    const css = ':root { --washi: #f4efe4; --sumi: #262019; }'
+
+    expect(failures(checkContrast(css, [['sumi', 'washi']]))).toEqual([])
+  })
+})
+
+describe('el informe', () => {
+  it('sale con código 1 en cuanto algo falla, que es lo que lo hace una puerta', () => {
+    const findings = checkSecurityHeaders(page())
+    expect(exitCode(findings)).toBe(1)
+    expect(exitCode(checkSecurityHeaders(page({ headers: {
+      'x-content-type-options': 'nosniff',
+      'referrer-policy': 'same-origin',
+      'content-security-policy': 'frame-ancestors none',
+      'permissions-policy': 'camera=()',
+    } })))).toBe(0)
+  })
+
+  it('dice qué se encontró, no solo que falla', () => {
+    const report = renderReport(checkSecurityHeaders(page()))
+    expect(report).toContain('NO pasa la auditoría')
+    expect(report).toContain('No viaja')
+  })
+})

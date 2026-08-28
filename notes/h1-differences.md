@@ -190,3 +190,49 @@ no se importan: es la decisión de núcleo fino, y a partir de ahí son del siti
   admite `contexto`, pero el armazón lo ensambla el generador en H5.
 - El **cupo de inscripciones** que se decidió en la entrevista: el módulo de contacto guarda
   consentimiento y frena el abuso, pero no limita plazas.
+
+
+---
+
+# H4 — la auditoría
+
+`npm run audit` existe, corre contra una web que esté respondiendo y **sale con código 1
+cuando algo falla**, que es lo que la convierte en puerta y no en informe. Vive en el núcleo
+(`@sitewright/core/audit`), con 126 pruebas que comprueban no que funcione, sino que **caza
+los fallos concretos que ocurrieron en producción**.
+
+## Las puertas
+
+| Puerta | Qué mira |
+|---|---|
+| identidad | Canonical, sitemap y robots nombran el mismo host, **y ese host responde 200 en vez de redirigir** |
+| seguridad | `nosniff`, `frame-ancestors`, `Referrer-Policy`, `Permissions-Policy` |
+| datos estructurados | El JSON-LD parsea, declara tipos, sus `@id` son del dominio y **sus referencias resuelven** |
+| geo | `/llms.txt` existe y no se ha colado un `undefined` que el CMS nunca dijo |
+| legal | Las tres páginas existen **y se enlazan desde la portada** |
+| consentimiento | **Ningún iframe de terceros viaja en el HTML antes de aceptar** |
+| imágenes | Todas con texto alternativo; aviso si se sirven sin medidas |
+| contraste | AA sobre los tokens de la paleta, medido |
+| peso | Techo del HTML de cada página |
+| esquema | Sin filas `batch = -1` y con todas las migraciones aplicadas |
+
+## Lo que pasó al estrenarla
+
+23. **Cazó un fallo en caliente, en la primera ejecución**: Subsuelo tenía otra vez la marca
+    `batch = -1` (dev y producción comparten rama, y yo había levantado el servidor). Es
+    exactamente lo que tumbó el primer despliegue, esta vez detectado antes.
+24. **En Organic Yoga cazó su hueco real**: no tiene aviso legal, ni privacidad, ni cookies,
+    y recoge datos personales por formulario. Cuatro puertas en rojo, y ninguna es teórica.
+25. **Una comprobación que no encuentra qué mirar tiene que decirlo.** El contraste
+    desaparecía del informe cuando los tokens se llamaban de otra forma (`--washi`, `--sumi`),
+    y un informe donde una puerta falta se lee igual que uno donde pasa. Ahora sale como "sin
+    comprobar" y admite `--contrast-pairs`.
+26. **Solo se miden parejas de texto**: un borde no se lee, y WCAG le pide 3:1, no 4,5:1.
+    Medir `--line` da un rojo que no es un rojo.
+
+## Lo que la auditoría todavía no mira
+
+- **Accesibilidad de verdad** (axe en un navegador): hoy solo se mide el contraste de la
+  paleta y el texto alternativo. Necesita Playwright y es H4.1.
+- **Rendimiento de verdad** (LCP, CLS): hoy solo hay un techo de peso del HTML.
+- **Que el formulario guarde el consentimiento**: se comprueba el iframe, no el envío.

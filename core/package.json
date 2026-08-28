@@ -19,6 +19,10 @@
     "./ui": {
       "types": "./dist/ui/index.d.ts",
       "import": "./dist/ui/index.js"
+    },
+    "./audit": {
+      "types": "./dist/audit/index.d.ts",
+      "import": "./dist/audit/index.js"
     }
   },
   "files": [
@@ -36,12 +40,14 @@
     "@stryker-mutator/core": "^10.0.0",
     "@stryker-mutator/vitest-runner": "^10.0.0",
     "@types/node": "^22.19.9",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19.2.14",
     "@vercel/analytics": "^2.0.1",
     "@vercel/blob": "^2.8.0",
     "@vercel/speed-insights": "^2.0.0",
     "next": "^16.3.0",
     "payload": "^3.88.0",
+    "pg": "^8.23.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "typescript": "5.7.3",
@@ -52,6 +58,7 @@
     "@vercel/blob": ">=2",
     "next": ">=16",
     "payload": ">=3.88",
+    "pg": ">=8",
     "react": ">=19"
   },
   "peerDependenciesMeta": {
@@ -60,6 +67,12 @@
     },
     "@vercel/blob": {
       "optional": true
+    },
+    "pg": {
+      "optional": true
     }
+  },
+  "bin": {
+    "sitewright-audit": "./dist/audit/cli.js"
   }
 }
