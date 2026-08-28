@@ -236,3 +236,44 @@ los fallos concretos que ocurrieron en producción**.
   paleta y el texto alternativo. Necesita Playwright y es H4.1.
 - **Rendimiento de verdad** (LCP, CLS): hoy solo hay un techo de peso del HTML.
 - **Que el formulario guarde el consentimiento**: se comprueba el iframe, no el envío.
+
+
+---
+
+# H5 — blueprint y generador
+
+`node generate.js --blueprint <fichero> --out <directorio>` escribe un sitio completo, y lo
+escrito **compila**: se generó una asociación cultural de ejemplo (siete módulos, paleta
+clara, tipografía con serifa) y pasó tipos y build sin tocar una línea a mano.
+
+## El blueprint
+
+Tres cosas y una paleta: **identidad**, **módulos** (etiquetas y rutas) y **diseño**, más los
+datos legales. Es pequeño porque la extracción se lo ganó, y su validador comprueba cosas que
+duelen: dos módulos peleándose por la misma ruta, un formulario sin dirección a la que
+escribir, un sitio sin titular legal. Diez pruebas con `node --test`, sin dependencias.
+
+## Lo que enseñó
+
+27. **Un módulo tiene que poder pedir sus propios campos en Ajustes.** El de contacto
+    necesitaba un texto introductorio editable, y no existía forma de añadirlo: el generador
+    ahora inyecta `settingsFields` de cada módulo. Sin eso, lo que el cliente lee lo decide
+    el código, que es justo lo que este sistema evita.
+28. **Las banderas booleanas no llevan valor detrás.** `--force` leía el argumento siguiente
+    —que no existía— y no hacía nada: el generador regeneraba sobre una copia vieja y yo
+    depurando un fallo que ya estaba arreglado.
+29. **El cableado vive con el módulo, no en el generador.** Cada módulo trae su `wiring.js`
+    con los trozos de código que le corresponden; el generador solo los ordena. Es lo que
+    permite añadir un módulo sin tocar el generador.
+30. **El aprovisionamiento se imprime, no se ejecuta.** Toca dinero y cuentas ajenas, y su
+    orden no se puede adivinar: la dirección pública de un proyecto de Vercel solo se sabe
+    **después** del primer despliegue.
+
+## Lo que falta de H5
+
+- **Contenido de ejemplo por módulo** (`seed.ts`): sigue declarado y sin escribir, así que un
+  sitio recién generado nace vacío del todo.
+- **Las páginas propias de cada módulo** (`/actividades/[slug]`, `/calendario`): el menú las
+  enlaza y todavía no existen, así que hoy darían 404.
+- **De blueprint a web desplegada**: lo generado compila, pero no se ha ejecutado contra una
+  base de datos ni desplegado. Falta una rama de Neon para el sitio de ejemplo.

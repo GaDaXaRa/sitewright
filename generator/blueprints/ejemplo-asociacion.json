@@ -1,0 +1,80 @@
+{
+  "identity": {
+    "id": "raiz",
+    "name": "Raíz",
+    "url": "https://raiz.example",
+    "schemaType": "NGO",
+    "email": "hola@raiz.example",
+    "city": "Zaragoza",
+    "tagline": "Asociación cultural de barrio"
+  },
+  "modules": {
+    "catalog": {
+      "labels": { "singular": "Actividad", "plural": "Actividades" },
+      "route": "/actividades",
+      "title": "Qué hacemos"
+    },
+    "schedule": {
+      "labels": { "singular": "Fecha", "plural": "Calendario" },
+      "route": "/calendario",
+      "title": "Próximas fechas",
+      "emptyText": "No hay nada convocado ahora mismo. Escríbenos y te avisamos."
+    },
+    "pricing": {
+      "labels": { "singular": "Cuota", "plural": "Cuotas" },
+      "route": "/cuotas",
+      "title": "Hazte socia"
+    },
+    "team": {
+      "labels": { "singular": "Miembro", "plural": "Junta directiva" },
+      "route": "/junta",
+      "title": "Quiénes somos"
+    },
+    "faq": {
+      "labels": { "singular": "Pregunta frecuente", "plural": "Preguntas frecuentes" },
+      "route": "/preguntas-frecuentes",
+      "title": "Preguntas frecuentes"
+    },
+    "notices": {
+      "labels": { "singular": "Aviso", "plural": "Avisos" },
+      "buttonUrl": "/calendario"
+    },
+    "contact": {
+      "labels": { "singular": "Solicitud", "plural": "Contacto" },
+      "title": "Escríbenos",
+      "askDate": false,
+      "kinds": {
+        "member": "Quiero asociarme",
+        "volunteer": "Quiero echar una mano",
+        "space": "Usar el local",
+        "other": "Otra cosa"
+      }
+    }
+  },
+  "design": {
+    "scheme": "light",
+    "altExample": "El grupo de teatro ensayando en el local",
+    "palette": {
+      "ground": "#f6f4ef",
+      "ground2": "#efece4",
+      "surface": "#ffffff",
+      "surface2": "#f2efe8",
+      "ink": "#1b1a17",
+      "inkSoft": "#4a4741",
+      "inkFaint": "#6b675f",
+      "line": "#dcd7cc",
+      "accent": "#1f5f3f",
+      "accentSoft": "#2c7a53"
+    },
+    "fonts": {
+      "display": { "family": "Bitter", "weights": ["600", "700"] },
+      "body": { "family": "Public Sans", "weights": ["400", "500", "600"] }
+    },
+    "sections": ["catalog", "schedule", "pricing", "team", "faq", "contact"]
+  },
+  "legal": {
+    "holder": "Asociación Cultural Raíz",
+    "id": "G99999999",
+    "address": "Calle de ejemplo 3, 50001 Zaragoza"
+  }
+}

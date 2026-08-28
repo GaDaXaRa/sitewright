@@ -161,5 +161,6 @@ export const SiteSettings: GlobalConfig = {
         },
       ],
     },
+    // The generator appends each module's own settings here.
   ],
 }
