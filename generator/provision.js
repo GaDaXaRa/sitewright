@@ -51,8 +51,14 @@ ${'─'.repeat(14 + name.length)}
    printf 'https://<la-que-responda>' | vercel env add NEXT_PUBLIC_SITE_URL production
    vercel --prod --yes
 
-4. Almacén de imágenes: en el panel de Vercel, Storage → Blob → conectar al proyecto. La
-   CLI no lo crea, y sin él las subidas fallan en producción.
+4. Almacén de imágenes:
+
+   vercel blob create-store ${id}-media --access public --region fra1 --yes
+
+   Público porque se sirven directas desde el CDN, y en Europa porque el valor por defecto
+   es Washington. El comando lo enlaza al proyecto y pone BLOB_READ_WRITE_TOKEN en los tres
+   entornos — y también en tu .env.local, así que las subidas locales pasan a ir al almacén
+   de producción hasta que quites esa línea.
 
 5. Comprobar antes de dar la web por buena:
 

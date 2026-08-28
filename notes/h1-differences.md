@@ -83,8 +83,12 @@ rutas del sitio** y **las etiquetas del negocio**. Ambas salen del blueprint.
 11. **`next build` reutiliza su caché y puede dar en verde lo que Vercel da en rojo.** El
     type-check tiene que ser su propio comando (`npm run typecheck`), y lo que escondía era
     un error real: `.map(eventLine)` metía el índice del array en el parámetro `past`.
-12. **El almacén Blob no se crea desde la CLI**: es un paso de panel. Sin él, subir imágenes
-    falla en producción aunque todo lo demás funcione.
+12. **El almacén Blob sí se crea desde la CLI** — me equivoqué al darlo por imposible: la
+    versión 56 trae `vercel blob create-store`, que en versiones anteriores no existía.
+    Requiere `--access public` (las imágenes se sirven directas desde el CDN) y conviene
+    `--region fra1`, porque por defecto lo crea en Washington. Enlaza el almacén al proyecto,
+    pone el token en los tres entornos **y en el `.env.local`**, con lo que las subidas
+    locales pasan a ir al almacén de producción.
 
 ## 5. Lo que esto cambia del plan
 
