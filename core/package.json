@@ -1,9 +1,8 @@
 {
-  "name": "@sitewright/core",
+  "name": "sitewright-core",
   "version": "0.1.0",
   "description": "The invariant half of a Sitewright site: pure logic, image handling, form brakes and SEO plumbing.",
-  "license": "UNLICENSED",
-  "private": true,
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -74,5 +73,19 @@
   },
   "bin": {
     "sitewright-audit": "./dist/audit/cli.js"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GaDaXaRa/sitewright"
+  },
+  "keywords": [
+    "payload",
+    "nextjs",
+    "seo",
+    "geo",
+    "rgpd"
+  ]
 }

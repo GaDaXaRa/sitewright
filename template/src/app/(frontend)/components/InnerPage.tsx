@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import type { SiteSetting } from '@/payload-types'
-import { mediaUrl } from '@sitewright/core'
+import { mediaUrl } from 'sitewright-core'
 import { site } from '@/site.config'
 
 import Nav from './Nav'

@@ -1,5 +1,5 @@
 import type { SiteSetting } from '@/payload-types'
-import { mediaAbsoluteUrl } from '@sitewright/core'
+import { mediaAbsoluteUrl } from 'sitewright-core'
 import { SITE_URL } from './site'
 
 /**

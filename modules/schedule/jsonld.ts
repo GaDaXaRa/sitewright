@@ -1,6 +1,6 @@
 import { ORG_ID } from '@/lib/jsonLd'
 import { SITE_URL } from '@/lib/site'
-import { mediaAbsoluteUrl } from '@sitewright/core'
+import { mediaAbsoluteUrl } from 'sitewright-core'
 import type { ScheduleItem } from './Row'
 
 /**

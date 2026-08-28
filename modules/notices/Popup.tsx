@@ -2,7 +2,7 @@
 
 import React, { useSyncExternalStore } from 'react'
 import Image from 'next/image'
-import { mediaAlt, mediaUrl } from '@sitewright/core'
+import { mediaAlt, mediaUrl } from 'sitewright-core'
 
 export type Notice = {
   id: number | string

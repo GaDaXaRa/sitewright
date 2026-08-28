@@ -71,7 +71,7 @@ import type { Metadata } from 'next'
 
 import InnerPage from '../../components/InnerPage'
 import { loadSiteContent } from '@/lib/data'
-import { mediaAlt, mediaUrl } from '@sitewright/core'
+import { mediaAlt, mediaUrl } from 'sitewright-core'
 
 export const revalidate = 300
 

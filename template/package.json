@@ -22,7 +22,7 @@
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
     "core:sync": "npm --prefix ../core run build && rm -rf node_modules/@sitewright && npm install --install-links --no-audit --no-fund",
-    "audit": "node ./node_modules/@sitewright/core/dist/audit/cli.js --url ${AUDIT_URL:-http://localhost:3000} --css \"src/app/(frontend)/styles.css\" --migrations src/migrations"
+    "audit": "node ./node_modules/sitewright-core/dist/audit/cli.js --url ${AUDIT_URL:-http://localhost:3000} --css \"src/app/(frontend)/styles.css\" --migrations src/migrations"
   },
   "engines": {
     "node": "^18.20.2 || >=20.9.0",
@@ -36,7 +36,7 @@
     "@payloadcms/storage-vercel-blob": "3.88.0",
     "@payloadcms/translations": "3.88.0",
     "@payloadcms/ui": "3.88.0",
-    "@sitewright/core": "file:../core",
+    "sitewright-core": "^0.1.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/blob": "^2.8.0",
     "@vercel/speed-insights": "^2.0.0",

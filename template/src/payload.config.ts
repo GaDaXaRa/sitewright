@@ -8,7 +8,7 @@ import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
-import { mediaCollection, usersCollection } from '@sitewright/core/payload'
+import { mediaCollection, usersCollection } from 'sitewright-core/payload'
 import { mediaRevalidation } from './collections/hooks/revalidate'
 import { SiteSettings } from './globals/SiteSettings'
 import { site } from './site.config'

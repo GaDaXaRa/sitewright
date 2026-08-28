@@ -1,5 +1,5 @@
 import type { CollectionConfig, Field } from 'payload'
-import { slugify } from '@sitewright/core'
+import { slugify } from 'sitewright-core'
 import { revalidator } from '@/collections/hooks/revalidate'
 
 /**

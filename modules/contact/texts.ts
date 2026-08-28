@@ -1,4 +1,4 @@
-import { escapeHtml } from '@sitewright/core'
+import { escapeHtml } from 'sitewright-core'
 
 /**
  * The text of the emails a request sends.

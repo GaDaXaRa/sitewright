@@ -1,5 +1,5 @@
 import type { LlmsSection } from '@/lib/llmsTxt'
-import { formatEventDate, splitEvents } from '@sitewright/core'
+import { formatEventDate, splitEvents } from 'sitewright-core'
 import type { ScheduleItem } from './Row'
 
 const IN_ARCHIVE = 8

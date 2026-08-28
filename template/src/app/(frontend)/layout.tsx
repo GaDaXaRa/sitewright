@@ -4,8 +4,8 @@ import { Public_Sans } from 'next/font/google'
 import { SITE_URL } from '@/lib/site'
 import { loadSettings } from '@/lib/data'
 import { site } from '@/site.config'
-import { ConsentProvider } from '@sitewright/core/ui'
-import { ConsentedAnalytics } from '@sitewright/core/ui'
+import { ConsentProvider } from 'sitewright-core/ui'
+import { ConsentedAnalytics } from 'sitewright-core/ui'
 import './styles.css'
 
 // The blueprint picks the real pair; the template starts on one neutral face for both, so

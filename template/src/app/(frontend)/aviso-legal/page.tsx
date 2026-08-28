@@ -2,7 +2,7 @@ import React from 'react'
 import type { Metadata } from 'next'
 import LegalPage from '../components/LegalPage'
 import { loadSettings } from '@/lib/data'
-import { legalNotice } from '@sitewright/core'
+import { legalNotice } from 'sitewright-core'
 import { SITE_URL } from '@/lib/site'
 
 export const revalidate = 3600

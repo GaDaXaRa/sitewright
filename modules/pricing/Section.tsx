@@ -1,5 +1,5 @@
 import React from 'react'
-import type { Tone } from '@sitewright/core'
+import type { Tone } from 'sitewright-core'
 
 export type Price = {
   id: number | string

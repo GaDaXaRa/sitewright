@@ -29,7 +29,7 @@ import JsonLd from '../../components/JsonLd'
 import { teamNodes } from '@/modules/team/jsonld'
 import { loadSiteContent } from '@/lib/data'
 import { buildHomeJsonLd } from '@/lib/jsonLd'
-import { mediaAlt, mediaUrl } from '@sitewright/core'
+import { mediaAlt, mediaUrl } from 'sitewright-core'
 
 export const revalidate = 300
 

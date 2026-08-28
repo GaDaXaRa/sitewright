@@ -1,4 +1,4 @@
-import { resolveSiteUrl } from '@sitewright/core'
+import { resolveSiteUrl } from 'sitewright-core'
 import { site } from '@/site.config'
 
 // The rule lives in the core; the address belongs to this site. Everything that declares

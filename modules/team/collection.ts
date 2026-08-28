@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { slugify } from '@sitewright/core'
+import { slugify } from 'sitewright-core'
 import { documentRevalidator } from '@/collections/hooks/revalidate'
 
 /**

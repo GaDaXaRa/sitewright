@@ -15,5 +15,5 @@ npm run dev
 npm run lint && npm run typecheck && npm run test:int && npm run build
 ```
 
-De lo demás se encarga [`@sitewright/core`](../core): imágenes, revalidación,
+De lo demás se encarga [`sitewright-core`](../core): imágenes, revalidación,
 consentimiento, frenos del formulario, páginas legales y lógica pura.

@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
-import { splitEvents, type Tone } from '@sitewright/core'
+import { splitEvents, type Tone } from 'sitewright-core'
 import ScheduleRow, { type ScheduleItem } from './Row'
 
 /**

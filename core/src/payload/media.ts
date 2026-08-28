@@ -13,7 +13,7 @@ export function mediaCollection({
   altExample,
   revalidation,
   slug = 'media',
-  saveButton = '@sitewright/core/ui#ImageButtons',
+  saveButton = 'sitewright-core/ui#ImageButtons',
 }: {
   /** Concrete example for the alt field, in the client's own words. */
   altExample: string

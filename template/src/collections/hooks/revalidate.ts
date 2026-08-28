@@ -1,4 +1,4 @@
-import { createRevalidation } from '@sitewright/core/payload'
+import { createRevalidation } from 'sitewright-core/payload'
 import { ALWAYS_STALE } from '@/site.config'
 
 /**

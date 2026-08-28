@@ -1,8 +1,8 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { mediaAlt, mediaUrl, parseEmbed, type Tone } from '@sitewright/core'
-import { Embed } from '@sitewright/core/ui'
+import { mediaAlt, mediaUrl, parseEmbed, type Tone } from 'sitewright-core'
+import { Embed } from 'sitewright-core/ui'
 
 export type MediaItem = {
   id: number | string

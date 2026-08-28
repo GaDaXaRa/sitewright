@@ -1,6 +1,6 @@
 import React from 'react'
 import type { SiteSetting } from '@/payload-types'
-import type { LegalSection } from '@sitewright/core'
+import type { LegalSection } from 'sitewright-core'
 import InnerPage from './InnerPage'
 
 /**

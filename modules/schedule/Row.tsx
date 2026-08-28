@@ -1,5 +1,5 @@
 import React from 'react'
-import { formatEventDate } from '@sitewright/core'
+import { formatEventDate } from 'sitewright-core'
 
 export type ScheduleItem = {
   id: number | string

@@ -2,7 +2,7 @@ import React from 'react'
 import type { Metadata } from 'next'
 import LegalPage from '../components/LegalPage'
 import { loadSettings } from '@/lib/data'
-import { cookiePolicy } from '@sitewright/core'
+import { cookiePolicy } from 'sitewright-core'
 
 export const revalidate = 3600
 

@@ -8,7 +8,7 @@ import JsonLd from './components/JsonLd'
 
 import { loadSiteContent } from '@/lib/data'
 import { buildHomeJsonLd } from '@/lib/jsonLd'
-import { mediaAlt, mediaFocal, mediaUrl } from '@sitewright/core'
+import { mediaAlt, mediaFocal, mediaUrl } from 'sitewright-core'
 
 // ISR: the home page is generated statically and revalidated every five minutes at most.
 // A hook also revalidates it the instant the client edits content in the CMS, so edits

@@ -29,7 +29,7 @@ import ScheduleRow from '@/modules/schedule/Row'
 import { scheduleNodes } from '@/modules/schedule/jsonld'
 import { loadSiteContent } from '@/lib/data'
 import { buildHomeJsonLd } from '@/lib/jsonLd'
-import { groupByYear, splitEvents } from '@sitewright/core'
+import { groupByYear, splitEvents } from 'sitewright-core'
 
 export const revalidate = 300
 

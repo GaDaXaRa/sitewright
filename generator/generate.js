@@ -205,7 +205,7 @@ ${jsonldImports}
 import { loadSiteContent } from '@/lib/data'
 import { buildHomeJsonLd } from '@/lib/jsonLd'
 import { site } from '@/site.config'
-import { alternateTones, mediaAlt, mediaFocal, mediaUrl${usesSplit ? ', splitEvents' : ''} } from '@sitewright/core'
+import { alternateTones, mediaAlt, mediaFocal, mediaUrl${usesSplit ? ', splitEvents' : ''} } from 'sitewright-core'
 
 // ISR: the home page is generated statically and revalidated every five minutes at most. A
 // hook also revalidates it the instant the client edits content, so changes show up.
@@ -594,7 +594,7 @@ mkdirSync(target, { recursive: true })
 // 1. The chassis, minus what belongs to the generator's own machinery.
 cpSync(join(ROOT, 'template'), target, {
   recursive: true,
-  // The lockfile goes too: it pins `@sitewright/core` to the **template's** own path, and a
+  // The lockfile goes too: it pins `sitewright-core` to the **template's** own path, and a
   // generated site inheriting it sends npm looking for the core next to itself, with an
   // ENOENT that names a directory nobody wrote. The first `npm install` writes a fresh one.
   filter: (src) =>
@@ -652,11 +652,11 @@ const pkg = JSON.parse(read('package.json'))
 pkg.name = bp.identity.id
 pkg.description = `Web de ${bp.identity.name}`
 pkg.scripts.audit = pkg.scripts.audit.replace('http://localhost:3000', bp.identity.url)
-// Worked out from where the site actually lands, not assumed: a fixed '../sitewright/core'
-// only resolves for one layout, and when it does not, npm fails with a bare ENOENT that
-// says nothing about what is wrong.
-pkg.dependencies['@sitewright/core'] =
-  arg('core') ?? `file:${relative(target, join(ROOT, 'core'))}`
+// The published package by default: a `file:` path does not survive a deploy, because only
+// the site's own repository gets uploaded. `--core file:…` still works for developing the
+// core against a site.
+pkg.dependencies['sitewright-core'] =
+  arg('core') ?? `^${JSON.parse(readFileSync(join(ROOT, 'core/package.json'), 'utf8')).version}`
 write('package.json', JSON.stringify(pkg, null, 2) + '\n')
 
 console.log(`

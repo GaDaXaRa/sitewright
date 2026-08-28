@@ -7,7 +7,7 @@ ejemplo.
 Se **copian** al sitio (`src/modules/<id>/`), no se importan de un paquete: es la decisión
 de "núcleo fino". A partir de ahí son del sitio y se pueden editar sin pedir permiso. Lo que
 no se copia —imágenes, revalidación, consentimiento, frenos del formulario— vive en
-[`@sitewright/core`](../core).
+[`sitewright-core`](../core).
 
 ## Qué trae cada uno
 

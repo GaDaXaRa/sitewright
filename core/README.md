@@ -1,4 +1,4 @@
-# @sitewright/core
+# sitewright-core
 
 Lo que no cambia de un sitio a otro: lógica pura, el sistema de imágenes, los frenos del
 formulario público y la fontanería de SEO y GEO.
@@ -18,9 +18,9 @@ npm run test:mutacion  # 96,14% — corta por debajo del 95%
 
 | Entrada | Qué trae |
 |---|---|
-| `@sitewright/core` | Lógica pura: identidad del dominio, lectura de imágenes y relaciones, slug, listas, escapado, tonos de sección, contenido con fecha, embebidos, decisiones del respaldo de imagen, frenos del formulario y las tres páginas legales |
-| `@sitewright/core/payload` | Hooks de imagen, endpoint de restaurar, colecciones `media` y `users`, y la fábrica de revalidación |
-| `@sitewright/core/ui` | Componentes de cliente: consentimiento, analítica condicionada, embebidos y los botones del panel |
+| `sitewright-core` | Lógica pura: identidad del dominio, lectura de imágenes y relaciones, slug, listas, escapado, tonos de sección, contenido con fecha, embebidos, decisiones del respaldo de imagen, frenos del formulario y las tres páginas legales |
+| `sitewright-core/payload` | Hooks de imagen, endpoint de restaurar, colecciones `media` y `users`, y la fábrica de revalidación |
+| `sitewright-core/ui` | Componentes de cliente: consentimiento, analítica condicionada, embebidos y los botones del panel |
 
 Los componentes de `ui` **no traen estilos**: pintan clases conocidas (`consent`, `embed`,
 `embed-blocked`…) y cómo se ven es cosa de la hoja de estilos de cada sitio, que es
@@ -29,7 +29,7 @@ justamente la mitad que un cliente pide cambiar.
 ## Cómo lo consume un sitio
 
 ```json
-{ "dependencies": { "@sitewright/core": "file:../sitewright/core" } }
+{ "dependencies": { "sitewright-core": "file:../sitewright/core" } }
 ```
 
 ```bash

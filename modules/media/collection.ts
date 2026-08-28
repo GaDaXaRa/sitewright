@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { parseEmbed, slugify } from '@sitewright/core'
+import { parseEmbed, slugify } from 'sitewright-core'
 import { revalidator } from '@/collections/hooks/revalidate'
 
 /**

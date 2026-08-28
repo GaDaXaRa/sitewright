@@ -1,5 +1,5 @@
 import type { LlmsSection } from '@/lib/llmsTxt'
-import { parseEmbed } from '@sitewright/core'
+import { parseEmbed } from 'sitewright-core'
 import type { MediaItem } from './Section'
 
 /** Title, who signs it and where it really lives — the platform link, not the player one. */

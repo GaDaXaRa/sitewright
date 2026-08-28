@@ -8,7 +8,7 @@ import {
   recordSubmission,
   requestIp,
   TOO_MANY_ERROR,
-} from '@sitewright/core'
+} from 'sitewright-core'
 
 /**
  * Recent submissions per IP. Kept in memory on purpose: the IP is personal data and there

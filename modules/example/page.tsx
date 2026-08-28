@@ -25,7 +25,7 @@ import { faqNode } from '@/modules/faq/jsonld'
 import { loadSiteContent } from '@/lib/data'
 import { buildHomeJsonLd } from '@/lib/jsonLd'
 import { site } from '@/site.config'
-import { alternateTones, mediaAlt, mediaFocal, mediaUrl, splitEvents } from '@sitewright/core'
+import { alternateTones, mediaAlt, mediaFocal, mediaUrl, splitEvents } from 'sitewright-core'
 
 export const revalidate = 300
 

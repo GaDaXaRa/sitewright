@@ -114,12 +114,12 @@ Subsuelo lo consume; Organic Yoga **no se toca** hasta que el núcleo tenga roda
 
 ## Lo que se llevó
 
-- **Lógica pura** (`@sitewright/core`): identidad del dominio, imágenes, relaciones, slug,
+- **Lógica pura** (`sitewright-core`): identidad del dominio, imágenes, relaciones, slug,
   listas, escapado, tonos de sección, contenido con fecha, embebidos, decisiones del
   respaldo de imagen, frenos del formulario y las tres páginas legales.
-- **Payload** (`@sitewright/core/payload`): hooks de imagen, endpoint de restaurar,
+- **Payload** (`sitewright-core/payload`): hooks de imagen, endpoint de restaurar,
   colecciones `media` y `users` como fábricas, y la fábrica de revalidación.
-- **Cliente** (`@sitewright/core/ui`): consentimiento, analítica condicionada, embebidos y
+- **Cliente** (`sitewright-core/ui`): consentimiento, analítica condicionada, embebidos y
   los botones del panel.
 
 De un sitio de 4.255 líneas, el sitio se queda con su dominio, sus secciones y su CSS.
@@ -127,7 +127,7 @@ De un sitio de 4.255 líneas, el sitio se queda con su dominio, sus secciones y 
 ## Lo que enseñó
 
 13. **Un enlace simbólico no vale como paquete local**: con la raíz de Turbopack fijada al
-    proyecto, `@sitewright/core` no se resolvía. Se instala con `--install-links`, que
+    proyecto, `sitewright-core` no se resolvía. Se instala con `--install-links`, que
     además ensaya lo que pasará cuando esté publicado. Y **npm no refresca un `file:` con
     la misma versión**: hay que borrar la copia antes de instalar.
 14. **El paquete tiene que ser ESM de verdad.** Con `moduleResolution: bundler`, TypeScript
@@ -145,7 +145,7 @@ De un sitio de 4.255 líneas, el sitio se queda con su dominio, sus secciones y 
     podía quitar ninguna sección jamás: código muerto que nadie habría notado, y que la
     cobertura daba por probado.
 18. **Los componentes de cliente sobreviven a `tsc`**: la directiva `'use client'` se
-    conserva en `dist/`, y el `importMap` de Payload acepta apuntar a `@sitewright/core/ui`.
+    conserva en `dist/`, y el `importMap` de Payload acepta apuntar a `sitewright-core/ui`.
     El panel monta sin quedarse en blanco.
 
 ## Lo que esto cambia del plan
@@ -202,7 +202,7 @@ no se importan: es la decisión de núcleo fino, y a partir de ahí son del siti
 
 `npm run audit` existe, corre contra una web que esté respondiendo y **sale con código 1
 cuando algo falla**, que es lo que la convierte en puerta y no en informe. Vive en el núcleo
-(`@sitewright/core/audit`), con 126 pruebas que comprueban no que funcione, sino que **caza
+(`sitewright-core/audit`), con 126 pruebas que comprueban no que funcione, sino que **caza
 los fallos concretos que ocurrieron en producción**.
 
 ## Las puertas
@@ -388,3 +388,22 @@ ya están arreglados y que ninguna cantidad de compilar habría enseñado.
   precios, y la portada no tiene huecos — el reparto de tonos se hace sobre lo que se pinta.
 - **La auditoría hace de red de verdad**: en las tres webs ha cazado algo real, y en esta
   avisó del relleno del seed que sigue publicado, que es exactamente su trabajo.
+
+
+---
+
+# Publicar el núcleo
+
+`sitewright-core@0.1.0`, MIT, público. Con eso un sitio generado ya se puede desplegar:
+`file:` no sobrevive a Vercel porque allí solo se sube el repositorio del sitio.
+
+45. **El ámbito `@sitewright` no estaba disponible** como organización, así que el paquete es
+    **sin ámbito**: `sitewright-core`. Los imports quedan más cortos y no depende de que
+    exista ninguna organización.
+46. **npm devuelve 404 cuando la credencial no puede publicar**, no 403: un `.npmrc` que yo
+    había dejado en la carpeta pisaba la sesión con un token de solo lectura y el error decía
+    "no existe" en vez de "no puedes". Costó dos intentos entender que el problema era la
+    credencial y no el nombre.
+47. **Un `export` repetido en el `~/.zshrc` gana el último, no el primero.** Al leer la
+    primera coincidencia estaba usando el token viejo mientras la terminal usaba el nuevo:
+    mismo fichero, dos verdades distintas.
