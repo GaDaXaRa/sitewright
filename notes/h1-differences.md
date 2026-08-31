@@ -434,3 +434,20 @@ pide), `apple-icon.png`, `icon-192.png` e `icon-512.png`.
 49. **npm sirve la versión cacheada aunque el `package.json` pida otra.** Tras publicar
     0.2.0, la plantilla siguió instalando 0.1.0 hasta pedirla explícitamente con
     `--prefer-online`. Media hora de "pero si ya está publicado".
+
+
+50. **Producción tenía el esquema empujado por detrás.** Al desplegar el icono, la migración
+    murió con "la columna ya existe": `favicon_id`, su clave y su índice estaban en la base
+    de producción **sin fila en `payload_migrations`**. El esquema era exactamente el que la
+    migración crea, así que se resolvió registrándola como aplicada.
+
+    **No he podido determinar cuándo se empujó.** El `.env` local apunta a la rama `dev`
+    desde el 28, `.env.local` no lleva `DATABASE_URL`, y la auditoría había dado producción
+    limpia después del despliegue anterior. Lo que sí quedó claro es que la marca `batch = -1`
+    que reapareció era el síntoma del mismo hecho. Si vuelve a pasar, el culpable es algo
+    ejecutando Payload en modo desarrollo contra la cadena de producción; la puerta de
+    esquema lo caza antes de cada despliegue, que es justo para lo que está.
+
+51. **"Faltan migraciones" es un falso rojo antes de desplegar.** La auditoría lo marca en
+    rojo y en ese momento es lo normal: las aplica el build. La comprobación vale **después**
+    del despliegue, y así lo dice DEPLOY.md.

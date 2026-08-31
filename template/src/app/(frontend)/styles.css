@@ -22,6 +22,10 @@
   --line: #26262b;
   --accent: #ff4d2e;
   --accent-soft: #ff7a5f;
+  /* El texto que va directamente sobre una foto de portada tratada (oscurecida) necesita
+     ser claro pase lo que pase — pero "claro" es --ground en un sitio claro e --ink en uno
+     oscuro como este. El generador escribe el valor que corresponda a cada blueprint. */
+  --on-photo: #f2efe9;
 
   --radius: 2px;
   --radius-lg: 6px;
@@ -392,6 +396,44 @@ img {
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
+
+/* Segundo intento: una caja (sólida o de cristal) siempre se lee como un parche encima de
+   la foto. Se trata la foto en su lugar — se oscurece lo bastante para que el texto claro
+   quede legible en el peor caso (un píxel blanco puro) sin necesidad de ninguna tarjeta:
+   brightness(0.5) más un velo negro de un mínimo de 0.35 dejan hasta el blanco más puro en
+   una luminancia que da 4,5:1 de sobra contra --ground. Los píxeles oscuros de la foto
+   quedan aún más oscuros, así que ese caso nunca es el problema. */
+.hero-has-image .hero-img {
+  filter: brightness(0.5) saturate(1.05);
+}
+
+.hero-has-image .hero-overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.35) 0%,
+    rgba(0, 0, 0, 0.35) 60%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+}
+
+.hero-has-image .kicker,
+.hero-has-image h1 {
+  color: var(--on-photo);
+}
+
+.hero-has-image .hero-text {
+  color: color-mix(in srgb, var(--on-photo) 85%, transparent);
+}
+
+.hero-has-image .btn-ghost {
+  border-color: var(--on-photo);
+  color: var(--on-photo);
+}
+
+.hero-has-image .btn-ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .hero.text-center .container {

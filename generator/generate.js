@@ -511,6 +511,10 @@ function applyPalette(css, design) {
     line: palette.line ?? palette.surface,
     accent: palette.accent,
     'accent-soft': palette.accentSoft ?? palette.accent,
+    // The hero darkens a photo and puts light text on top regardless of the site's own
+    // scheme — "light" here means whichever token actually reads as light in this palette:
+    // --ground in a light site, --ink in a dark one, where ground is the near-black.
+    'on-photo': design.scheme === 'light' ? palette.ground : palette.ink,
   }
 
   let out = css.replace(

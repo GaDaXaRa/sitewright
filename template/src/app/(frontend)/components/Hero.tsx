@@ -41,7 +41,7 @@ export default function Hero({
   const objectPosition = `${focalX ?? 50}% ${focalY ?? 50}%`
 
   return (
-    <header className={`hero text-${position} height-${height}`} id="inicio">
+    <header className={`hero text-${position} height-${height} ${imageUrl ? 'hero-has-image' : ''}`} id="inicio">
       {imageUrl ? (
         // The cover image is the largest element on the page (LCP): served through
         // next/image with `priority` so it starts loading immediately.
