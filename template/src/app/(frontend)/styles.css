@@ -22,6 +22,12 @@
   --line: #26262b;
   --accent: #ff4d2e;
   --accent-soft: #ff7a5f;
+  /* El texto del botón y su hover no se eligen a ojo: los calcula el generador midiendo el
+     contraste sobre el acento de cada sitio. Cableado aquí, un acento oscuro dejaba el
+     botón ilegible y ninguna puerta lo cazaba, porque medir --ink sobre --ground no dice
+     nada del texto sobre un botón. */
+  --on-accent: #14100f;
+  --accent-hover: #ff7a5f;
   /* El texto que va directamente sobre una foto de portada tratada (oscurecida) necesita
      ser claro pase lo que pase — pero "claro" es --ground en un sitio claro e --ink en uno
      oscuro como este. El generador escribe el valor que corresponda a cada blueprint. */
@@ -205,12 +211,12 @@ img {
 
 .btn-primary {
   background: var(--accent);
-  color: #14100f;
+  color: var(--on-accent);
 }
 
 .btn-primary:hover {
-  background: var(--accent-soft);
-  color: #14100f;
+  background: var(--accent-hover);
+  color: var(--on-accent);
 }
 
 .btn-primary:disabled {

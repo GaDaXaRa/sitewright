@@ -29,6 +29,9 @@ export {
   type IconDescriptor,
 } from './lib/icons.js'
 
+// Colour, where it has a right answer
+export { contrastRatio, bestTextOn, buttonColors, type ButtonColors } from './lib/color.js'
+
 // Laying out a page
 export { alternateTones, type Tone } from './lib/sectionTones.js'
 

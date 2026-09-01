@@ -1,4 +1,5 @@
 import { type Fetched, type Finding, fail, ok, skip, warn } from './types.js'
+import { contrastRatio } from '../lib/color.js'
 
 /**
  * The rest of the gates: GEO, legal, consent, images, contrast and weight.
@@ -183,31 +184,6 @@ export function checkPlaceholders(pages: Fetched[]): Finding[] {
 
 const GATE_CONTRAST = 'contraste'
 
-function luminance(hex: string): number | null {
-  const clean = hex.replace('#', '')
-  const full =
-    clean.length === 3
-      ? clean
-          .split('')
-          .map((c) => c + c)
-          .join('')
-      : clean
-  if (!/^[0-9a-f]{6}$/i.test(full)) return null
-
-  const channels = [0, 2, 4].map((i) => {
-    const v = parseInt(full.slice(i, i + 2), 16) / 255
-    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4
-  })
-  return 0.2126 * channels[0]! + 0.7152 * channels[1]! + 0.0722 * channels[2]!
-}
-
-export function contrastRatio(a: string, b: string): number | null {
-  const [la, lb] = [luminance(a), luminance(b)]
-  if (la === null || lb === null) return null
-  const [hi, lo] = la > lb ? [la, lb] : [lb, la]
-  return (hi + 0.05) / (lo + 0.05)
-}
-
 /** Reads the `--token: #hex` declarations out of a stylesheet. */
 export function cssTokens(css: string): Record<string, string> {
   const tokens: Record<string, string> = {}
@@ -234,6 +210,8 @@ export function checkContrast(
     ['ink-soft', 'ground'],
     ['ink-faint', 'ground'],
     ['accent', 'ground'],
+    // The one nobody was measuring: text on the loud button.
+    ['on-accent', 'accent'],
     ['ink-soft', 'surface'],
     ['ink-faint', 'surface'],
   ],

@@ -1,0 +1,24 @@
+/* Sobre mí: retrato a un lado y texto al otro, o solo texto si no hay foto. */
+.about {
+  display: grid;
+  grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 56px);
+  align-items: start;
+}
+
+.about-photo img {
+  width: 100%;
+  border-radius: var(--radius);
+  display: block;
+}
+
+.about-text p {
+  color: var(--ink-soft);
+  max-width: 62ch;
+}
+
+@media (max-width: 760px) {
+  .about {
+    grid-template-columns: 1fr;
+  }
+}

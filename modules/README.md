@@ -27,7 +27,7 @@ estudio, "Proyectos" en un portafolio, "Sesiones" en un colectivo y "Actividades
 asociación. Por eso ninguna etiqueta está escrita en el código: entran por la fábrica, y el
 blueprint decide cuál toca.
 
-## Los nueve
+## Los diez
 
 | Módulo | Qué es | Página propia |
 |---|---|---|
@@ -40,3 +40,4 @@ blueprint decide cuál toca.
 | `faq` | Preguntas frecuentes | Sí |
 | `notices` | Aviso emergente programable | No |
 | `contact` | Formulario, con consentimiento y avisos por correo | No |
+| `about` | La presentación del negocio. Sin colección: vive en Ajustes | No |

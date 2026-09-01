@@ -1,6 +1,6 @@
 {
   "name": "sitewright-core",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "The invariant half of a Sitewright site: pure logic, image handling, form brakes and SEO plumbing.",
   "license": "MIT",
   "type": "module",

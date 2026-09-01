@@ -1,0 +1,10 @@
+{
+  "id": "about",
+  "title": "Sobre mí",
+  "note": "La presentación del negocio. No tiene colección: vive en Ajustes, porque es un texto único que su dueño reescribe, no una lista.",
+  "collection": null,
+  "defaultTitle": "Sobre mí",
+  "routes": {},
+  "section": "sobre-mi",
+  "contributes": { "jsonld": false, "llms": true, "seed": false }
+}

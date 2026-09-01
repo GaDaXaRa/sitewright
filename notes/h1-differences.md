@@ -451,3 +451,44 @@ pide), `apple-icon.png`, `icon-192.png` e `icon-512.png`.
 51. **"Faltan migraciones" es un falso rojo antes de desplegar.** La auditoría lo marca en
     rojo y en ese momento es lo normal: las aplica el build. La comprobación vale **después**
     del despliegue, y así lo dice DEPLOY.md.
+
+
+---
+
+# Lo que enseñó la primera web hecha por otra persona
+
+Sandunguera (una DJ, cliente real) la generó otro agente con la skill. Comparando lo
+generado con lo que quedó, el agente tuvo que tocar cinco cosas y **tres eran huecos de la
+herramienta**, no decisiones de esa web. Se han traído dos, más una tercera de higiene:
+
+52. **El color del texto del botón estaba cableado.** La plantilla escribía `#14100f` en
+    `.btn-primary`: se lee sobre un acento claro y desaparece sobre uno oscuro, y **ninguna
+    puerta lo cazaba** porque medir `--ink` sobre `--ground` no dice nada del texto sobre un
+    botón. Ahora lo calcula el generador (`buttonColors`, en el núcleo) y la auditoría mide
+    la pareja `--on-accent` sobre `--accent`.
+
+    El detalle que lo hace interesante: en esa paleta —granate y mango— **ningún texto
+    servía para el acento y su versión suave a la vez**. El agente lo resolvió a mano
+    dejando el hover en el propio acento oscurecido; la función deriva ahora exactamente esa
+    misma conclusión, y prefiere los colores del sitio antes que blanco o negro para que la
+    web siga pareciéndose a sí misma.
+
+53. **Faltaba la presentación.** El agente añadió a mano un campo "Sobre mí" y su sección:
+    todo negocio tiene una, y el blueprint no sabía expresarla. Es el décimo módulo, y el
+    primero **sin colección** — vive en Ajustes, porque es un texto que su dueño reescribe,
+    no una lista. Eso obligó a que el generador tolere módulos sin colección ni consulta.
+
+54. **Un módulo sin datos propios escribía un hueco en la desestructuración** de
+    `llms.txt` (`const { settings, , faqs }`): un `null` colado en una lista de variables.
+    Compilaba en el generador y rompía en el sitio.
+
+55. **Los sitios generados nacían sin guía.** El único `CLAUDE.md` que tenía Sandunguera
+    importaba las reglas de Next y nada más. Ahora el generador escribe una con lo que ya
+    nos ha mordido: dos ramas de Neon, migración obligatoria, el favicon con dirección
+    estable, el `importMap` tras tocar el panel, y que el núcleo **no se edita desde el
+    sitio**. Quien abra ese repositorio después será otro agente, y llegaba sin nada.
+
+Lo que **no** se ha traído: los comentarios que justifican esa paleta concreta, el dominio
+sin `www` y el vinilo dibujado a mano. Son de esa web. Aunque el `www` deja tarea: la
+entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hubo que editar
+`site.config.ts` a mano.

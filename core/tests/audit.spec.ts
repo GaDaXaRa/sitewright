@@ -14,9 +14,9 @@ import {
   checkImages,
   checkLegalPages,
   checkLlmsTxt,
-  contrastRatio,
   cssTokens,
 } from '../src/audit/checks2.js'
+import { contrastRatio } from '../src/lib/color.js'
 import { exitCode, renderReport } from '../src/audit/report.js'
 
 const SITE = 'https://ejemplo.es'

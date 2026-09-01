@@ -11,6 +11,7 @@
  */
 
 export const MODULE_IDS = [
+  'about',
   'catalog',
   'schedule',
   'pricing',
@@ -23,6 +24,12 @@ export const MODULE_IDS = [
 ]
 
 const SCHEMA_TYPES = ['Organization', 'LocalBusiness', 'Person', 'MusicGroup', 'NGO']
+
+/**
+ * Modules that are a section and nothing else: they live in the settings, so they have no
+ * collection to label in singular and plural — what they need is the heading they show.
+ */
+const WITHOUT_COLLECTION = ['about']
 
 const HEX = /^#[0-9a-fA-F]{6}$/
 const ID = /^[a-z][a-z0-9-]*$/
@@ -69,9 +76,13 @@ export function validateBlueprint(blueprint) {
   const routes = []
   for (const [id, module] of Object.entries(modules)) {
     if (!MODULE_IDS.includes(id)) continue
-    const labels = module?.labels ?? {}
-    required(labels.singular, `modules.${id}.labels.singular`, errors)
-    required(labels.plural, `modules.${id}.labels.plural`, errors)
+    if (WITHOUT_COLLECTION.includes(id)) {
+      required(module?.title, `modules.${id}.title`, errors, 'falta el título de la sección')
+    } else {
+      const labels = module?.labels ?? {}
+      required(labels.singular, `modules.${id}.labels.singular`, errors)
+      required(labels.plural, `modules.${id}.labels.plural`, errors)
+    }
 
     if (module?.route) {
       if (!ROUTE.test(module.route)) {

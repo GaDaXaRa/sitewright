@@ -3,7 +3,7 @@ import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } fr
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { sectionOrder, validateBlueprint } from './schema.js'
-import { defaultIconSvg } from '../core/dist/index.js'
+import { buttonColors, defaultIconSvg } from '../core/dist/index.js'
 
 /**
  * From a blueprint to a site on disk.
@@ -77,8 +77,11 @@ export const ALWAYS_STALE = ['/', '/llms.txt']
 // ── payload.config.ts ───────────────────────────────────────────────────────────────────
 
 function payloadConfig(template, bp, modules, wirings) {
-  const imports = wirings.map((w) => w.collectionImport).join('\n')
-  const calls = wirings
+  // A module can be a section and nothing else (`about` lives in the settings), so only the
+  // ones that bring a collection are wired here.
+  const withCollection = wirings.filter((w) => w.collectionImport)
+  const imports = withCollection.map((w) => w.collectionImport).join('\n')
+  const calls = withCollection
     .map((w) => `    ${w.collectionCall(modules[w.id], bp)},`)
     .join('\n')
 
@@ -284,7 +287,9 @@ ${sectioned.map((w) => `      ${w.sectionRender(modules[w.id], bp)}`).join('\n\n
 function llmsRoute(bp, modules, wirings) {
   const contributors = wirings.filter((w) => w.llmsSection || w.llmsSpread)
   const imports = contributors.map((w) => w.llmsImport).join('\n')
-  const vars = [...new Set(contributors.map((w) => w.variable))]
+  // A module can contribute a section without having data of its own (`about` reads the
+  // settings), and a null in this list writes an empty hole into the destructuring.
+  const vars = [...new Set(contributors.map((w) => w.variable).filter(Boolean))]
   const usesNow = contributors.some((w) => w.llmsSpread)
   const sections = contributors
     .map((w) =>
@@ -496,6 +501,86 @@ ${perDocument}
   return out
 }
 
+// ── CLAUDE.md ───────────────────────────────────────────────────────────────────────────
+
+/**
+ * The site's own guide.
+ *
+ * Whoever opens this repository next is most likely another agent, and it will arrive
+ * knowing nothing: not that the schema needs a migration, not that development and
+ * production are two branches, not that the icon has to keep its address. Every one of
+ * those cost a real afternoon somewhere, and writing them down here is cheaper than paying
+ * for them again.
+ */
+function siteGuide(bp, modules) {
+  const rows = Object.entries(modules)
+    .map(([id, m]) => `| ${m.labels?.plural ?? m.title ?? id} | \`${id}\` | ${m.route ?? '—'} |`)
+    .join('\n')
+
+  return `# Guía para agentes — ${bp.identity.name}
+
+Web + CMS generada con [Sitewright](https://www.npmjs.com/package/sitewright-core) a partir
+de \`${bp.identity.id}.json\`. Lo que no cambia entre sitios vive en el paquete
+\`sitewright-core\`; **no lo edites desde aquí**: se toca en el repositorio de Sitewright y
+se publica una versión.
+
+## Qué tiene este sitio
+
+| Sección | Módulo | Ruta |
+|---|---|---|
+${rows}
+
+Lo que el núcleo no puede saber está en [\`src/site.config.ts\`](src/site.config.ts):
+identidad, rutas y menú. Se edita ahí y nada más tiene que moverse.
+
+## Convenciones
+
+- **El código va en inglés**: identificadores, comentarios y mensajes de commit.
+- **Lo que ve una persona va en español**: etiquetas del panel, textos de la web y correos.
+  El cliente final no es técnico.
+- Los comentarios explican **por qué**, no qué hace la línea.
+
+## Entorno
+
+- **Dos ramas de Neon**: \`dev\` en tu \`.env\` y la de producción en Vercel. Compartir una
+  sola es lo que deja marcas de modo dev en producción y **tumba el despliegue**.
+- Sin \`BLOB_READ_WRITE_TOKEN\` las imágenes van a disco local y la copia original no se
+  guarda: eso solo se prueba desplegado.
+
+## Cómo verificar
+
+\`\`\`bash
+npm run lint && npm run typecheck && npm run test:int && npm run build
+npm run audit -- --url http://localhost:3000
+\`\`\`
+
+**\`typecheck\` no es opcional**: \`next build\` reutiliza su caché y puede dar por bueno un
+fichero que no ha vuelto a comprobar.
+
+## Lo que ya nos ha mordido
+
+- **Todo cambio de esquema necesita migración** (\`npm run migrate:create -- <nombre>\` y
+  \`npm run generate:types\`). En desarrollo Payload empuja el esquema solo; producción
+  **solo aplica migraciones**.
+- **Nunca ejecutes el seed contra producción**: deja una marca de modo dev
+  (\`batch = -1\`) que cuelga \`payload migrate\` en el build. Se limpia con
+  \`scripts/fix-prod-migration.mjs\`.
+- **El favicon vive en \`public/\` con dirección fija.** Dentro de la carpeta de la app Next le
+  pone un hash que cambia en cada despliegue, y Google necesita una URL estable. Si el
+  cliente sube el suyo desde el panel, se sirve en \`/icono.png\`, que tampoco cambia.
+- **Tras tocar un componente del panel, \`npm run generate:importmap\`**, o \`/admin\` se queda
+  en blanco.
+- **La auditoría antes de desplegar, no después.** Su puerta de esquema es la que caza lo
+  que rompe el build; "faltan migraciones" en cambio es normal antes de desplegar, porque
+  las aplica el propio build.
+
+## Lo que es de este sitio y no del sistema
+
+Las secciones, la hoja de estilos y los módulos de \`src/modules/\` son **copias**: edítalos
+sin pedir permiso. Si el cambio sirve para cualquier web, va al repositorio de Sitewright.
+`
+}
+
 // ── design ──────────────────────────────────────────────────────────────────────────────
 
 function applyPalette(css, design) {
@@ -517,12 +602,24 @@ function applyPalette(css, design) {
     'on-photo': design.scheme === 'light' ? palette.ground : palette.ink,
   }
 
+  // Measured, not chosen: which ink reads on this accent has a right answer.
+  const button = buttonColors({
+    accent: palette.accent,
+    accentSoft: palette.accentSoft,
+    ink: palette.ink,
+    ground: palette.ground,
+  })
+  map['on-accent'] = button.text
+  map['accent-hover'] = button.hover
+
   let out = css.replace(
     /color-scheme:\s*\w+;/,
     `color-scheme: ${design.scheme === 'light' ? 'light' : 'dark'};`,
   )
   for (const [token, value] of Object.entries(map)) {
-    out = out.replace(new RegExp(`(--${token}:\\s*)#[0-9a-fA-F]{3,8}`), `$1${value}`)
+    // The hover can be a `color-mix(...)` rather than a hex, so the old value is matched up
+    // to its semicolon instead of assuming six hex digits.
+    out = out.replace(new RegExp(`(--${token}:\\s*)[^;]+;`), `$1${value};`)
   }
   return out
 }
@@ -626,7 +723,7 @@ for (const id of Object.keys(modules)) {
     filter: (src) => !/module\.json|wiring\.js|package\.json|section\.css/.test(src),
   })
   // Titles default to the plural label: the client's own word for the thing.
-  modules[id].title = modules[id].title ?? modules[id].labels.plural
+  modules[id].title = modules[id].title ?? modules[id].labels?.plural ?? id
 }
 
 const read = (path) => readFileSync(join(target, path), 'utf8')
@@ -640,6 +737,7 @@ write('src/app/(frontend)/page.tsx', homePage(bp, modules, wirings, order))
 write('src/app/llms.txt/route.ts', llmsRoute(bp, modules, wirings))
 write('src/app/sitemap.ts', sitemap(read('src/app/sitemap.ts'), bp, modules, wirings))
 write('scripts/seed.ts', seedScript(bp, modules, wirings))
+write('CLAUDE.md', siteGuide(bp, modules))
 const pages = writeModulePages(target, bp, modules, wirings, write)
 write(
   'src/app/(frontend)/styles.css',
