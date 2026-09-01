@@ -23,6 +23,17 @@ menú y pie) · `llms.txt` · la paleta y las tipografías.
 - **El aprovisionamiento.** `provision.js` imprime los comandos; ejecutarlos toca dinero y
   cuentas ajenas, así que lo hace quien manda.
 
+## Dónde vive cada blueprint
+
+Los de `blueprints/` son **ejemplos ficticios**, y están aquí porque documentan la forma del
+fichero. El blueprint de una web real vive **en el repositorio de esa web**, que es privado:
+lleva el nombre legal de quien la encarga, sus textos y su contacto, y este repositorio es
+público.
+
+```bash
+node generate.js --blueprint ../../mi-sitio/blueprints/mi-sitio.json --out ../../mi-sitio
+```
+
 ## El blueprint
 
 Tres cosas y una paleta: **identidad**, **módulos** (etiquetas y rutas) y **diseño**, más los
