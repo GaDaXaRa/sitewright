@@ -32,7 +32,8 @@
     "dev": "tsc -p tsconfig.build.json --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:mutacion": "stryker run"
+    "test:mutacion": "stryker run",
+    "prepublishOnly": "npm run typecheck && npm run test && npm run test:mutacion && npm run build"
   },
   "devDependencies": {
     "@payloadcms/ui": "^3.88.0",

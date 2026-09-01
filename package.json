@@ -1,0 +1,10 @@
+{
+  "name": "sitewright",
+  "private": true,
+  "type": "module",
+  "description": "Generador de sitios web profesionales. Punto de entrada único para las operaciones peligrosas.",
+  "scripts": {
+    "publicar": "node scripts/publicar.mjs",
+    "usar-nucleo": "node scripts/usar-nucleo.mjs"
+  }
+}

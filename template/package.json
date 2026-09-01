@@ -22,7 +22,7 @@
     "test": "npm run test:int && npm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
-    "core:sync": "npm --prefix ../core run build && rm -rf node_modules/@sitewright && npm install --install-links --no-audit --no-fund",
+    "core:sync": "rm -rf node_modules/sitewright-core && npm install --prefer-online --install-links --no-audit --no-fund",
     "audit": "node ./node_modules/sitewright-core/dist/audit/cli.js --url ${AUDIT_URL:-http://localhost:3000} --css \"src/app/(frontend)/styles.css\" --migrations src/migrations"
   },
   "engines": {

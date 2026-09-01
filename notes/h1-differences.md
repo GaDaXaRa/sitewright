@@ -603,3 +603,17 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
 73. **Publiqué el núcleo con el listón de mutación en rojo** (94,66%) por no medirlo antes de
     publicar. El artefacto no cambió —faltaban pruebas, no código— pero el orden correcto es
     medir y luego publicar. Va en el guion de publicación.
+
+
+74. **Un guion puede mentir terminando con éxito.** `core:sync` existía justo para evitar
+    que un sitio se quedara con un núcleo viejo, y borraba `node_modules/@sitewright`: un
+    nombre muerto desde que el paquete pasó a llamarse `sitewright-core`. Borraba nada,
+    salía con cero, y el sitio seguía con la copia antigua. Tres veces lo pagué creyendo
+    que era despiste mío. Lo que hay que comprobar es el efecto —el hash de lo instalado
+    contra lo construido—, no el código de salida.
+
+75. **Lo que no es un guion, una puerta o un hook hay que recordarlo**, y recordar es
+    justo lo que falla. Los tropiezos repetidos no estaban en el código, que tiene 174
+    pruebas y un listón de mutación, sino en publicar, instalar, desplegar y comprobar,
+    que no tenían ni una puerta. Las reglas cortas viven ahora en `CLAUDE.md`, cada una
+    con el comando que la verifica; este cuaderno es el archivo, no la chuleta.

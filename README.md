@@ -7,9 +7,19 @@ RGPD de serie.
 Pensado para colectivos, portafolios personales, asociaciones y pequeños negocios
 personales. La referencia de calidad es [organicyoga.es](https://www.organicyoga.es).
 
+- **Reglas de trabajo** → [CLAUDE.md](CLAUDE.md) — léelo antes de tocar nada
 - **Plan de la v1** → [docs/plan-v1.md](docs/plan-v1.md)
-- **Estado**: H1 en curso — se construye a mano la primera web de diana (un colectivo de
-  DJs) para descubrir qué es realmente común antes de extraer el núcleo.
+- **Estado**: v1.1. Dos webs en producción, una de ellas de cliente.
+
+## Operaciones
+
+Las que pueden romper algo tienen un único punto de entrada, porque hacerlas a mano salió
+mal más de una vez:
+
+```
+npm run publicar                  publica sitewright-core tras pasar las puertas
+npm run usar-nucleo ../<sitio>    instala el núcleo en un sitio y verifica el resultado
+```
 
 ## Convenciones
 
