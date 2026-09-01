@@ -37,7 +37,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - run: node --test generator/
+      # Con el directorio a secas, Node intenta cargarlo como módulo.
+      - run: node --test generator/*.test.js
 
   template:
     name: Plantilla
