@@ -67,6 +67,6 @@ console.log(`
   Publicado sitewright-core ${version}.
 
   Queda por hacer a mano, porque afecta a sitios en producción:
-    node scripts/usar-nucleo.mjs ../<sitio>     actualiza e instala un sitio
+    node scripts/sync-core.mjs ../<sitio>     actualiza e instala un sitio
     git commit && git tag                       deja constancia de la versión
 `)

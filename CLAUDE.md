@@ -12,10 +12,10 @@ blueprint produce una web Next.js + Payload desplegada. El núcleo es el paquete
 Cada una existe porque se incumplió al menos una vez y costó tiempo real. Llevan al lado
 el comando que las comprueba: si no hay comando, no hay regla, hay buena intención.
 
-1. **Publicar el núcleo es `npm run publicar`**, nunca `npm publish` a mano. El guion
+1. **Publicar el núcleo es `npm run release`**, nunca `npm publish` a mano. El guion
    exige árbol limpio, comprueba contra el registro que la versión esté libre y pasa las
    puertas antes de subir nada.
-2. **Instalar el núcleo en un sitio es `npm run usar-nucleo ../<sitio>`.** npm no refresca
+2. **Instalar el núcleo en un sitio es `npm run sync-core ../<sitio>`.** npm no refresca
    una dependencia `file:` que conserva su versión, así que el guion la borra y compara el
    hash de lo instalado con lo que acaba de construir.
 3. **Los tipos se comprueban aparte: `npm run typecheck`.** `next build` con caché
@@ -44,7 +44,7 @@ No es descuido: estas devuelven algo que parece una respuesta y no lo es.
 |---|---|---|
 | `vercel env pull` | Trae los valores | Los sensibles vienen **censurados** (11 caracteres). Un secreto guardado no se puede leer: si necesitas saberlo, vuelve a escribirlo desde su fuente. |
 | `npm view` | Pregunta al registro | Responde desde caché. Siempre `--prefer-online`. |
-| `npm install` (dep `file:`) | Instala | Si la versión no cambia, deja lo que había. `npm run usar-nucleo`. |
+| `npm install` (dep `file:`) | Instala | Si la versión no cambia, deja lo que había. `npm run sync-core`. |
 | `.npmrc` en un subdirectorio | No está | Tapa el token de la sesión y provoca 404 inexplicables. `ls core/.npmrc`. |
 | `~/.zshrc` con la variable repetida | Vale la primera | Vale **la última**. `zsh -lc 'echo $NPM_TOKEN' \| head -c 8`. |
 | `next build` | Compila de cero | Reutiliza caché y puede ocultar errores de tipos. `npm run typecheck`. |

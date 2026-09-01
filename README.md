@@ -17,8 +17,8 @@ Las que pueden romper algo tienen un único punto de entrada, porque hacerlas a 
 mal más de una vez:
 
 ```
-npm run publicar                  publica sitewright-core tras pasar las puertas
-npm run usar-nucleo ../<sitio>    instala el núcleo en un sitio y verifica el resultado
+npm run release                  publica sitewright-core tras pasar las puertas
+npm run sync-core ../<sitio>    instala el núcleo en un sitio y verifica el resultado
 ```
 
 ## Convenciones

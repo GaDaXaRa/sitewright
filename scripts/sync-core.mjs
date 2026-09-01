@@ -21,7 +21,7 @@ const step = (what) => console.log(`\n── ${what} ──`)
 const hash = (file) => createHash('sha256').update(readFileSync(file)).digest('hex').slice(0, 12)
 
 const [target, askedVersion] = process.argv.slice(2)
-if (!target) stop('Uso: node scripts/usar-nucleo.mjs <ruta-del-sitio> [versión]')
+if (!target) stop('Uso: npm run sync-core -- <ruta-del-sitio> [versión]')
 
 const site = isAbsolute(target) ? target : resolve(process.cwd(), target)
 if (!existsSync(join(site, 'package.json'))) stop(`${site} no parece un sitio: no hay package.json.`)
