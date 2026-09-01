@@ -1,9 +1,12 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
 import { NextRequest } from 'next/server'
 import { config, middleware } from '@/middleware'
+import { site } from '@/site.config'
 
 const VERCEL = 'sitio-abc123.vercel.app'
-const MARCA = 'example.com'
+// Del sitio, no escrito a mano: una web generada nacía con estas pruebas en rojo
+// porque seguían hablando del dominio de la plantilla.
+const MARCA = new URL(site.url).host
 
 // Simula una petición entrante con el Host que se quiera probar.
 function peticion(host: string, ruta = '/') {
@@ -69,7 +72,7 @@ describe('Redirección al dominio de marca', () => {
   // el middleware se ejecuta en todas las rutas.
   it('aguanta una petición sin cabecera Host', () => {
     enProduccion('production')
-    const res = middleware(new NextRequest(new URL('https://example.com/pagina')))
+    const res = middleware(new NextRequest(new URL(`${site.url}/pagina`)))
 
     expect(res.headers.get('location')).toBeNull()
   })

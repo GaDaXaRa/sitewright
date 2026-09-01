@@ -492,3 +492,16 @@ Lo que **no** se ha traído: los comentarios que justifican esa paleta concreta,
 sin `www` y el vinilo dibujado a mano. Son de esa web. Aunque el `www` deja tarea: la
 entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hubo que editar
 `site.config.ts` a mano.
+
+
+56. **Los sitios generados nacían con tres pruebas en rojo.** Las del middleware y la
+    identidad venían de la plantilla con `example.com` escrito a mano, y el generador nunca
+    las adaptaba: cualquier web salía suspendiendo su propia batería desde el minuto uno, y
+    quien la generó no llegó a ejecutarla. Ahora leen el dominio de `site.config.ts`, así
+    que no pueden desfasarse.
+
+57. **Un sitio puede tener tres dominios distintos a la vez**: el del blueprint, el de
+    `site.config.ts` y el de `NEXT_PUBLIC_SITE_URL` — y este último gana en ejecución. En
+    Sandunguera el blueprint decía `www`, la configuración no, y el `.env` volvía a decir
+    `www`. La entrevista tiene que preguntar **con o sin www** y el generador escribir esa
+    respuesta en los tres sitios.

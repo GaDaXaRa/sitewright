@@ -1,4 +1,5 @@
 import { describe, it, expect, afterAll, vi } from 'vitest'
+import { site } from '@/site.config'
 
 /**
  * `SITE_URL` decides which domain the site declares as its own: canonical, sitemap,
@@ -31,7 +32,7 @@ describe('the site domain', () => {
   it('falls back to the address the site is actually served from', async () => {
     // Whatever the blueprint wrote in site.config: it must be an address that answers,
     // never a guess at what Vercel will assign.
-    expect(await loadSiteUrl()).toBe('https://example.com')
+    expect(await loadSiteUrl()).toBe(site.url)
   })
 
   it('obeys what Vercel sets, so buying a domain needs no code change', async () => {
