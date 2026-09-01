@@ -537,3 +537,12 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
     decía "no medimos las visitas" mientras las medía: el interruptor solo quitaba la
     pregunta, no la medición. Y había una prueba que fijaba esa frase, es decir, que
     defendía el error. Ahora distingue los tres casos de verdad.
+
+
+63. **El icono del CMS se servía como WebP bajo una etiqueta que decía PNG.** La ruta
+    `/icono.png` devolvía los bytes tal cual llegaban del almacén, y la página los declaraba
+    `type="image/png"`: un navegador puede descartar el icono por esa incoherencia y quedarse
+    sin ninguno, que es exactamente lo que se veía. Ahora la ruta **convierte con sharp** a
+    PNG de 512×512 con recorte centrado, así que el nombre, el tipo declarado y los bytes
+    dicen lo mismo — y el cliente puede subir lo que tenga, que era el punto de tener el
+    campo.
