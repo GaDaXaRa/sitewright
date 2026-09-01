@@ -2,7 +2,7 @@ import React from 'react'
 import type { Metadata } from 'next'
 import { Public_Sans } from 'next/font/google'
 import { SITE_URL } from '@/lib/site'
-import { buildIcons } from 'sitewright-core'
+import { buildIcons, needsCookieBanner } from 'sitewright-core'
 import { loadSettings } from '@/lib/data'
 import { site } from '@/site.config'
 import { ConsentProvider } from 'sitewright-core/ui'
@@ -50,7 +50,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="es" className={`${display.variable} ${body.variable}`}>
       <body>
-        <ConsentProvider storageKey={site.id} cookiesHref={site.routes.cookies}>
+        <ConsentProvider
+        storageKey={site.id}
+        cookiesHref={site.routes.cookies}
+        showBanner={needsCookieBanner({
+          mode: settings?.cookieBanner,
+          analyticsRequiresConsent: settings?.analyticsConsent !== false,
+        })}
+      >
           <main>{children}</main>
           {/* Only on the public site: traffic to /admin is the client's own and would
               falsify the numbers. */}

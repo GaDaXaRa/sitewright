@@ -80,6 +80,7 @@ export function ConsentProvider({
   storageKey,
   cookiesHref = '/cookies',
   hasEmbeds = false,
+  showBanner = true,
   children,
 }: {
   /** Something stable and site-specific, e.g. "subsuelo". */
@@ -88,6 +89,12 @@ export function ConsentProvider({
   cookiesHref?: string
   /** Whether this site embeds third-party players at all. */
   hasEmbeds?: boolean
+  /**
+   * Whether to greet the visitor with a banner. A site whose only third-party things are
+   * players does not need one: each player asks in place, where the person is already
+   * looking at what they want to hear.
+   */
+  showBanner?: boolean
   children: React.ReactNode
 }) {
   KEY = `sitewright:${storageKey}:consent`
@@ -103,7 +110,7 @@ export function ConsentProvider({
       }}
     >
       {children}
-      {status === 'unknown' ? (
+      {showBanner && status === 'unknown' ? (
         <ConsentBanner cookiesHref={cookiesHref} hasEmbeds={hasEmbeds} />
       ) : null}
     </ConsentContext.Provider>

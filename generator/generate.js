@@ -747,8 +747,8 @@ write(
 write(
   'src/app/(frontend)/layout.tsx',
   applyFonts(read('src/app/(frontend)/layout.tsx'), bp.design).replace(
-    '<ConsentProvider storageKey={site.id} cookiesHref={site.routes.cookies}>',
-    `<ConsentProvider storageKey={site.id} cookiesHref={site.routes.cookies}${modules.media ? ' hasEmbeds' : ''}>`,
+    '<ConsentProvider\n        storageKey={site.id}\n        cookiesHref={site.routes.cookies}',
+    `<ConsentProvider\n        storageKey={site.id}${modules.media ? '\n        hasEmbeds' : ''}\n        cookiesHref={site.routes.cookies}`,
   ),
 )
 

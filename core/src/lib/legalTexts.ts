@@ -123,7 +123,11 @@ export function privacyPolicy(settings: LegalSettings | null | undefined): Legal
 }
 
 export function cookiePolicy(settings: LegalSettings | null | undefined): LegalSection[] {
-  const measures = settings?.analyticsConsent !== false
+  const asksFirst = settings?.analyticsConsent !== false
+  const banner = settings?.cookieBanner ?? 'auto'
+  // Asking before measuring only works if there is a banner to ask with. Saying otherwise
+  // in a legal page is the worst place to be wrong.
+  const measuresAtAll = !asksFirst || banner !== 'never'
 
   return [
     {
@@ -134,13 +138,15 @@ export function cookiePolicy(settings: LegalSettings | null | undefined): LegalS
     },
     {
       heading: 'Medición de visitas',
-      paragraphs: measures
-        ? [
-            'Usamos Vercel Analytics para saber cuántas visitas recibe cada página. No usa cookies ni construye un perfil de quien navega, y aun así no se carga hasta que aceptas.',
-          ]
-        : [
-            'No medimos las visitas: no se carga ninguna herramienta de analítica.',
-          ],
+      paragraphs: !measuresAtAll
+        ? ['No medimos las visitas: no se carga ninguna herramienta de analítica.']
+        : asksFirst
+          ? [
+              'Usamos Vercel Analytics para saber cuántas visitas recibe cada página. No usa cookies ni construye un perfil de quien navega, y aun así no se carga hasta que aceptas.',
+            ]
+          : [
+              'Usamos Vercel Analytics para saber cuántas visitas recibe cada página. No usa cookies, no guarda nada en tu navegador y no construye un perfil de quien navega; por eso se carga sin pedirte permiso.',
+            ],
     },
     {
       heading: 'Reproductores de terceros',

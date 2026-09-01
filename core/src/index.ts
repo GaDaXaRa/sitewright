@@ -32,6 +32,13 @@ export {
 // Colour, where it has a right answer
 export { contrastRatio, bestTextOn, buttonColors, type ButtonColors } from './lib/color.js'
 
+// Consent, and whether a banner is needed at all
+export {
+  needsCookieBanner,
+  BANNER_OFF_WARNING,
+  type CookieBannerMode,
+} from './lib/consent.js'
+
 // Laying out a page
 export { alternateTones, type Tone } from './lib/sectionTones.js'
 

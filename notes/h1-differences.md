@@ -517,3 +517,23 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
     sube lo que tiene. Ahora el núcleo expone las medidas guardadas (`mediaSize`) y el menú
     lo sirve con `next/image`: en Sandunguera pasó de 17,9 KB a 2,2 KB en móvil, en todas
     las páginas.
+
+
+60. **El banner de cookies no depende de si hay terceros, sino de si hay algo que decidir
+    *antes* de actuar.** La medición se dispara al cargar la página, así que hay que
+    preguntar de antemano; un reproductor solo se carga cuando alguien quiere oírlo, y su
+    marcador de posición ya pide permiso allí mismo, con lo que la persona ha venido a
+    buscar delante. De ahí que una web llena de audio embebido pueda no necesitar banner y
+    una con solo un contador de visitas sí. Lo decide `needsCookieBanner`, y en Ajustes hay
+    un control de tres posiciones: automático, siempre, nunca.
+
+61. **Apagarlo tiene una consecuencia que no es obvia**, así que la casilla que lo confirma
+    es obligatoria para guardar: sin banner, la medición **no se carga nunca** —nadie puede
+    aceptarla— mientras que los reproductores siguen funcionando. La advertencia vive en el
+    núcleo (`BANNER_OFF_WARNING`) para que el panel y la documentación no puedan contar
+    cosas distintas.
+
+62. **La política de cookies afirmaba algo falso.** Con la analítica sin consentimiento
+    decía "no medimos las visitas" mientras las medía: el interruptor solo quitaba la
+    pregunta, no la medición. Y había una prueba que fijaba esa frase, es decir, que
+    defendía el error. Ahora distingue los tres casos de verdad.

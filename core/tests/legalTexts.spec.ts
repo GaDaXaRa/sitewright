@@ -172,10 +172,13 @@ describe('cookie policy', () => {
     expect(text(cookiePolicy(settings({ analyticsConsent: true })))).toContain('Vercel Analytics')
   })
 
-  it('says plainly that nothing is measured when it is switched off', () => {
+  it('says that measurement happens without asking when consent is not required', () => {
+    // This test used to assert "no medimos las visitas", which was false: with the flag off
+    // the site measures, it just does not ask first. A wrong sentence in the page whose job
+    // is to be true.
     const body = text(cookiePolicy(settings({ analyticsConsent: false })))
 
-    expect(body).toContain('No medimos las visitas')
-    expect(body).not.toContain('Vercel Analytics')
+    expect(body).toContain('se carga sin pedirte permiso')
+    expect(body).toContain('Vercel Analytics')
   })
 })

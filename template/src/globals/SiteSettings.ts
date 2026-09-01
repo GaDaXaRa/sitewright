@@ -1,6 +1,7 @@
 import type { GlobalConfig } from 'payload'
 import { revalidateSiteGlobal } from '../collections/hooks/revalidate'
 import { site } from '../site.config'
+import { BANNER_OFF_WARNING } from 'sitewright-core'
 
 /**
  * Site-wide settings: identity, home cover, contact, social links and legal data.
@@ -168,6 +169,37 @@ export const SiteSettings: GlobalConfig = {
             description:
               'Recomendado. Sin marcar, la analítica se carga desde el primer momento y eso solo es defendible si no usa cookies.',
           },
+        },
+        {
+          name: 'cookieBanner',
+          label: 'Banner de cookies',
+          type: 'select',
+          defaultValue: 'auto',
+          options: [
+            { label: 'Automático: solo si hace falta (recomendado)', value: 'auto' },
+            { label: 'Mostrarlo siempre', value: 'always' },
+            { label: 'No mostrarlo nunca', value: 'never' },
+          ],
+          admin: {
+            description:
+              'En automático solo aparece si hay algo que decidir antes de navegar: la medición de visitas. Los reproductores de audio y vídeo no lo necesitan, porque cada uno pide permiso al pulsarlo.',
+          },
+        },
+        {
+          name: 'cookieBannerOffAcknowledged',
+          label: 'Entiendo lo que implica quitar el banner',
+          type: 'checkbox',
+          defaultValue: false,
+          admin: {
+            condition: (data) => data?.cookieBanner === 'never',
+            description: BANNER_OFF_WARNING,
+          },
+          // Not decoration: without the box ticked the change does not save, because "no
+          // banner" is a decision with consequences and this is the only place it is read.
+          validate: (value: unknown, { data }: { data?: { cookieBanner?: string } }) =>
+            data?.cookieBanner !== 'never' || value === true
+              ? true
+              : 'Marca la casilla para confirmar que asumes lo que implica quitarlo.',
         },
       ],
     },

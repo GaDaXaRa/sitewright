@@ -25,4 +25,5 @@ export type LegalSettings = {
   legalEmail?: string | null
   email?: string | null
   analyticsConsent?: boolean | null
+  cookieBanner?: 'auto' | 'always' | 'never' | null
 }
