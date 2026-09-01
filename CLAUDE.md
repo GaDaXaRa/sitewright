@@ -51,6 +51,21 @@ No es descuido: estas devuelven algo que parece una respuesta y no lo es.
 | Stryker | Marca supervivientes | Los mutantes estáticos salen como supervivientes sin serlo (`ignoreStatic`). |
 | Un guion que termina con éxito | Ha hecho su trabajo | `core:sync` borraba `node_modules/@sitewright`, nombre muerto desde el renombrado: terminaba bien sin hacer nada. Comprueba el efecto, no el código de salida. |
 
+## La CI
+
+`.github/workflows/ci.yml` corre en cada push: tipos, pruebas, listón de mutación y build
+del núcleo, las pruebas del generador y las de la plantilla. Los tipos de Payload no están
+versionados, así que la plantilla los genera antes de comprobarlos.
+
+Los sitios llevan `.github/workflows/audit.yml`: cuando Vercel termina un despliegue de
+producción, audita la dirección que acaba de quedar viva. La URL sale de la variable
+`AUDIT_URL` del repositorio (`gh variable set AUDIT_URL --repo …`), y si no está, de la
+que informe el despliegue.
+
+Ojo con auditar producción desde el portátil: la puerta de la conexión agrupada lee el
+`DATABASE_URL` del entorno que lanza el comando, que en local es el de desarrollo. El
+fallo que da ahí no es un fallo de la web.
+
 ## Dónde está lo demás
 
 - **`notes/h1-differences.md`** — los 73 hallazgos con su contexto. Es el archivo

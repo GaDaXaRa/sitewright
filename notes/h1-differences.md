@@ -617,3 +617,20 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
     pruebas y un listón de mutación, sino en publicar, instalar, desplegar y comprobar,
     que no tenían ni una puerta. Las reglas cortas viven ahora en `CLAUDE.md`, cada una
     con el comando que la verifica; este cuaderno es el archivo, no la chuleta.
+
+
+76. **La CI encontró algo antes de existir del todo.** Al escribirla salió que
+    `payload-types.ts` está en `.gitignore` a propósito —cada sitio genera el suyo— y que
+    por tanto la copia de cada quien se queda atrás cuando alguien añade un campo. La mía
+    no conocía `favicon` ni `cookieBanner`, así que mi `typecheck` local llevaba tiempo
+    comprobando una forma de los datos que ya no era la real. La CI los genera antes de
+    mirar, que es la única manera de que lo comprobado sea lo que hay.
+
+77. **`node --test <directorio>` intenta cargar el directorio como módulo** en Node 24 y
+    falla con un error que habla de un módulo que nadie escribió. Hay que darle ficheros.
+
+78. **La auditoría lee `DATABASE_URL` del entorno que la lanza, no del entorno que
+    audita.** Auditando `https://www.sandunguera.es` desde el portátil, la puerta de la
+    conexión agrupada mira la cadena de *desarrollo* —directa, como debe ser en local— y
+    da un fallo que no existe en producción. Lo ambiental miente: esa comprobación
+    debería exigir una cadena pasada a propósito, no coger la que haya puesta.
