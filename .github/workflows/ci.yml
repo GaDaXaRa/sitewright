@@ -53,7 +53,13 @@ jobs:
           cache: npm
           cache-dependency-path: template/package-lock.json
       - run: npm ci
-      # Los tipos de Payload están escritos en el repositorio y se quedan atrás cuando
-      # alguien añade un campo: ya pasó con `favicon` y `cookieBanner`.
+      # Los tipos de Payload no están versionados —los genera cada sitio— así que aquí
+      # hay que escribirlos antes de comprobarlos. No hace falta base de datos: sólo se
+      # lee la configuración. La copia local de cada quien se queda atrás cuando alguien
+      # añade un campo, y entonces miente en las dos direcciones.
+      - run: npm run generate:types
+        env:
+          DATABASE_URI: postgres://localhost:5432/ninguna
+          PAYLOAD_SECRET: ci
       - run: npm run typecheck
       - run: npm run test:int
