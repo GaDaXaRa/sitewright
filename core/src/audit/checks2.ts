@@ -182,6 +182,68 @@ export function checkPlaceholders(pages: Fetched[]): Finding[] {
   ]
 }
 
+// ── alcanzables ──────────────────────────────────────────────────────────────────────────
+
+const GATE_REACH = 'navegacion'
+
+/** The internal paths a page links to, normalised and without fragments or trailing slashes. */
+export function internalLinks(html: string, siteUrl: string): string[] {
+  const host = new URL(siteUrl).host
+  const paths = new Set<string>()
+
+  for (const [, href] of html.matchAll(/<a\b[^>]*\bhref="([^"]+)"/gi)) {
+    try {
+      const url = new URL(href, siteUrl)
+      if (url.host !== host) continue
+      const path = url.pathname.replace(/\/$/, '') || '/'
+      paths.add(path)
+    } catch {
+      // A malformed href links nowhere; the browser agrees.
+    }
+  }
+
+  return [...paths]
+}
+
+/**
+ * Everything in the sitemap has to be reachable by clicking.
+ *
+ * A page that is generated, indexed and linked from nowhere is a page nobody reads: it
+ * happened to the questions page of the third site built with this, which existed, ranked
+ * and could only be reached by typing the address. Search engines will find it through the
+ * sitemap and people will not, which is the wrong way round.
+ */
+export function checkReachable(sitemapUrls: string[], reachable: Set<string>): Finding[] {
+  if (!sitemapUrls.length) {
+    return [skip(GATE_REACH, 'Todo lo del sitemap se alcanza pinchando', 'El sitemap está vacío.')]
+  }
+
+  const orphans = sitemapUrls
+    .map((url) => {
+      try {
+        return new URL(url).pathname.replace(/\/$/, '') || '/'
+      } catch {
+        return null
+      }
+    })
+    .filter((path): path is string => Boolean(path))
+    .filter((path) => !reachable.has(path))
+
+  return [
+    orphans.length
+      ? fail(
+          GATE_REACH,
+          'Todo lo del sitemap se alcanza pinchando',
+          `Sin ningún enlace que lleve a ${orphans.slice(0, 4).join(', ')}${orphans.length > 4 ? ` y ${orphans.length - 4} más` : ''}.`,
+        )
+      : ok(
+          GATE_REACH,
+          'Todo lo del sitemap se alcanza pinchando',
+          `${sitemapUrls.length} páginas, todas enlazadas.`,
+        ),
+  ]
+}
+
 // ── contraste ───────────────────────────────────────────────────────────────────────────
 
 const GATE_CONTRAST = 'contraste'

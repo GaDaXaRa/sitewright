@@ -15,9 +15,11 @@ import {
   checkLegalPages,
   checkLlmsTxt,
   checkPlaceholders,
+  checkReachable,
   checkWeight,
+  internalLinks,
 } from './checks2.js'
-import { checkMigrations } from './migrations.js'
+import { checkMigrations, checkPooled } from './migrations.js'
 
 export type AuditOptions = {
   /** Where the site is answering right now: a dev server or the real thing. */
@@ -71,6 +73,29 @@ export async function runAudit(options: AuditOptions): Promise<Finding[]> {
   // host that redirects to itself answers 308 forever and every page still names it.
   const canonical = await get(`${siteUrl}/`, 'manual')
 
+  // A short crawl from the home page: what a person could reach by clicking, which is the
+  // only honest way to tell an indexed page from an orphan one.
+  const reachable = new Set<string>(['/'])
+  const queue = internalLinks(home.body, base)
+  const seen = new Set<string>(['/'])
+  let budget = 25
+  while (queue.length && budget > 0) {
+    const path = queue.shift()!
+    reachable.add(path)
+    if (seen.has(path)) continue
+    seen.add(path)
+    budget -= 1
+    const page = await get(`${base}${path}`)
+    if (page.status === 200) {
+      for (const link of internalLinks(page.body, base)) {
+        reachable.add(link)
+        if (!seen.has(link)) queue.push(link)
+      }
+    }
+  }
+
+  const sitemapUrls = [...sitemap.body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]!)
+
   const findings: Finding[] = [
     ...checkIdentity(home, siteUrl),
     ...checkCanonicalAnswers(canonical),
@@ -83,6 +108,7 @@ export async function runAudit(options: AuditOptions): Promise<Finding[]> {
     ...checkImages(allPages),
     ...checkPlaceholders(allPages),
     ...checkWeight(allPages),
+    ...checkReachable(sitemapUrls, reachable),
   ]
 
   if (options.cssPath) {
@@ -95,6 +121,7 @@ export async function runAudit(options: AuditOptions): Promise<Finding[]> {
     findings.push(skip('contraste', 'Contraste de la paleta', 'Sin --css no hay paleta que medir.'))
   }
 
+  findings.push(...checkPooled(options.databaseUrl))
   findings.push(
     ...(await checkMigrations({
       databaseUrl: options.databaseUrl,

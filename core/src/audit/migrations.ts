@@ -12,6 +12,41 @@ const GATE = 'esquema'
  * deploy of the first site built this way, and the cause was mundane — development and
  * production sharing one branch.
  */
+/**
+ * A serverless site needs the **pooled** connection string.
+ *
+ * Each function instance opens its own connection, and Postgres counts them: with the
+ * direct endpoint a busy afternoon exhausts the limit and the site starts answering with
+ * database errors, at the worst possible time and without anything having changed.
+ *
+ * It checks **the string you hand it**, which is worth saying: the value a deployment
+ * actually uses cannot be read back from the host (`vercel env pull` redacts it), so pass
+ * the same one production has, or this gate is only auditing your own notes.
+ */
+export function checkPooled(databaseUrl?: string): Finding[] {
+  if (!databaseUrl) return []
+
+  let host: string
+  try {
+    host = new URL(databaseUrl).host
+  } catch {
+    return []
+  }
+
+  // Only Neon names its pooled endpoint this way; elsewhere there is nothing to check.
+  if (!host.includes('.neon.tech')) return []
+
+  return [
+    host.includes('-pooler')
+      ? ok(GATE, 'La conexión es la agrupada', host)
+      : fail(
+          GATE,
+          'La conexión es la agrupada',
+          `${host} es el endpoint directo. En producción, cada función abre su propia conexión y se agota el límite.`,
+        ),
+  ]
+}
+
 export async function checkMigrations({
   databaseUrl,
   migrationsDir,

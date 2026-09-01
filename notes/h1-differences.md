@@ -558,3 +558,26 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
     reevalúa el módulo, y se contaban como fallos de las pruebas. Comprobado a mano —
     cambiando la constante, la batería falla— y configurado `ignoreStatic`. Contarlos era
     medir el ejecutor, no las pruebas.
+
+
+---
+
+# v1.1
+
+66. **Una página del sitemap a la que no lleva ningún enlace es una página que nadie lee.**
+    La auditoría hace ahora un recorrido corto desde la portada —hasta veinticinco páginas—
+    y compara lo alcanzable con lo publicado en el sitemap. Es la puerta que habría cazado
+    la página de preguntas huérfana de la tercera web.
+
+67. **El dominio se pregunta y se escribe en los tres sitios.** La entrevista pide
+    explícitamente con o sin `www` —y enseña a comprobarlo con un `curl`, porque el que
+    responde 200 es el canónico y el que devuelve 308 no— y el generador lo escribe también
+    en `.env.example`, que era el tercer lugar donde vivía y el que ganaba en ejecución.
+
+68. **La conexión de producción tiene que ser la agrupada.** Con el endpoint directo, cada
+    función abre su propia conexión y el límite se agota justo cuando hay tráfico. Hay puerta.
+
+69. **`vercel env pull` redacta las variables sensibles**, así que leí once caracteres de
+    relleno y concluí que las dos webs usaban el endpoint directo. No se puede comprobar
+    desde fuera qué cadena usa un despliegue: la puerta mide **la que le pasas**. Las dos
+    quedaron con la agrupada porque la escribí yo, no porque lo verificara.

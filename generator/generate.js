@@ -765,6 +765,16 @@ write(
   }),
 )
 
+// The domain lived in three places and the one nobody wrote was the one that won at
+// runtime: `NEXT_PUBLIC_SITE_URL`. It gets written here too, from the same answer.
+write(
+  '.env.example',
+  read('.env.example').replace(
+    /^NEXT_PUBLIC_SITE_URL=.*$/m,
+    `NEXT_PUBLIC_SITE_URL=${bp.identity.url}`,
+  ),
+)
+
 const pkg = JSON.parse(read('package.json'))
 pkg.name = bp.identity.id
 pkg.description = `Web de ${bp.identity.name}`

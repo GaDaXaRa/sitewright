@@ -52,6 +52,17 @@ de las que pasa, y la auditoría lo va a cazar de todas formas.
 → `identity`, `legal`. Sin `legal.holder` no se puede generar: es lo que hace legales las
 páginas legales.
 
+**Pregunta el dominio con o sin `www`, y en voz alta.** No se deduce, decide qué versión
+indexa Google, y acaba escrito en tres sitios: `site.config.ts`, `.env` y las variables de
+Vercel — donde manda el último. Si el dominio ya existe, compruébalo antes de escribirlo:
+
+```bash
+curl -s -o /dev/null -w '%{http_code} → %{redirect_url}\n' https://ejemplo.es/
+```
+
+Lo que responda 200 es el canónico; lo que devuelva 308 es el que redirige. Ponerlo al revés
+hace que la web declare como buena una dirección que no sirve nada.
+
 **6 · Contenido.** Qué textos existen ya, qué fotos hay, qué se puede redactar en borrador.
 → `content` y la hoja de encargo.
 

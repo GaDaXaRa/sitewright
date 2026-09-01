@@ -10,6 +10,8 @@ import {
 import {
   checkConsentGating,
   checkPlaceholders,
+  checkReachable,
+  internalLinks,
   checkContrast,
   checkImages,
   checkLegalPages,
@@ -221,6 +223,56 @@ describe('contenido', () => {
     const real = page({ body: '<p>Damos clases de teatro los martes en el local de la calle Mayor.</p>' })
 
     expect(checkPlaceholders([real]).every((f) => f.status === 'ok')).toBe(true)
+  })
+})
+
+describe('navegación', () => {
+  it('lee los enlaces internos y descarta los de fuera', () => {
+    const html =
+      '<a href="/sesiones">x</a><a href="https://ejemplo.es/bolos/">y</a>' +
+      '<a href="https://otro.es/z">fuera</a><a href="/sesiones#abajo">repetido</a>'
+
+    expect(internalLinks(html, SITE).sort()).toEqual(['/bolos', '/sesiones'])
+  })
+
+  it('caza una página del sitemap a la que no lleva ningún enlace', () => {
+    // Le pasó a la página de preguntas de la tercera web: existía, entraba en el sitemap,
+    // y solo se llegaba escribiendo la dirección. Google la encuentra y una persona no.
+    const findings = checkReachable(
+      [`${SITE}/`, `${SITE}/sesiones`, `${SITE}/preguntas-frecuentes`],
+      new Set(['/', '/sesiones']),
+    )
+
+    expect(failures(findings)).toHaveLength(1)
+    expect(findings[0]!.detail).toContain('/preguntas-frecuentes')
+  })
+
+  it('pasa cuando todo lo publicado tiene por dónde llegarse', () => {
+    expect(
+      failures(checkReachable([`${SITE}/`, `${SITE}/sesiones`], new Set(['/', '/sesiones']))),
+    ).toEqual([])
+  })
+
+  it('no juzga un sitemap vacío: dice que no lo ha comprobado', () => {
+    expect(checkReachable([], new Set(['/'])).every((f) => f.status === 'skip')).toBe(true)
+  })
+})
+
+describe('conexión a la base', () => {
+  it('caza el endpoint directo de Neon, que agota conexiones en producción', async () => {
+    const { checkPooled } = await import('../src/audit/migrations.js')
+
+    expect(
+      failures(checkPooled('postgresql://u:p@ep-calm-mud-b1uz3k5f.c-5.eu-central-1.aws.neon.tech/db')),
+    ).toHaveLength(1)
+  })
+
+  it('pasa con la agrupada y no opina de otros proveedores', async () => {
+    const { checkPooled } = await import('../src/audit/migrations.js')
+
+    expect(failures(checkPooled('postgresql://u:p@ep-x-pooler.c-5.eu-central-1.aws.neon.tech/db'))).toEqual([])
+    expect(checkPooled('postgresql://u:p@localhost:5432/db')).toEqual([])
+    expect(checkPooled(undefined)).toEqual([])
   })
 })
 
