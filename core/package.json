@@ -1,7 +1,7 @@
 {
   "name": "sitewright-core",
-  "version": "0.5.0",
-  "description": "The invariant half of a Sitewright site: pure logic, image handling, form brakes and SEO plumbing.",
+  "version": "0.5.2",
+  "description": "Shared runtime for Next.js + Payload CMS sites: image backup and versioning, public-form abuse brakes, real cookie consent, generated legal pages, SEO/GEO helpers, and an audit CLI that gates deploys.",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
@@ -77,15 +77,26 @@
   "publishConfig": {
     "access": "public"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/GaDaXaRa/sitewright"
-  },
   "keywords": [
     "payload",
+    "payloadcms",
     "nextjs",
+    "cms",
     "seo",
     "geo",
-    "rgpd"
-  ]
+    "llms-txt",
+    "cookie-consent",
+    "gdpr",
+    "accessibility",
+    "audit"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GaDaXaRa/sitewright.git",
+    "directory": "core"
+  },
+  "homepage": "https://github.com/GaDaXaRa/sitewright#readme",
+  "bugs": {
+    "url": "https://github.com/GaDaXaRa/sitewright/issues"
+  }
 }
