@@ -1,0 +1,32 @@
+name: Auditoría
+
+# La web se despliega sola con cada push, así que ya nadie ejecuta la auditoría a mano.
+# Esta se lanza contra la dirección que acaba de quedar en producción: si el despliegue
+# salió roto, el aviso llega sin que nadie se acuerde de mirar.
+on:
+  deployment_status:
+
+jobs:
+  audit:
+    name: La web en producción
+    if: >
+      github.event.deployment_status.state == 'success' &&
+      (github.event.deployment_status.environment == 'Production' ||
+       github.event.deployment_status.environment == 'production')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Auditar
+        env:
+          # El dominio propio cuando lo hay; si aún no se ha comprado, la dirección que
+          # Vercel acaba de publicar. Se define con `gh variable set AUDIT_URL`.
+          URL: ${{ vars.AUDIT_URL || github.event.deployment_status.environment_url }}
+        run: |
+          VERSION=$(node -p "require('./package.json').dependencies['sitewright-core'].replace(/[^0-9.]/g, '')")
+          npx --yes "sitewright-core@$VERSION" sitewright-audit \
+            --url "$URL" \
+            --css "src/app/(frontend)/styles.css" \
+            --migrations src/migrations

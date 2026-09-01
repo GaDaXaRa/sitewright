@@ -1,0 +1,59 @@
+name: CI
+
+# El listón tiene que sobrevivir a un push venga de quien venga, incluido un agente que
+# no haya leído CLAUDE.md. Lo que aquí falla no llega a main.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  core:
+    name: Núcleo
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: core
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: core/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      # Once segundos en ocho núcleos: barato para vigilar cada push, y el listón ya ha
+      # derivado dos veces sin que nadie se diera cuenta.
+      - run: npm run test:mutacion
+      - run: npm run build
+
+  generator:
+    name: Generador
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node --test generator/
+
+  template:
+    name: Plantilla
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: template
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: template/package-lock.json
+      - run: npm ci
+      # Los tipos de Payload están escritos en el repositorio y se quedan atrás cuando
+      # alguien añade un campo: ya pasó con `favicon` y `cookieBanner`.
+      - run: npm run typecheck
+      - run: npm run test:int
