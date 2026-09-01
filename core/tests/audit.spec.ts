@@ -193,6 +193,13 @@ describe('imágenes', () => {
     )
   })
 
+  it('reconoce el srcSet que sirve React, con la S grande', () => {
+    // Marcaba como sin optimizar cada next/image de cada web: React emite `srcSet`.
+    const html = '<img alt="foto" srcSet="/a.webp 640w, /b.webp 750w" sizes="100vw"/>'
+
+    expect(checkImages([page({ body: html })]).every((f) => f.status === 'ok')).toBe(true)
+  })
+
   it('acepta el alt vacío de una imagen decorativa', () => {
     expect(failures(checkImages([page({ body: '<img src="/a.webp" alt="" width="10"/>' })]))).toEqual(
       [],

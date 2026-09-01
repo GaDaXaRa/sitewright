@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import type { SiteSetting } from '@/payload-types'
-import { mediaUrl } from 'sitewright-core'
+import { mediaSize, mediaUrl } from 'sitewright-core'
 import { site } from '@/site.config'
 
 import Nav from './Nav'
@@ -30,6 +30,7 @@ export default function InnerPage({
       <Nav
         name={settings?.siteName ?? site.name}
         logoUrl={mediaUrl(settings?.logo)}
+        logoSize={mediaSize(settings?.logo)}
         links={[...site.nav]}
         cta={site.cta ?? undefined}
       />

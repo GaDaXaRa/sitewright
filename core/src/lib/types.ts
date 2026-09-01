@@ -10,6 +10,8 @@
 export type MediaLike = {
   url?: string | null
   alt?: string | null
+  width?: number | null
+  height?: number | null
   focalX?: number | null
   focalY?: number | null
 }

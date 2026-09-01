@@ -10,7 +10,7 @@
 export { resolveSiteUrl } from './lib/site.js'
 
 // Reading the CMS
-export { mediaUrl, mediaAbsoluteUrl, mediaAlt, mediaFocal } from './lib/media.js'
+export { mediaUrl, mediaAbsoluteUrl, mediaAlt, mediaFocal, mediaSize } from './lib/media.js'
 export { relationId, relationPointsTo } from './lib/relations.js'
 export type { MediaLike, LegalSettings } from './lib/types.js'
 

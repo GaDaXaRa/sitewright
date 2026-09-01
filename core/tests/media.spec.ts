@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { mediaAbsoluteUrl, mediaAlt, mediaFocal, mediaUrl } from '../src/lib/media.js'
+import { mediaAbsoluteUrl, mediaAlt, mediaFocal, mediaSize, mediaUrl } from '../src/lib/media.js'
 
 const SITE = 'https://ejemplo.es'
 
@@ -58,5 +58,17 @@ describe('mediaAlt and mediaFocal', () => {
 
   it('keeps a zero, which is a corner and not a missing value', () => {
     expect(mediaFocal({ focalX: 0, focalY: 0 })).toEqual({ x: 0, y: 0 })
+  })
+})
+
+describe('mediaSize', () => {
+  it('devuelve las medidas guardadas al subir', () => {
+    expect(mediaSize({ width: 1200, height: 400 })).toEqual({ width: 1200, height: 400 })
+  })
+
+  it('no inventa medidas cuando falta alguna', () => {
+    // Sin las dos no se puede pedir a next/image que la sirva: mejor decirlo que suponer.
+    expect(mediaSize({ width: 1200 })).toBeNull()
+    expect(mediaSize(null)).toBeNull()
   })
 })

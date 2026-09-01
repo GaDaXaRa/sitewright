@@ -27,6 +27,18 @@ export function mediaAlt(value: unknown): string | null {
   return asMedia(value)?.alt ?? null
 }
 
+/**
+ * The dimensions Payload stored when the file was uploaded.
+ *
+ * Without them a logo can only be rendered as a plain `<img>`, which means every visitor
+ * downloads whatever the client happened to upload — and the client is exactly who cannot
+ * be expected to resize a file before uploading it.
+ */
+export function mediaSize(value: unknown): { width: number; height: number } | null {
+  const m = asMedia(value) as { width?: number | null; height?: number | null } | null
+  return m?.width && m?.height ? { width: m.width, height: m.height } : null
+}
+
 /** Focal point set in the admin panel (0-100): the part that must not be cropped away. */
 export function mediaFocal(value: unknown): { x: number | null; y: number | null } {
   const m = asMedia(value)

@@ -505,3 +505,15 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
     Sandunguera el blueprint decía `www`, la configuración no, y el `.env` volvía a decir
     `www`. La entrevista tiene que preguntar **con o sin www** y el generador escribir esa
     respuesta en los tres sitios.
+
+
+58. **La puerta de imágenes marcaba en rojo lo que estaba bien.** Buscaba `srcset` en
+    minúsculas y React sirve `srcSet`: cada `next/image` de cada web salía como "sin
+    optimizar". Un aviso que miente entrena a la gente a ignorar el informe, que es la peor
+    avería posible en una auditoría.
+
+59. **El logo era la única imagen sin optimizar de verdad.** Iba como `<img>` a pelo porque
+    "se ve pequeño y da igual el tamaño" — pero quien elige ese fichero es el cliente, que
+    sube lo que tiene. Ahora el núcleo expone las medidas guardadas (`mediaSize`) y el menú
+    lo sirve con `next/image`: en Sandunguera pasó de 17,9 KB a 2,2 KB en móvil, en todas
+    las páginas.

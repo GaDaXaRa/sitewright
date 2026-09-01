@@ -116,8 +116,10 @@ export function checkImages(pages: Fetched[]): Finding[] {
 
   if (!tags.length) return [ok(GATE_IMG, 'Las imágenes llevan texto alternativo', 'No hay <img>.')]
 
-  const noAlt = tags.filter(({ tag }) => !/\balt=/.test(tag))
-  const noSizes = tags.filter(({ tag }) => !/\bsrcset=/.test(tag) && !/\bwidth=/.test(tag))
+  // Sin distinguir mayúsculas: React sirve `srcSet` con la S grande, y buscando `srcset` la
+  // puerta marcaba como sin optimizar cada imagen que sí lo estaba.
+  const noAlt = tags.filter(({ tag }) => !/\balt=/i.test(tag))
+  const noSizes = tags.filter(({ tag }) => !/\bsrcset=/i.test(tag) && !/\bwidth=/i.test(tag))
 
   return [
     noAlt.length

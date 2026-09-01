@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 
 export type NavLink = { href: string; label: string }
@@ -8,11 +9,18 @@ export type NavLink = { href: string; label: string }
 export default function Nav({
   name,
   logoUrl,
+  logoSize,
   links = [],
   cta,
 }: {
   name: string
   logoUrl?: string | null
+  /**
+   * The dimensions the CMS stored for the logo. With them the image is served at the size
+   * it is shown; without them it would go out whole to every visitor on every page, and the
+   * person choosing that file is the client.
+   */
+  logoSize?: { width: number; height: number } | null
   /** One per module with a page of its own. The generator fills this in. */
   links?: NavLink[]
   cta?: NavLink
@@ -23,9 +31,18 @@ export default function Nav({
     <nav className="nav">
       <div className="container nav-inner">
         <Link href="/" className="brand" onClick={() => setOpen(false)}>
-          {logoUrl ? (
-            /* The logo is uploaded by the client at unknown dimensions and shown small in
-               the bar, so a plain <img> is enough here. */
+          {logoUrl && logoSize ? (
+            <Image
+              src={logoUrl}
+              alt={`Logo de ${name}`}
+              width={logoSize.width}
+              height={logoSize.height}
+              sizes="200px"
+              priority
+            />
+          ) : logoUrl ? (
+            /* Uploaded before Payload recorded its dimensions: served as it is rather than
+               not at all. */
             // eslint-disable-next-line @next/next/no-img-element
             <img src={logoUrl} alt={`Logo de ${name}`} />
           ) : (

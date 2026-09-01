@@ -209,7 +209,7 @@ ${jsonldImports}
 import { loadSiteContent } from '@/lib/data'
 import { buildHomeJsonLd } from '@/lib/jsonLd'
 import { site } from '@/site.config'
-import { alternateTones, mediaAlt, mediaFocal, mediaUrl${usesSplit ? ', splitEvents' : ''} } from 'sitewright-core'
+import { alternateTones, mediaAlt, mediaFocal, mediaSize, mediaUrl${usesSplit ? ', splitEvents' : ''} } from 'sitewright-core'
 
 // ISR: the home page is generated statically and revalidated every five minutes at most. A
 // hook also revalidates it the instant the client edits content, so changes show up.
@@ -257,6 +257,7 @@ ${overlays.map((w) => `      ${w.overlayRender()}`).join('\n')}
       <Nav
         name={settings.siteName}
         logoUrl={mediaUrl(settings.logo)}
+        logoSize={mediaSize(settings.logo)}
         links={[...site.nav]}
         cta={site.cta ?? undefined}
       />
