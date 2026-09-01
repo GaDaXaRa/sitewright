@@ -53,7 +53,14 @@ function siteConfig(bp, modules, wirings) {
 export const site = {
   id: '${bp.identity.id}',
   name: '${bp.identity.name}',
-  url: '${bp.identity.url}',
+  ${
+    bp.identity.url
+      ? `url: '${bp.identity.url}',`
+      : `// Sin dominio propio todavía: el sitio usa la dirección que Vercel da al proyecto,
+  // que es real desde el primer despliegue y pasa a ser la de verdad en cuanto se compre
+  // el dominio y se configure ahí. Cuando eso ocurra, se escribe aquí.
+  url: '',`
+  }
 
   routes: {
 ${routes.join('\n')}
@@ -767,18 +774,22 @@ write(
 
 // The domain lived in three places and the one nobody wrote was the one that won at
 // runtime: `NEXT_PUBLIC_SITE_URL`. It gets written here too, from the same answer.
-write(
-  '.env.example',
-  read('.env.example').replace(
-    /^NEXT_PUBLIC_SITE_URL=.*$/m,
-    `NEXT_PUBLIC_SITE_URL=${bp.identity.url}`,
-  ),
-)
+if (bp.identity.url) {
+  write(
+    '.env.example',
+    read('.env.example').replace(
+      /^NEXT_PUBLIC_SITE_URL=.*$/m,
+      `NEXT_PUBLIC_SITE_URL=${bp.identity.url}`,
+    ),
+  )
+}
 
 const pkg = JSON.parse(read('package.json'))
 pkg.name = bp.identity.id
 pkg.description = `Web de ${bp.identity.name}`
-pkg.scripts.audit = pkg.scripts.audit.replace('http://localhost:3000', bp.identity.url)
+if (bp.identity.url) {
+  pkg.scripts.audit = pkg.scripts.audit.replace('http://localhost:3000', bp.identity.url)
+}
 // The published package by default: a `file:` path does not survive a deploy, because only
 // the site's own repository gets uploaded. `--core file:…` still works for developing the
 // core against a site.
@@ -795,7 +806,13 @@ Sitio generado en ${target}
 
 Lo que falta, y no lo hace el generador:
 
-  1. cp .env.example .env  y pon DATABASE_URL (una rama de Neon para este sitio)
+  1. cp .env.example .env  y pon DATABASE_URL (una rama de Neon para este sitio)${
+    bp.identity.url
+      ? ''
+      : `
+     (sin dominio propio: no pongas NEXT_PUBLIC_SITE_URL y el sitio usará su dirección
+      de Vercel; cuando compréis el dominio, ponedlo en Vercel y en src/site.config.ts)`
+  }
   2. npm install && npm run generate:types && npm run icons
   3. npm run migrate:create -- initial && npm run migrate
   4. npm run seed        (usuario del panel y ajustes)

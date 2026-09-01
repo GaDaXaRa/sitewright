@@ -63,6 +63,12 @@ curl -s -o /dev/null -w '%{http_code} → %{redirect_url}\n' https://ejemplo.es/
 Lo que responda 200 es el canónico; lo que devuelva 308 es el que redirige. Ponerlo al revés
 hace que la web declare como buena una dirección que no sirve nada.
 
+**Y si todavía no hay dominio, no te lo inventes.** Es lo normal cuando la web se está
+construyendo. Deja `identity.url` vacío: el sitio usará la dirección que Vercel da al
+proyecto, que es real desde el primer despliegue y pasa a ser la definitiva en cuanto se
+configure el dominio ahí. Dilo en voz alta al entregar, porque son tres pasos el día que lo
+compren: añadirlo en Vercel, poner `NEXT_PUBLIC_SITE_URL`, y escribirlo en `site.config.ts`.
+
 **6 · Contenido.** Qué textos existen ya, qué fotos hay, qué se puede redactar en borrador.
 → `content` y la hoja de encargo.
 

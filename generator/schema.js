@@ -57,9 +57,14 @@ export function validateBlueprint(blueprint) {
     errors.push('identity.id: solo minúsculas, números y guiones (se usa en claves y rutas)')
   }
   required(identity.name, 'identity.name', errors)
-  required(identity.url, 'identity.url', errors)
+  // El dominio puede no existir todavía: durante la semana en que se construye la web, lo
+  // normal es que nadie lo haya comprado. Sin él, el sitio usa la dirección que le da
+  // Vercel, que es real desde el primer despliegue.
   if (identity.url && !/^https:\/\//.test(identity.url)) {
     errors.push('identity.url: tiene que ser https y la dirección donde responde de verdad')
+  }
+  if (identity.url && /\/$/.test(identity.url)) {
+    errors.push('identity.url: sin barra final, o se concatenarán rutas con doble barra')
   }
   if (identity.schemaType && !SCHEMA_TYPES.includes(identity.schemaType)) {
     errors.push(`identity.schemaType: uno de ${SCHEMA_TYPES.join(', ')}`)

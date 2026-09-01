@@ -1,12 +1,11 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
 import { NextRequest } from 'next/server'
-import { config, middleware } from '@/middleware'
-import { site } from '@/site.config'
+import { config, middleware as middleware } from '@/middleware'
 
 const VERCEL = 'sitio-abc123.vercel.app'
-// Del sitio, no escrito a mano: una web generada nacía con estas pruebas en rojo
-// porque seguían hablando del dominio de la plantilla.
-const MARCA = new URL(site.url).host
+// Fijado aquí y no leído del sitio: con el dominio todavía pendiente, la dirección resuelta
+// es `localhost`, y lo que se prueba —a dónde manda el middleware— no existiría.
+const MARCA = 'www.ejemplo.es'
 
 // Simula una petición entrante con el Host que se quiera probar.
 function peticion(host: string, ruta = '/') {
@@ -18,36 +17,47 @@ function enProduccion(valor: string | undefined) {
   else process.env.VERCEL_ENV = valor
 }
 
-describe('Redirección al dominio de marca', () => {
-  afterEach(() => enProduccion(undefined))
+/** El middleware, releído con el dominio de marca puesto. */
+async function conDominio() {
+  vi.resetModules()
+  process.env.NEXT_PUBLIC_SITE_URL = `https://${MARCA}`
+  return (await import('@/middleware')).middleware
+}
 
-  it('manda al dominio de marca a quien llega por el subdominio de Vercel', () => {
+describe('Redirección al dominio de marca', () => {
+  afterEach(() => {
+    enProduccion(undefined)
+    delete process.env.NEXT_PUBLIC_SITE_URL
+    vi.resetModules()
+  })
+
+  it('manda al dominio de marca a quien llega por el subdominio de Vercel', async () => {
     enProduccion('production')
-    const res = middleware(peticion(VERCEL, '/pagina'))
+    const res = (await conDominio())(peticion(VERCEL, '/pagina'))
 
     expect(res.status).toBe(308)
     expect(res.headers.get('location')).toBe(`https://${MARCA}/pagina`)
   })
 
-  it('conserva la ruta y los parámetros, para no romper "Me interesa"', () => {
+  it('conserva la ruta y los parámetros, para no romper "Me interesa"', async () => {
     enProduccion('production')
-    const res = middleware(peticion(VERCEL, '/?fecha=3'))
+    const res = (await conDominio())(peticion(VERCEL, '/?fecha=3'))
 
     expect(res.headers.get('location')).toBe(`https://${MARCA}/?fecha=3`)
   })
 
-  it('no toca al dominio de marca', () => {
+  it('no toca al dominio de marca', async () => {
     enProduccion('production')
-    const res = middleware(peticion(MARCA, '/pagina'))
+    const res = (await conDominio())(peticion(MARCA, '/pagina'))
 
     expect(res.headers.get('location')).toBeNull()
   })
 
   // Las vistas previas de Vercel también viven en *.vercel.app: si se redirigiesen,
   // no habría forma de revisar un despliegue antes de publicarlo.
-  it('deja pasar las vistas previa de Vercel', () => {
+  it('deja pasar las vistas previa de Vercel', async () => {
     enProduccion('preview')
-    const res = middleware(peticion('sitio-git-rama.vercel.app', '/'))
+    const res = (await conDominio())(peticion('sitio-git-rama.vercel.app', '/'))
 
     expect(res.headers.get('location')).toBeNull()
   })
@@ -70,9 +80,9 @@ describe('Redirección al dominio de marca', () => {
 
   // Una petición sin Host (una sonda, un cliente mal hecho) no puede tumbar el sitio:
   // el middleware se ejecuta en todas las rutas.
-  it('aguanta una petición sin cabecera Host', () => {
+  it('aguanta una petición sin cabecera Host', async () => {
     enProduccion('production')
-    const res = middleware(new NextRequest(new URL(`${site.url}/pagina`)))
+    const res = (await conDominio())(new NextRequest(new URL(`https://${MARCA}/pagina`)))
 
     expect(res.headers.get('location')).toBeNull()
   })
@@ -89,9 +99,9 @@ describe('Redirección al dominio de marca', () => {
     expect(casa('/favicon.ico')).toBe(false)
   })
 
-  it('deja pasar el entorno local', () => {
+  it('deja pasar el entorno local', async () => {
     enProduccion(undefined)
-    const res = middleware(peticion('localhost:3000', '/'))
+    const res = (await conDominio())(peticion('localhost:3000', '/'))
 
     expect(res.headers.get('location')).toBeNull()
   })

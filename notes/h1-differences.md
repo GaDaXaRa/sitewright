@@ -581,3 +581,25 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
     relleno y concluí que las dos webs usaban el endpoint directo. No se puede comprobar
     desde fuera qué cadena usa un despliegue: la puerta mide **la que le pasas**. Las dos
     quedaron con la agrupada porque la escribí yo, no porque lo verificara.
+
+
+70. **El dominio puede no existir todavía**, y es el estado normal de una web durante la
+    semana en que se construye. El blueprint ya no lo exige: sin él, el sitio usa
+    `VERCEL_PROJECT_PRODUCTION_URL` —la dirección que la plataforma da al proyecto, real
+    desde el primer despliegue y que pasa a ser la definitiva cuando se configura el dominio
+    ahí—. El orden es: lo que alguien escribió, lo que dice el blueprint, lo que da la
+    plataforma, y localhost.
+
+71. **Un canónico que no es público no puede ser destino de una redirección.** Sin dominio,
+    `SITE_URL` puede resolver a `localhost`, y el middleware habría mandado a cada visitante
+    de producción a su propia máquina. Ahora comprueba que el canónico sea https y no sea
+    local antes de redirigir a ningún sitio: nunca debería dispararse, y el coste de
+    equivocarse ahí es la web entera.
+
+72. **Una prueba no puede depender de que el blueprint traiga dominio.** La del middleware
+    leía la dirección resuelta, que con dominio pendiente es `localhost`, y probaba algo que
+    no existe. Ahora fija el suyo y recarga el módulo.
+
+73. **Publiqué el núcleo con el listón de mutación en rojo** (94,66%) por no medirlo antes de
+    publicar. El artefacto no cambió —faltaban pruebas, no código— pero el orden correcto es
+    medir y luego publicar. Va en el guion de publicación.

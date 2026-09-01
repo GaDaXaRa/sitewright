@@ -32,7 +32,8 @@ describe('the site domain', () => {
   it('falls back to the address the site is actually served from', async () => {
     // Whatever the blueprint wrote in site.config: it must be an address that answers,
     // never a guess at what Vercel will assign.
-    expect(await loadSiteUrl()).toBe(site.url)
+    // Con dominio pendiente, `site.url` está vacío y manda la dirección de la plataforma.
+    expect(await loadSiteUrl()).toBe(site.url || 'http://localhost:3000')
   })
 
   it('obeys what Vercel sets, so buying a domain needs no code change', async () => {

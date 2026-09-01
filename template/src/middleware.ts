@@ -1,7 +1,18 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { SITE_URL } from '@/lib/site'
 
-const CANONICAL_HOST = new URL(SITE_URL).host
+const canonical = new URL(SITE_URL)
+const CANONICAL_HOST = canonical.host
+
+/**
+ * Only ever redirect towards a real, public address.
+ *
+ * With no domain bought yet, `SITE_URL` can resolve to localhost — and a production site
+ * redirecting every visitor to their own machine is a worse failure than not redirecting at
+ * all. In production Vercel provides the project's own address, so this guard should never
+ * fire; it exists because the cost of being wrong here is the whole site.
+ */
+const CANONICAL_IS_PUBLIC = canonical.protocol === 'https:' && !/^localhost|^127\./.test(CANONICAL_HOST)
 
 /**
  * Sends anyone arriving through a Vercel subdomain to the brand domain.
@@ -19,6 +30,8 @@ const CANONICAL_HOST = new URL(SITE_URL).host
  */
 export function middleware(request: NextRequest) {
   if (process.env.VERCEL_ENV !== 'production') return NextResponse.next()
+
+  if (!CANONICAL_IS_PUBLIC) return NextResponse.next()
 
   const host = request.headers.get('host')
   if (!host || host === CANONICAL_HOST) return NextResponse.next()
