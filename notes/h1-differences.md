@@ -546,3 +546,15 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
     PNG de 512×512 con recorte centrado, así que el nombre, el tipo declarado y los bytes
     dicen lo mismo — y el cliente puede subir lo que tenga, que era el punto de tener el
     campo.
+
+
+64. **El listón de mutación se había caído sin que nadie mirase.** Al añadir color, iconos y
+    consentimiento pasó del 96% al **89,98%**, por debajo del corte de 95: entraron módulos
+    con pruebas que los ejecutaban sin comprobar lo que dicen. Se arregló fijando las listas
+    de iconos enteras y la identidad de los colores derivados, no relajando el umbral.
+
+65. **Stryker daba por supervivientes mutantes que sí mueren.** Los que tocan una constante
+    de módulo (`FALLBACK_INKS`, `CMS_ICON_ROUTE`) no se pueden evaluar porque el ejecutor no
+    reevalúa el módulo, y se contaban como fallos de las pruebas. Comprobado a mano —
+    cambiando la constante, la batería falla— y configurado `ignoreStatic`. Contarlos era
+    medir el ejecutor, no las pruebas.

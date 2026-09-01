@@ -18,6 +18,20 @@ describe('contrastRatio', () => {
 
   it('no inventa una medida con lo que no es un color', () => {
     expect(contrastRatio('verde', '#000000')).toBeNull()
+    // Ni con algo que empieza por seis dígitos válidos y sigue: un color de ocho no es
+    // este color, y aceptarlo a medias sería medir otra cosa.
+    expect(contrastRatio('#ffffffff', '#000000')).toBeNull()
+  })
+
+  it('entiende la forma corta de tres dígitos', () => {
+    expect(contrastRatio('#fff', '#000')!).toBeCloseTo(21, 1)
+    expect(contrastRatio('#fff', '#000000')).toBe(contrastRatio('#ffffff', '#000000'))
+  })
+
+  it('mide bien los tonos muy oscuros, que van por otra rama de la fórmula', () => {
+    // Por debajo de 0,03928 el canal se divide entre 12,92 en vez de elevarse: sin un color
+    // así, esa rama no se ejecuta nunca y podría estar mal sin que nadie se enterase.
+    expect(contrastRatio('#080808', '#ffffff')!).toBeCloseTo(20.03, 1)
   })
 })
 
@@ -38,16 +52,19 @@ describe('bestTextOn', () => {
 })
 
 describe('buttonColors', () => {
-  it('sobre un acento oscuro pone texto claro', () => {
+  it('sobre un acento oscuro pone el claro **del sitio**, no un blanco cualquiera', () => {
     const { text } = buttonColors({ accent: '#99423b', ink: '#1e2a1a', ground: '#f3f2e1' })
 
+    // La identidad importa: el crema de la paleta, no el blanco de reserva. Una web que
+    // resuelve sus contrastes con blanco y negro deja de parecerse a sí misma.
+    expect(text).toBe('#f3f2e1')
     expect(contrastRatio(text, '#99423b')!).toBeGreaterThanOrEqual(4.5)
   })
 
-  it('sobre un acento claro pone texto oscuro', () => {
+  it('sobre un acento claro pone la tinta del sitio', () => {
     const { text } = buttonColors({ accent: '#ffd166', ink: '#141312', ground: '#fbfaf7' })
 
-    expect(contrastRatio(text, '#ffd166')!).toBeGreaterThanOrEqual(4.5)
+    expect(text).toBe('#141312')
   })
 
   it('usa el acento suave para el hover solo si el texto sigue leyéndose', () => {

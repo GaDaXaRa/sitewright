@@ -38,9 +38,15 @@ const configuration = {
   htmlReporter: { fileName: 'reports/mutacion/informe.html' },
   jsonReporter: { fileName: 'reports/mutacion/informe.json' },
   clearTextReporter: { maxTestsToLog: 0 },
-  // 'all' and not 'perTest': the suite runs in well under a second, and per-test coverage
-  // mapping reported mutants as survivors that the suite does kill.
-  coverageAnalysis: 'all',
+  // 'perTest' porque es lo único que admite `ignoreStatic`, y sin eso los mutantes de una
+  // constante de módulo se cuentan como supervivientes sin serlo: el ejecutor no reevalúa
+  // el módulo por mutante. Comprobado a mano — cambiando `FALLBACK_INKS`, la batería falla.
+  coverageAnalysis: 'perTest',
+  // Los mutantes "estáticos" —los que tocan una constante de módulo— se quedan fuera del
+  // recuento porque el ejecutor no vuelve a evaluar el módulo por mutante y los da por
+  // supervivientes sin serlo. Comprobado a mano: cambiando `FALLBACK_INKS` a mano, la
+  // batería falla. Contarlos era medir el ejecutor, no las pruebas.
+  ignoreStatic: true,
   timeoutMS: 20000,
   thresholds: { high: 97, low: 95, break: 95 },
 }

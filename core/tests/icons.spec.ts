@@ -27,6 +27,12 @@ describe('defaultIconSvg', () => {
     expect(svg).toContain('viewBox="0 0 512 512"')
   })
 
+  it('escapa también las comillas, que romperían el atributo', () => {
+    const svg = defaultIconSvg({ name: 'La "Sandunguera"', accent: '#000000', ground: '#ffffff' })
+
+    expect(svg).toContain('aria-label="La &quot;Sandunguera&quot;"')
+  })
+
   it('escapes a name with markup instead of writing broken XML', () => {
     const svg = defaultIconSvg({ name: 'A & <b>', accent: '#000000', ground: '#ffffff' })
 
@@ -36,12 +42,36 @@ describe('defaultIconSvg', () => {
 })
 
 describe('buildIcons', () => {
-  it('declares the generated files when nothing has been uploaded', () => {
-    const icons = buildIcons({})
+  it('declares exactly los ficheros generados cuando no hay subida', () => {
+    // La lista entera, no solo el primero: cada tamaño y cada tipo se declaran a un
+    // navegador que elige por ellos, así que equivocarse en uno es servir el que no era.
+    expect(buildIcons({})).toEqual({
+      icon: [
+        { url: '/favicon.ico', sizes: '48x48', type: 'image/x-icon' },
+        { url: '/icon.svg', type: 'image/svg+xml' },
+        { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+        { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+      ],
+      apple: [{ url: '/apple-icon.png', sizes: '180x180', type: 'image/png' }],
+    })
+  })
 
-    expect(icons.icon[0]!.url).toBe('/favicon.ico')
-    expect(icons.apple[0]!.url).toBe('/apple-icon.png')
-    expect(icons.icon.some((i) => i.url === CMS_ICON_ROUTE)).toBe(false)
+  it('aguanta unos ajustes vacíos, que es como nace un sitio', () => {
+    expect(buildIcons(null)).toEqual(buildIcons({}))
+    expect(buildIcons(undefined)).toEqual(buildIcons({}))
+  })
+
+  it('con subida, la pone delante y conserva el resto tal cual', () => {
+    expect(buildIcons({ favicon: { url: 'https://blob/x.png' } })).toEqual({
+      icon: [
+        { url: CMS_ICON_ROUTE, sizes: '512x512', type: 'image/png' },
+        { url: '/favicon.ico', sizes: '48x48', type: 'image/x-icon' },
+        { url: '/icon.svg', type: 'image/svg+xml' },
+        { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+        { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+      ],
+      apple: [{ url: CMS_ICON_ROUTE, sizes: '180x180', type: 'image/png' }],
+    })
   })
 
   it('puts the uploaded one first, and keeps the files underneath', () => {
