@@ -64,3 +64,27 @@ jobs:
           PAYLOAD_SECRET: ci
       - run: npm run typecheck
       - run: npm run test:int
+
+  site:
+    name: Un sitio generado
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      # Los módulos no se compilan en ningún sitio: sólo existen dentro de una web
+      # generada. Sin este trabajo, una errata en un módulo la descubre el cliente.
+      - run: npm ci --prefix core && npm run build --prefix core
+      - run: node generator/generate.js --blueprint generator/blueprints/ejemplo-asociacion.json --out /tmp/sitio
+      - run: npm install --no-audit --no-fund
+        working-directory: /tmp/sitio
+      - run: npm run generate:types
+        working-directory: /tmp/sitio
+        env:
+          DATABASE_URI: postgres://localhost:5432/ninguna
+          PAYLOAD_SECRET: ci
+      - run: npm run typecheck
+        working-directory: /tmp/sitio
+      - run: npm run test:int
+        working-directory: /tmp/sitio

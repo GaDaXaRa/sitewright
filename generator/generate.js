@@ -2,7 +2,7 @@
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { sectionOrder, validateBlueprint } from './schema.js'
+import { sectionOrder, validateBlueprint, validateWiring } from './schema.js'
 import { buttonColors, defaultIconSvg } from '../core/dist/index.js'
 
 /**
@@ -111,15 +111,17 @@ function payloadConfig(template, bp, modules, wirings) {
 
 function dataLoader(bp, modules, wirings) {
   const queried = wirings.filter((w) => w.dataQuery)
-  const names = queried.map((w) => (w.id === 'notices' ? 'notices' : w.variable))
+  // Un módulo que elige entre lo que trae la consulta liga el resultado con otro nombre:
+  // `notices` es lo que hay en la base, `notice` es el que toca enseñar hoy.
+  const names = queried.map((w) => w.dataPick?.from ?? w.variable)
   const queries = queried.map((w) => `        ${w.dataQuery(modules[w.id], bp)},`).join('\n')
-  const notices = wirings.find((w) => w.id === 'notices')
-  const returned = queried
-    .map((w) => (w.id === 'notices' ? null : `      ${w.variable}: ${w.variable}.docs,`))
-    .filter(Boolean)
-  const empties = queried
-    .map((w) => (w.id === 'notices' ? null : `      ${w.variable}: [],`))
-    .filter(Boolean)
+  const picks = queried.filter((w) => w.dataPick).map((w) => `    ${w.dataPick.code}`)
+  const returned = queried.map((w) =>
+    w.dataPick ? `      ${w.variable},` : `      ${w.variable}: ${w.variable}.docs,`,
+  )
+  const empties = queried.map((w) =>
+    w.dataPick ? `      ${w.variable}: ${w.dataPick.empty},` : `      ${w.variable}: [],`,
+  )
 
   return `import { cache } from 'react'
 import { getPayload } from 'payload'
@@ -154,19 +156,21 @@ export const loadSiteContent = cache(async () => {
         payload.findGlobal({ slug: 'site-settings' }),
 ${queries}
       ])
-${notices ? `\n    ${notices.dataPick}\n` : `\n    // The moment the page is generated: a component must not read the clock while
+
+    // The moment the page is generated: a component must not read the clock while
     // rendering, or the same render would place a dated item differently.
-    const now = Date.now()\n`}
+    const now = Date.now()
+${picks.join('\n')}
     return {
       settings: settings ?? FALLBACK,
-${returned.join('\n')}${notices ? '\n      notice,' : ''}
+${returned.join('\n')}
       now,
     }
   } catch (err) {
     console.error('No se pudo cargar el contenido del sitio:', err)
     return {
       settings: FALLBACK,
-${empties.join('\n')}${notices ? '\n      notice: null,' : ''}
+${empties.join('\n')}
       now: Date.now(),
     }
   }
@@ -376,7 +380,8 @@ function seedScript(bp, modules, wirings) {
   const written = (id) => {
     const items = bp.content?.[id]
     if (!Array.isArray(items) || !items.length) return null
-    const collection = { catalog: 'catalog', schedule: 'schedule', pricing: 'pricing', team: 'team', media: 'embeds', reviews: 'reviews', faq: 'faqs', notices: 'notices' }[id]
+    const collection = wirings.find((w) => w.id === id)?.collectionSlug
+    if (!collection) return null
     return `  const ${id}Count = await payload.count({ collection: '${collection}' })
   if (${id}Count.totalDocs === 0) {
     for (const data of ${JSON.stringify(items, null, 2).split('\n').join('\n    ')} as never[]) {
@@ -723,6 +728,12 @@ for (const id of Object.keys(modules)) {
     // chassis. Saying so beats letting somebody debug a "generated" site that never was.
     rmSync(target, { recursive: true, force: true })
     console.error(`\nEl módulo "${id}" no se pudo cargar, así que no se ha generado nada:\n\n${err}\n`)
+    process.exit(1)
+  }
+  const wiringErrors = validateWiring(id, wiring)
+  if (wiringErrors.length) {
+    rmSync(target, { recursive: true, force: true })
+    console.error(`\nNo se ha generado nada:\n\n${wiringErrors.map((e) => `  - ${e}`).join('\n')}\n`)
     process.exit(1)
   }
   wirings.push(wiring)

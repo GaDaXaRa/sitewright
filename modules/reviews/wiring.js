@@ -1,5 +1,6 @@
 export const wiring = {
   id: 'reviews',
+  collectionSlug: 'reviews',
   variable: 'reviews',
   collectionImport: "import { reviewsCollection } from './modules/reviews/collection'",
   collectionCall: (m) => `reviewsCollection({ labels: ${JSON.stringify(m.labels)} })`,

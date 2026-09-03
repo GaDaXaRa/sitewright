@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { sectionOrder, validateBlueprint } from './schema.js'
+import { sectionOrder, validateBlueprint, validateWiring } from './schema.js'
 
 /**
  * A blueprint with a typo has to fail in front of a person, not halfway through writing
@@ -92,4 +92,45 @@ test('el orden ignora una sección de un módulo que no está activo', () => {
   bp.design.sections = ['pricing', 'contact']
 
   assert.deepEqual(sectionOrder(bp), ['contact', 'catalog'])
+})
+
+// ── el contrato de los módulos ──────────────────────────────────────────────────────────
+
+test('un cableado con una clave que el generador no lee se rechaza', () => {
+  const errors = validateWiring('faq', { id: 'faq', variable: 'faqs', sectionRnder: 'x' })
+  assert.equal(errors.length, 1)
+  assert.match(errors[0], /sectionRnder/)
+})
+
+test('el id del cableado tiene que ser el del directorio', () => {
+  const errors = validateWiring('faq', { id: 'faqs', variable: 'faqs' })
+  assert.match(errors.join(), /su id dice "faqs"/)
+})
+
+test('no declarar `variable` es distinto de declararla nula', () => {
+  assert.match(validateWiring('about', { id: 'about' }).join(), /falta `variable`/)
+  assert.deepEqual(validateWiring('about', { id: 'about', variable: null }), [])
+})
+
+test('quien consulta datos tiene que nombrarlos', () => {
+  const errors = validateWiring('faq', { id: 'faq', variable: null, dataQuery: () => '' })
+  assert.match(errors.join(), /`variable` tiene que nombrarlos/)
+})
+
+test('elegir entre datos que no se han pedido no tiene sentido', () => {
+  const errors = validateWiring('notices', {
+    id: 'notices',
+    variable: 'notice',
+    dataPick: { from: 'notices', empty: 'null', code: '' },
+  })
+  assert.match(errors.join(), /`dataPick` sin `dataQuery`/)
+})
+
+test('los diez módulos reales cumplen su propio contrato', async () => {
+  const { readdirSync } = await import('node:fs')
+  const dirs = readdirSync(new URL('../modules', import.meta.url), { withFileTypes: true })
+  for (const { name: id } of dirs.filter((d) => d.isDirectory())) {
+    const { wiring } = await import(`../modules/${id}/wiring.js`)
+    assert.deepEqual(validateWiring(id, wiring), [], `modules/${id}`)
+  }
 })

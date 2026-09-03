@@ -1,103 +1,10 @@
-import { type Fetched, type Finding, fail, ok, skip, warn } from './types.js'
-import { contrastRatio } from '../lib/color.js'
+import { type Fetched, type Finding, fail, ok, skip, warn } from '../types.js'
+import { contrastRatio } from '../../lib/color.js'
 
 /**
- * The rest of the gates: GEO, legal, consent, images, contrast and weight.
- *
- * Same rule as the others — each one is here because it went wrong somewhere real.
+ * Lo que ve quien entra: imágenes servidas como deben, ningún texto de relleno olvidado,
+ * contraste suficiente para leer y una página que no pese de más.
  */
-
-// ── GEO ─────────────────────────────────────────────────────────────────────────────────
-
-const GATE_GEO = 'geo'
-
-/**
- * `/llms.txt` is what an assistant reads instead of guessing from HTML. Two things can be
- * checked cheaply and both have bitten: that it exists at all, and that nothing leaked into
- * it that the CMS never said — "undefined", "null" or an empty euro sign.
- */
-export function checkLlmsTxt(llms: Fetched, siteName?: string): Finding[] {
-  if (llms.status !== 200) {
-    return [fail(GATE_GEO, 'Hay /llms.txt', `Devuelve ${llms.status}.`)]
-  }
-
-  const findings: Finding[] = [ok(GATE_GEO, 'Hay /llms.txt', `${llms.body.length} caracteres.`)]
-
-  const leaks = ['undefined', 'null', 'NaN', 'Invalid Date', '[object Object]'].filter((leak) =>
-    llms.body.includes(leak),
-  )
-  findings.push(
-    leaks.length
-      ? fail(GATE_GEO, 'No se cuela nada que el CMS no dijo', `Aparece: ${leaks.join(', ')}.`)
-      : ok(GATE_GEO, 'No se cuela nada que el CMS no dijo'),
-  )
-
-  if (siteName) {
-    findings.push(
-      llms.body.includes(siteName)
-        ? ok(GATE_GEO, 'El resumen nombra al negocio')
-        : warn(GATE_GEO, 'El resumen nombra al negocio', `No aparece "${siteName}".`),
-    )
-  }
-
-  return findings
-}
-
-// ── legal y consentimiento ──────────────────────────────────────────────────────────────
-
-const GATE_LEGAL = 'legal'
-const GATE_CONSENT = 'consentimiento'
-
-/**
- * A site with a form needs the three pages, and needs them **linked**: one that exists but
- * is reachable only by typing the address protects nobody.
- */
-export function checkLegalPages(pages: Fetched[], home: Fetched): Finding[] {
-  const findings: Finding[] = pages.map((page) => {
-    const path = new URL(page.url).pathname
-    return page.status === 200
-      ? ok(GATE_LEGAL, `Existe ${path}`)
-      : fail(GATE_LEGAL, `Existe ${path}`, `Devuelve ${page.status}.`)
-  })
-
-  const unlinked = pages
-    .map((page) => new URL(page.url).pathname)
-    .filter((path) => !home.body.includes(`href="${path}"`))
-  findings.push(
-    unlinked.length
-      ? fail(
-          GATE_LEGAL,
-          'Las páginas legales se enlazan desde la portada',
-          `Sin enlace: ${unlinked.join(', ')}.`,
-        )
-      : ok(GATE_LEGAL, 'Las páginas legales se enlazan desde la portada'),
-  )
-
-  return findings
-}
-
-const THIRD_PARTY_FRAMES =
-  /<iframe[^>]+src="https?:\/\/(?!(?:[a-z0-9-]+\.)*(?:localhost|127\.0\.0\.1))/i
-
-/**
- * **No third-party iframe may be in the HTML before anyone accepts.**
- *
- * This is the gate that turns the cookie banner from theatre into something real: a player
- * that ships in the first response has already set its cookies, whatever the banner says.
- */
-export function checkConsentGating(pages: Fetched[]): Finding[] {
-  const offenders = pages.filter((page) => THIRD_PARTY_FRAMES.test(page.body))
-
-  return [
-    offenders.length
-      ? fail(
-          GATE_CONSENT,
-          'Ningún reproductor de terceros carga antes de aceptar',
-          `En ${offenders.map((p) => new URL(p.url).pathname).join(', ')}.`,
-        )
-      : ok(GATE_CONSENT, 'Ningún reproductor de terceros carga antes de aceptar'),
-  ]
-}
 
 // ── imágenes ────────────────────────────────────────────────────────────────────────────
 
@@ -179,68 +86,6 @@ export function checkPlaceholders(pages: Fetched[]): Finding[] {
       'No queda texto de ejemplo publicado',
       `Sigue el relleno del seed: ${unique.slice(0, 3).join(', ')}${unique.length > 3 ? `, y ${unique.length - 3} más` : ''}.`,
     ),
-  ]
-}
-
-// ── alcanzables ──────────────────────────────────────────────────────────────────────────
-
-const GATE_REACH = 'navegacion'
-
-/** The internal paths a page links to, normalised and without fragments or trailing slashes. */
-export function internalLinks(html: string, siteUrl: string): string[] {
-  const host = new URL(siteUrl).host
-  const paths = new Set<string>()
-
-  for (const [, href] of html.matchAll(/<a\b[^>]*\bhref="([^"]+)"/gi)) {
-    try {
-      const url = new URL(href, siteUrl)
-      if (url.host !== host) continue
-      const path = url.pathname.replace(/\/$/, '') || '/'
-      paths.add(path)
-    } catch {
-      // A malformed href links nowhere; the browser agrees.
-    }
-  }
-
-  return [...paths]
-}
-
-/**
- * Everything in the sitemap has to be reachable by clicking.
- *
- * A page that is generated, indexed and linked from nowhere is a page nobody reads: it
- * happened to the questions page of the third site built with this, which existed, ranked
- * and could only be reached by typing the address. Search engines will find it through the
- * sitemap and people will not, which is the wrong way round.
- */
-export function checkReachable(sitemapUrls: string[], reachable: Set<string>): Finding[] {
-  if (!sitemapUrls.length) {
-    return [skip(GATE_REACH, 'Todo lo del sitemap se alcanza pinchando', 'El sitemap está vacío.')]
-  }
-
-  const orphans = sitemapUrls
-    .map((url) => {
-      try {
-        return new URL(url).pathname.replace(/\/$/, '') || '/'
-      } catch {
-        return null
-      }
-    })
-    .filter((path): path is string => Boolean(path))
-    .filter((path) => !reachable.has(path))
-
-  return [
-    orphans.length
-      ? fail(
-          GATE_REACH,
-          'Todo lo del sitemap se alcanza pinchando',
-          `Sin ningún enlace que lleve a ${orphans.slice(0, 4).join(', ')}${orphans.length > 4 ? ` y ${orphans.length - 4} más` : ''}.`,
-        )
-      : ok(
-          GATE_REACH,
-          'Todo lo del sitemap se alcanza pinchando',
-          `${sitemapUrls.length} páginas, todas enlazadas.`,
-        ),
   ]
 }
 

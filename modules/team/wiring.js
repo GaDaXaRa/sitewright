@@ -1,5 +1,6 @@
 export const wiring = {
   id: 'team',
+  collectionSlug: 'team',
   variable: 'team',
   collectionImport: "import { teamCollection } from './modules/team/collection'",
   collectionCall: (m) =>

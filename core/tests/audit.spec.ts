@@ -6,7 +6,7 @@ import {
   checkSecurityHeaders,
   checkSitemapAndRobots,
   checkStructuredData,
-} from '../src/audit/checks.js'
+} from '../src/audit/checks/index.js'
 import {
   checkConsentGating,
   checkPlaceholders,
@@ -17,7 +17,7 @@ import {
   checkLegalPages,
   checkLlmsTxt,
   cssTokens,
-} from '../src/audit/checks2.js'
+} from '../src/audit/checks/index.js'
 import { contrastRatio } from '../src/lib/color.js'
 import { exitCode, renderReport } from '../src/audit/report.js'
 

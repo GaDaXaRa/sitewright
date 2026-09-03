@@ -7,8 +7,6 @@ import {
   checkSecurityHeaders,
   checkSitemapAndRobots,
   checkStructuredData,
-} from './checks.js'
-import {
   checkConsentGating,
   checkContrast,
   checkImages,
@@ -18,7 +16,7 @@ import {
   checkReachable,
   checkWeight,
   internalLinks,
-} from './checks2.js'
+} from './checks/index.js'
 import { checkMigrations, checkPooled } from './migrations.js'
 
 export type AuditOptions = {

@@ -634,3 +634,32 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
     conexión agrupada mira la cadena de *desarrollo* —directa, como debe ser en local— y
     da un fallo que no existe en producción. Lo ambiental miente: esa comprobación
     debería exigir una cadena pasada a propósito, no coger la que haya puesta.
+
+
+79. **Un fichero llamado `checks2` es un fichero sin nombre.** Las dieciocho puertas se
+    partieron en dos por tamaño, no por sentido. Ahora van por lo que vigilan —que la web
+    se encuentre, lo que leen las máquinas, lo que puede acabar en multa, y lo que ve
+    quien entra—, que es como se buscan.
+
+80. **Los módulos no se compilan en ninguna parte.** Sólo existen dentro de una web
+    generada, así que un error de tipos en un módulo no lo ve nadie hasta que hay un
+    cliente delante; por eso cinco colecciones llevaban meses con el objeto devuelto mal
+    indentado. La CI genera ahora una web de ejemplo y la comprueba entera.
+
+81. **El generador conocía a un módulo por su nombre.** `notices` estaba escrito a mano
+    seis veces en el cargador de datos, y el reloj del render venía de tapadillo dentro de
+    su propio código: un segundo módulo que eligiera entre lo consultado habría declarado
+    `now` dos veces y roto la compilación. Ahora `dataPick` es parte del contrato —de
+    dónde elige, qué ata y qué vale cuando la base no responde— y el generador no escribe
+    el nombre de ningún módulo.
+
+82. **El generador llevaba a mano la lista de qué colección es cada módulo**, que cada
+    módulo ya declara en su `collection.ts`. Faltaba `contact`, así que sembrar contenido
+    suyo habría escrito `collection: 'undefined'`. Ahora lo dice el cableado.
+
+83. **Un cableado son veinticuatro claves opcionales sin esquema**: una errata no rompe
+    nada, sólo deja sin escribir esa parte de la web, en silencio. El generador valida
+    ahora el contrato y no genera nada si no cuadra. La primera vez que se ejecutó
+    protestó por `variable` en dos módulos donde el `null` era deliberado: la regla estaba
+    mal, no los módulos, y distinguir «no lo declara» de «lo declara vacío» es justo lo
+    que hace útil al contrato.

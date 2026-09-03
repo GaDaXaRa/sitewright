@@ -8,6 +8,7 @@
  */
 export const wiring = {
   id: 'catalog',
+  collectionSlug: 'catalog',
   variable: 'catalog',
   collectionImport: "import { catalogCollection } from './modules/catalog/collection'",
   collectionCall: (m) =>

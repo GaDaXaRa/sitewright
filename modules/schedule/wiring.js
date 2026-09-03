@@ -1,5 +1,6 @@
 export const wiring = {
   id: 'schedule',
+  collectionSlug: 'schedule',
   variable: 'schedule',
   collectionImport: "import { scheduleCollection } from './modules/schedule/collection'",
   collectionCall: (m) =>

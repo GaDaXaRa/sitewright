@@ -1,5 +1,6 @@
 export const wiring = {
   id: 'faq',
+  collectionSlug: 'faqs',
   variable: 'faqs',
   collectionImport: "import { faqCollection } from './modules/faq/collection'",
   collectionCall: (m) => `faqCollection({ labels: ${JSON.stringify(m.labels)}, route: '${m.route}' })`,

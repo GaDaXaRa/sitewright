@@ -15,33 +15,33 @@ export function faqCollection({
   const revalidation = revalidator(route)
 
   return {
-  slug: 'faqs',
-  labels,
-  admin: {
-    useAsTitle: 'question',
-    defaultColumns: ['question', 'order', 'active'],
-    group: 'Contenido',
-  },
-  access: { read: () => true },
-  defaultSort: 'order',
-  hooks: { afterChange: [revalidation.afterChange], afterDelete: [revalidation.afterDelete] },
-  fields: [
-    { name: 'question', label: 'Pregunta', type: 'text', required: true },
-    { name: 'answer', label: 'Respuesta', type: 'textarea', required: true },
-    {
-      name: 'order',
-      label: 'Orden',
-      type: 'number',
-      defaultValue: 0,
-      admin: { position: 'sidebar', description: 'Se muestran de menor a mayor número.' },
+    slug: 'faqs',
+    labels,
+    admin: {
+      useAsTitle: 'question',
+      defaultColumns: ['question', 'order', 'active'],
+      group: 'Contenido',
     },
-    {
-      name: 'active',
-      label: 'Activa (visible en la web)',
-      type: 'checkbox',
-      defaultValue: true,
-      admin: { position: 'sidebar' },
-    },
-  ],
+    access: { read: () => true },
+    defaultSort: 'order',
+    hooks: { afterChange: [revalidation.afterChange], afterDelete: [revalidation.afterDelete] },
+    fields: [
+      { name: 'question', label: 'Pregunta', type: 'text', required: true },
+      { name: 'answer', label: 'Respuesta', type: 'textarea', required: true },
+      {
+        name: 'order',
+        label: 'Orden',
+        type: 'number',
+        defaultValue: 0,
+        admin: { position: 'sidebar', description: 'Se muestran de menor a mayor número.' },
+      },
+      {
+        name: 'active',
+        label: 'Activa (visible en la web)',
+        type: 'checkbox',
+        defaultValue: true,
+        admin: { position: 'sidebar' },
+      },
+    ],
   }
 }

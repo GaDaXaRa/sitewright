@@ -1,5 +1,6 @@
 export const wiring = {
   id: 'pricing',
+  collectionSlug: 'pricing',
   variable: 'pricing',
   collectionImport: "import { pricingCollection } from './modules/pricing/collection'",
   collectionCall: (m, bp) =>

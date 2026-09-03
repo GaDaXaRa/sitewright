@@ -1,5 +1,6 @@
 export const wiring = {
   id: 'media',
+  collectionSlug: 'embeds',
   variable: 'embeds',
   collectionImport: "import { mediaModuleCollection } from './modules/media/collection'",
   collectionCall: (m) =>
