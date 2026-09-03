@@ -742,3 +742,15 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
     publicar sobre la versión 0.8.1 ya preparada», que fue la única pista de que sí había
     llegado. Publicar y dar por hecho que ya está es otro caso de herramienta que miente;
     el guion espera ahora a que el registro la sirva de verdad.
+
+
+97. **El cableado hacía inalcanzable una condición del propio módulo.** La sección de
+    agenda se esconde si no hay nada por delante *y* nadie ha pedido un texto de espera
+    —`if (!upcoming.length && !emptyText) return null`— pero el cableado pasaba siempre un
+    texto por defecto, así que la portada de una web recién hecha anunciaba «no hay nada
+    convocado» y enlazaba a una página vacía. Ahora el texto es opcional de verdad.
+
+98. **Regenerar una web ya desplegada la destruye.** `--force` borra el directorio entero:
+    `.env`, `.vercel`, las migraciones escritas a mano y `node_modules`. El generador se
+    ejecuta una vez por web; a partir de ahí, los cambios del blueprint hay que llevarlos
+    a mano. Es la deuda más grande que queda.

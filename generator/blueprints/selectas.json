@@ -41,8 +41,7 @@
         "plural": "Agenda"
       },
       "route": "/agenda",
-      "title": "Próximas fechas",
-      "emptyText": "No hay nada convocado ahora mismo. Escríbenos y te avisamos."
+      "title": "Próximas fechas"
     },
     "reviews": {
       "labels": {
