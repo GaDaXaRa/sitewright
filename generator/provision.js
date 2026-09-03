@@ -44,12 +44,11 @@ ${'─'.repeat(14 + name.length)}
    grep '^DATABASE_URL=' .env | cut -d= -f2- | tr -d '\\n' | vercel env add DATABASE_URL production
    openssl rand -hex 32 | tr -d '\\n' | vercel env add PAYLOAD_SECRET production
 
-3. Primer despliegue **antes** de fijar la dirección, porque hasta ahora no se sabe cuál es:
+3. Primer despliegue. Sin dominio propio no hay que fijar ninguna dirección: el sitio usa
+   la que le da la plataforma, que es la que responde 200 y no la del equipo.
 
    vercel --prod --yes
-   vercel alias ls | grep ${id}          # la buena es la que responde 200, no la del equipo
-   printf 'https://<la-que-responda>' | vercel env add NEXT_PUBLIC_SITE_URL production
-   vercel --prod --yes
+   curl -sI https://${id}.vercel.app | head -1     # comprueba que responde
 
 4. Almacén de imágenes:
 
@@ -60,7 +59,14 @@ ${'─'.repeat(14 + name.length)}
    entornos — y también en tu .env.local, así que las subidas locales pasan a ir al almacén
    de producción hasta que quites esa línea.
 
-5. Comprobar antes de dar la web por buena:
+5. Sembrar producción — y limpiar lo que eso deja. Un `payload run` contra la base de
+   producción empuja el esquema y deja una marca de modo dev que bloquea el siguiente
+   `migrate` durante el build:
 
-   npm run audit -- --url https://<la-que-responda>
+   DATABASE_URL=<la de main> SEED_EMAIL=<correo> SEED_PASSWORD=<contraseña> npm run seed
+   DATABASE_URL=<la de main> node scripts/fix-prod-migration.mjs
+
+6. Comprobar antes de dar la web por buena, con la base delante o no comprueba el esquema:
+
+   npm run audit -- --url https://${id}.vercel.app --db '<la de main>'
 `)

@@ -754,3 +754,15 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
     `.env`, `.vercel`, las migraciones escritas a mano y `node_modules`. El generador se
     ejecuta una vez por web; a partir de ahí, los cambios del blueprint hay que llevarlos
     a mano. Es la deuda más grande que queda.
+
+
+99. **Resuelto el misterio de subsuelo.** La marca de modo dev en producción la deja
+    **sembrar la base de producción**: un `payload run` con el esquema en modo desarrollo
+    empuja el esquema y escribe una fila con `batch = -1`, que bloquea el `migrate` del
+    siguiente build. La puerta de la auditoría lo cazó en la quinta web a los diez minutos
+    de existir, y ahora el guion de aprovisionamiento manda limpiarla en el mismo paso.
+
+100. **El aprovisionamiento tenía un paso que ya sobraba.** Decía cazar el alias bueno a
+     mano y escribir `NEXT_PUBLIC_SITE_URL`; desde que el sitio puede existir sin dominio
+     lo resuelve solo, y se comprobó aquí: sin tocar nada, la web declaró
+     `https://selectas.vercel.app`, que es justo la que responde 200.
