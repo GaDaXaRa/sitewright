@@ -71,6 +71,26 @@ const updated = template.replace(
   /("sitewright-core":\s*")[^"]+(")/,
   `$1^${version}$2`,
 )
+// npm contesta `ok` y sale con cero antes de que la versión se pueda instalar: queda
+// «preparada» y tarda minutos en propagarse. Sin esperar aquí, lo siguiente que la pida
+// falla con un ETARGET que no dice nada de la publicación.
+step('Esperando a que el registro la sirva')
+const deadline = Date.now() + 10 * 60 * 1000
+let live = false
+while (!live && Date.now() < deadline) {
+  try {
+    live = read('npm', ['view', `sitewright-core@${version}`, 'version', '--prefer-online']) === version
+  } catch {
+    live = false
+  }
+  if (!live) execFileSync('sleep', ['20'])
+}
+if (!live) {
+  stop(`publicada, pero el registro todavía no la sirve. Reintenta el resto cuando aparezca:
+  npm view sitewright-core@${version} version --prefer-online`)
+}
+console.log(`  disponible`)
+
 if (updated !== template) {
   writeFileSync(templatePath, updated)
   // `npm ci` se niega si el lockfile no cuadra con el package.json, así que cambiar uno

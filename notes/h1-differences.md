@@ -734,3 +734,11 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
     daba por hueca la página de las doce Selectas porque cada ficha sin retrato pinta un
     `member-photo-empty`. Mi prueba cubría el sufijo (`not-emptyish`) y no el prefijo, que
     es justo el caso real. La clase tiene que ser exactamente `empty`, no contenerla.
+
+
+96. **npm dice `ok` y sale con cero antes de que la versión se pueda instalar.** La deja
+    «preparada» y tarda minutos en propagarse: el `npm install` que venía detrás falló con
+    un ETARGET que no mencionaba la publicación, y un reintento contestó «no se puede
+    publicar sobre la versión 0.8.1 ya preparada», que fue la única pista de que sí había
+    llegado. Publicar y dar por hecho que ya está es otro caso de herramienta que miente;
+    el guion espera ahora a que el registro la sirva de verdad.
