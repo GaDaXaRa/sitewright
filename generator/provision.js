@@ -59,9 +59,9 @@ ${'─'.repeat(14 + name.length)}
    entornos — y también en tu .env.local, así que las subidas locales pasan a ir al almacén
    de producción hasta que quites esa línea.
 
-5. Sembrar producción — y limpiar lo que eso deja. Un `payload run` contra la base de
+5. Sembrar producción — y limpiar lo que eso deja. Un \`payload run\` contra la base de
    producción empuja el esquema y deja una marca de modo dev que bloquea el siguiente
-   `migrate` durante el build:
+   \`migrate\` durante el build:
 
    DATABASE_URL=<la de main> SEED_EMAIL=<correo> SEED_PASSWORD=<contraseña> npm run seed
    DATABASE_URL=<la de main> node scripts/fix-prod-migration.mjs
@@ -74,7 +74,7 @@ ${'─'.repeat(14 + name.length)}
    gh variable set AUDIT_URL --repo GaDaXaRa/${id} --body https://${id}.vercel.app
 
    Antes de conectar, en github.com/settings/installations → Vercel → Configure, añade el
-   repositorio a los permitidos, o `vercel git connect` falla hablando de erratas:
+   repositorio a los permitidos, o «vercel git connect» falla hablando de erratas:
 
    vercel git connect
 

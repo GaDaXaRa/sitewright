@@ -39,6 +39,9 @@ jobs:
           node-version: 24
       # Con el directorio a secas, Node intenta cargarlo como módulo.
       - run: node --test generator/*.test.js
+      # `provision.js` sólo imprime, y por eso nadie lo ejecutaba: se rompió con una
+      # comilla invertida dentro de una plantilla literal y se subió roto.
+      - run: node generator/provision.js generator/blueprints/ejemplo-asociacion.json > /dev/null
 
   template:
     name: Plantilla

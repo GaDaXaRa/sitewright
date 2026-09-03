@@ -778,3 +778,9 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
      sin el ámbito `workflow` —hay que empujar por SSH— y la app de Vercel en GitHub tiene
      que tener el repositorio nuevo en su lista, o `vercel git connect` falla diciendo que
      quizá hay una errata. Los dos van ahora en el guion de aprovisionamiento.
+
+
+103. **Lo que sólo imprime, nadie lo ejecuta.** `provision.js` se rompió con una comilla
+     invertida dentro de una plantilla literal —escribiendo, precisamente, la lección
+     sobre la marca de modo dev— y se subió roto: ningún trabajo de la CI lo llamaba.
+     Ahora lo llama uno.
