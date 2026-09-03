@@ -64,3 +64,5 @@ skills-lock.json
 /reports/
 /.stryker-tmp/
 .env*
+# El ejemplo no lleva secretos, y sin él no se puede generar una web desde cero.
+!.env.example

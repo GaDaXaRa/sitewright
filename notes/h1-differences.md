@@ -663,3 +663,15 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
     protestó por `variable` en dos módulos donde el `null` era deliberado: la regla estaba
     mal, no los módulos, y distinguir «no lo declara» de «lo declara vacío» es justo lo
     que hace útil al contrato.
+
+
+84. **El repositorio no podía generar una web.** `template/.env.example` lo tapaba el
+    `.env*` del `.gitignore`, así que nunca estuvo versionado: todas las webs se generaron
+    con la copia sin seguimiento de mi portátil. Desde un clon limpio, el generador se
+    paraba en el primer `read`. Lo descubrió la CI en su primera ejecución, que es
+    exactamente para lo que está.
+
+85. **La plantilla llevaba el nombre de la primera web que se hizo con ella.** El ejemplo
+    de entorno decía `EMAIL_FROM_NAME=Subsuelo`, y eso viajó a todas: quien copiara el
+    ejemplo sin mirarlo mandaría los correos de su cliente firmados por otro. Ahora lo
+    escribe el generador con el nombre de quien encarga la web.

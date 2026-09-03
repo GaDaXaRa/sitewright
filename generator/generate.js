@@ -785,14 +785,15 @@ write(
 
 // The domain lived in three places and the one nobody wrote was the one that won at
 // runtime: `NEXT_PUBLIC_SITE_URL`. It gets written here too, from the same answer.
-if (bp.identity.url) {
-  write(
-    '.env.example',
-    read('.env.example').replace(
-      /^NEXT_PUBLIC_SITE_URL=.*$/m,
-      `NEXT_PUBLIC_SITE_URL=${bp.identity.url}`,
-    ),
+{
+  let env = read('.env.example').replace(
+    /^EMAIL_FROM_NAME=.*$/m,
+    `EMAIL_FROM_NAME=${bp.identity.name}`,
   )
+  if (bp.identity.url) {
+    env = env.replace(/^NEXT_PUBLIC_SITE_URL=.*$/m, `NEXT_PUBLIC_SITE_URL=${bp.identity.url}`)
+  }
+  write('.env.example', env)
 }
 
 const pkg = JSON.parse(read('package.json'))
