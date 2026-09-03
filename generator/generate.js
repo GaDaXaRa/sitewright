@@ -390,11 +390,32 @@ function siteSettings(template, bp, modules, wirings) {
  * It goes through the seed like everything else so the site is reproducible: regenerating
  * and reseeding gives the same site, and nothing has to be typed into the panel twice.
  */
-function settingsContent(bp) {
-  const entries = Object.entries(bp.content?.settings ?? {})
-  return entries.length
-    ? entries.map(([key, value]) => `${key}: ${JSON.stringify(value)},`).join('\n      ') + '\n      '
-    : ''
+/**
+ * Los ajustes que se siembran, decididos en un solo sitio.
+ *
+ * Antes se concatenaban por trozos, y el blueprint podía escribir en `content.settings`
+ * una clave que ya salía de `identity` —la ciudad, sin ir más lejos—: el resultado era un
+ * objeto con la misma propiedad dos veces, que TypeScript rechaza. Ahora es un mapa, y lo
+ * que se redactó en la entrevista pisa a lo que se dedujo, que es el orden correcto.
+ */
+function seedSettings(bp) {
+  const settings = new Map([['siteName', 'site.name']])
+  const add = (key, value) => {
+    if (value !== undefined && value !== null && value !== '') settings.set(key, JSON.stringify(value))
+  }
+
+  add('tagline', bp.identity.tagline)
+  add('email', bp.identity.email)
+  add('city', bp.identity.city)
+  add('schemaType', bp.identity.schemaType)
+  add('legalHolder', bp.legal.holder)
+  add('legalId', bp.legal.id)
+  add('legalAddress', bp.legal.address)
+
+  for (const [key, value] of Object.entries(bp.content?.settings ?? {})) add(key, value)
+  settings.set('analyticsConsent', 'true')
+
+  return [...settings].map(([key, value]) => `${key}: ${value},`).join('\n      ')
 }
 
 function seedScript(bp, modules, wirings) {
@@ -446,9 +467,7 @@ export const seed = async () => {
   await payload.updateGlobal({
     slug: 'site-settings',
     data: {
-      siteName: site.name,
-      ${bp.identity.tagline ? `tagline: '${bp.identity.tagline}',\n      ` : ''}${bp.identity.email ? `email: '${bp.identity.email}',\n      ` : ''}${bp.identity.city ? `city: '${bp.identity.city}',\n      ` : ''}${bp.identity.schemaType ? `schemaType: '${bp.identity.schemaType}',\n      ` : ''}legalHolder: '${bp.legal.holder}',
-      ${bp.legal.id ? `legalId: '${bp.legal.id}',\n      ` : ''}${bp.legal.address ? `legalAddress: '${bp.legal.address}',\n      ` : ''}${settingsContent(bp)}analyticsConsent: true,
+      ${seedSettings(bp)}
     },
   })
 

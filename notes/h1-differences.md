@@ -716,3 +716,15 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
 92. **Cambiar el `package.json` de la plantilla sin su lockfile deja la CI en rojo.**
     `npm ci` se niega si no cuadran, y el error no menciona la publicación que lo causó:
     el guion de release actualizaba uno y no el otro. Ahora refresca los dos.
+
+
+93. **Un blueprint podía hacer que el generador escribiera TypeScript inválido.** Los
+    ajustes que se siembran se concatenaban por trozos, así que redactar en
+    `content.settings` una clave que ya salía de `identity` —la ciudad— producía un objeto
+    con la misma propiedad dos veces. Ahora es un mapa: un solo sitio donde se decide, y lo
+    redactado en la entrevista pisa a lo deducido, que es el orden correcto. El blueprint
+    de ejemplo lleva ya esa colisión para que la CI la vigile.
+
+94. **Regenerar con `--force` borra el directorio entero**, `node_modules` incluido. Es lo
+    que promete —y es lo correcto, porque media web vieja mezclada con media nueva es
+    peor— pero cuesta una instalación completa cada vez.
