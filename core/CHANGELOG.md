@@ -3,7 +3,7 @@
 Qué gana una web al actualizar. Escrito para quien tiene que decidir si le compensa, no
 para quien escribió el código.
 
-## Sin publicar
+## 0.8.0 — 3 de septiembre de 2026
 
 - **La auditoría avisa de las páginas vacías que la web anuncia.** Una página que dice
   «todavía no hay nada publicado» no es contenido fino: es ninguno, y Google la descubre,
