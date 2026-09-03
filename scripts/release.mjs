@@ -44,6 +44,19 @@ try {
   stop('existe core/.npmrc y puede tapar el token de la sesión. Bórralo.')
 } catch {}
 
+// npm contesta 404 cuando la credencial no puede publicar, no 401 ni 403: el error dice
+// que el paquete no existe cuando lo que pasa es que no te conoce. Preguntarlo antes
+// convierte media hora de desconcierto en una línea.
+try {
+  const who = read('npm', ['whoami'])
+  console.log(`  npm te reconoce como ${who}`)
+} catch {
+  stop(
+    'npm no reconoce la credencial. Míralo en este orden: ~/.npmrc (un token revocado ahí\n' +
+      '  tapa al bueno), NPM_TOKEN en el perfil, y que el token tenga permiso de publicación.',
+  )
+}
+
 // The gates live in core's prepublishOnly so they also run when someone publishes
 // without this script. npm runs them before it packs anything: a red gate means
 // nothing is uploaded. That is why they are not repeated here.

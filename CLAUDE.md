@@ -49,6 +49,7 @@ No es descuido: estas devuelven algo que parece una respuesta y no lo es.
 | `npm view` | Pregunta al registro | Responde desde caché. Siempre `--prefer-online`. |
 | `npm install` (dep `file:`) | Instala | Si la versión no cambia, deja lo que había. `npm run sync-core`. |
 | `.npmrc` en un subdirectorio | No está | Tapa el token de la sesión y provoca 404 inexplicables. `ls core/.npmrc`. |
+| `~/.npmrc` con un token viejo | Estás autenticado | Un token revocado ahí tapa al bueno del perfil, y npm contesta **404** —«no existe el paquete»— cuando lo que pasa es que no te conoce. `npm whoami`. |
 | `~/.zshrc` con la variable repetida | Vale la primera | Vale **la última**. `zsh -lc 'echo $NPM_TOKEN' \| head -c 8`. |
 | `next build` | Compila de cero | Reutiliza caché y puede ocultar errores de tipos. `npm run typecheck`. |
 | Stryker | Marca supervivientes | Los mutantes estáticos salen como supervivientes sin serlo (`ignoreStatic`). |
