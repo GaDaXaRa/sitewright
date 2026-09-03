@@ -766,3 +766,15 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
      mano y escribir `NEXT_PUBLIC_SITE_URL`; desde que el sitio puede existir sin dominio
      lo resuelve solo, y se comprobó aquí: sin tocar nada, la web declaró
      `https://selectas.vercel.app`, que es justo la que responde 200.
+
+
+101. **Cada web se quedaba con el README de la plantilla**, que habla del chasis y apunta a
+     `../core`, un directorio que no existe al lado de un sitio generado: quien abría el
+     repositorio de su propia web leía la documentación de otra cosa. Ahora el generador
+     escribe uno para quien la mantiene.
+
+102. **Crear el repositorio no termina el trabajo, y hacen falta dos permisos que ningún
+     guion puede darse a sí mismo**: el token de `gh` no puede subir `.github/workflows`
+     sin el ámbito `workflow` —hay que empujar por SSH— y la app de Vercel en GitHub tiene
+     que tener el repositorio nuevo en su lista, o `vercel git connect` falla diciendo que
+     quizá hay una errata. Los dos van ahora en el guion de aprovisionamiento.

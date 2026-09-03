@@ -66,7 +66,19 @@ ${'─'.repeat(14 + name.length)}
    DATABASE_URL=<la de main> SEED_EMAIL=<correo> SEED_PASSWORD=<contraseña> npm run seed
    DATABASE_URL=<la de main> node scripts/fix-prod-migration.mjs
 
-6. Comprobar antes de dar la web por buena, con la base delante o no comprueba el esquema:
+6. Repositorio y despliegue por push. Dos permisos que no se pueden conceder desde aquí:
+
+   gh repo create GaDaXaRa/${id} --private --source=. --remote=GaDaXaRa
+   git remote set-url GaDaXaRa git@github.com:GaDaXaRa/${id}.git   # el token de gh no
+   git push -u GaDaXaRa main                                      # sube workflows
+   gh variable set AUDIT_URL --repo GaDaXaRa/${id} --body https://${id}.vercel.app
+
+   Antes de conectar, en github.com/settings/installations → Vercel → Configure, añade el
+   repositorio a los permitidos, o `vercel git connect` falla hablando de erratas:
+
+   vercel git connect
+
+7. Comprobar antes de dar la web por buena, con la base delante o no comprueba el esquema:
 
    npm run audit -- --url https://${id}.vercel.app --db '<la de main>'
 `)

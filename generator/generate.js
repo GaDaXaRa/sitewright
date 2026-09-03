@@ -583,6 +583,62 @@ ${perDocument}
  * those cost a real afternoon somewhere, and writing them down here is cheaper than paying
  * for them again.
  */
+/**
+ * El README de la web, para la persona que la mantiene.
+ *
+ * Antes se quedaba el de la plantilla, que habla del chasis y apunta a `../core`, un
+ * directorio que no existe al lado de un sitio generado: quien abría el repositorio de su
+ * propia web leía la documentación de otra cosa.
+ */
+function siteReadme(bp, modules) {
+  const rows = Object.entries(modules)
+    .filter(([, m]) => m.route)
+    .map(([, m]) => `- **${m.labels?.plural ?? m.title}** — \`${m.route}\``)
+    .join('\n')
+
+  return `# ${bp.identity.name}
+
+${bp.identity.tagline ? bp.identity.tagline + '\n\n' : ''}Web y gestor de contenidos. **Los textos, las fotos y las fechas se escriben en el panel**,
+en \`/admin\`; aquí sólo está el código.
+
+## Secciones
+
+${rows}
+
+Una sección sin contenido no aparece ni en el menú ni en el sitemap: se publica sola en
+cuanto tiene algo dentro.
+
+## Trabajar en local
+
+\`\`\`bash
+cp .env.example .env     # y pon DATABASE_URL (la rama dev) y PAYLOAD_SECRET
+npm install
+npm run generate:types
+npm run dev
+\`\`\`
+
+## Antes de dar un cambio por bueno
+
+\`\`\`bash
+npm run typecheck && npm run test:int
+npm run audit -- --url http://localhost:3000
+\`\`\`
+
+La auditoría comprueba lo que se rompe en silencio: canónicos, sitemap, datos
+estructurados, páginas legales, consentimiento, contraste y peso.
+
+## Desplegar
+
+\`git push\`. La plataforma construye y publica sola, y al terminar vuelve a pasar la
+auditoría contra la web en producción.
+
+---
+
+Generada con [Sitewright](https://www.npmjs.com/package/sitewright-core). Lo que no cambia
+entre webs vive en ese paquete y **no se edita desde aquí**.
+`
+}
+
 function siteGuide(bp, modules) {
   const rows = Object.entries(modules)
     .map(([id, m]) => `| ${m.labels?.plural ?? m.title ?? id} | \`${id}\` | ${m.route ?? '—'} |`)
@@ -821,6 +877,7 @@ write('src/app/llms.txt/route.ts', llmsRoute(bp, modules, wirings))
 write('src/app/sitemap.ts', sitemap(read('src/app/sitemap.ts'), bp, modules, wirings))
 write('scripts/seed.ts', seedScript(bp, modules, wirings))
 write('CLAUDE.md', siteGuide(bp, modules))
+write('README.md', siteReadme(bp, modules))
 const pages = writeModulePages(target, bp, modules, wirings, write)
 write(
   'src/app/(frontend)/styles.css',
