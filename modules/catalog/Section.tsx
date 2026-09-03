@@ -40,14 +40,18 @@ export default function CatalogSection({
   return (
     <section className={`section ${tone ? `tone-${tone}` : ''}`} id="catalogo">
       <div className="container">
-        <div className="section-head">
-          <h2>{title}</h2>
-          {limit && items.length > limit ? (
-            <Link className="section-more" href={route}>
-              {moreLabel}
-            </Link>
-          ) : null}
-        </div>
+        {/* En su propia página el <h1> es de la página, así que la sección no pone
+            encabezado: un <h2> vacío es peor que ninguno. */}
+        {title || (limit && items.length > limit) ? (
+          <div className="section-head">
+            {title ? <h2>{title}</h2> : null}
+            {limit && items.length > limit ? (
+              <Link className="section-more" href={route}>
+                {moreLabel}
+              </Link>
+            ) : null}
+          </div>
+        ) : null}
 
         <div className="cards">
           {shown.map((item) => {

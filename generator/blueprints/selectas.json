@@ -1,0 +1,333 @@
+{
+  "identity": {
+    "id": "selectas",
+    "name": "Selectas",
+    "schemaType": "Organization",
+    "email": "selectasdjs@gmail.com",
+    "city": "Madrid",
+    "tagline": "Mujeres y Disidencias Djs"
+  },
+  "modules": {
+    "about": {
+      "title": "Sobre Selectas"
+    },
+    "team": {
+      "labels": {
+        "singular": "Selecta",
+        "plural": "Selectas"
+      },
+      "route": "/selectas",
+      "title": "La plataforma"
+    },
+    "catalog": {
+      "labels": {
+        "singular": "Línea de trabajo",
+        "plural": "Qué hacemos"
+      },
+      "route": "/que-hacemos",
+      "title": "Qué hacemos"
+    },
+    "media": {
+      "labels": {
+        "singular": "Sesión",
+        "plural": "Sesiones"
+      },
+      "route": "/sesiones",
+      "title": "Escucha"
+    },
+    "schedule": {
+      "labels": {
+        "singular": "Fecha",
+        "plural": "Agenda"
+      },
+      "route": "/agenda",
+      "title": "Próximas fechas",
+      "emptyText": "No hay nada convocado ahora mismo. Escríbenos y te avisamos."
+    },
+    "reviews": {
+      "labels": {
+        "singular": "Aparición",
+        "plural": "En los medios"
+      },
+      "title": "Selectas en los medios"
+    },
+    "faq": {
+      "labels": {
+        "singular": "Pregunta frecuente",
+        "plural": "Preguntas frecuentes"
+      },
+      "route": "/preguntas-frecuentes",
+      "title": "Preguntas frecuentes"
+    },
+    "contact": {
+      "labels": {
+        "singular": "Solicitud",
+        "plural": "Contacto"
+      },
+      "title": "Escríbenos",
+      "askDate": false,
+      "kinds": {
+        "join": "Quiero unirme a la plataforma",
+        "booking": "Quiero programaros o contrataros",
+        "sponsor": "Patrocinio, subvención o colaboración",
+        "press": "Prensa"
+      }
+    }
+  },
+  "design": {
+    "scheme": "light",
+    "altExample": "Una de las Selectas pinchando",
+    "palette": {
+      "ground": "#faf6ef",
+      "ground2": "#f2ece1",
+      "surface": "#ffffff",
+      "surface2": "#f4eee3",
+      "ink": "#15120e",
+      "inkSoft": "#4a423a",
+      "inkFaint": "#6d645a",
+      "line": "#ded5c6",
+      "accent": "#b5341f",
+      "accentSoft": "#c9482f"
+    },
+    "fonts": {
+      "display": {
+        "family": "Archivo Black",
+        "weights": [
+          "400"
+        ]
+      },
+      "body": {
+        "family": "Public Sans",
+        "weights": [
+          "400",
+          "500",
+          "600"
+        ]
+      }
+    },
+    "sections": [
+      "about",
+      "team",
+      "catalog",
+      "media",
+      "schedule",
+      "reviews",
+      "faq",
+      "contact"
+    ]
+  },
+  "legal": {
+    "holder": "Paola Rodríguez"
+  },
+  "contentStatus": "borrador",
+  "content": {
+    "settings": {
+      "heroEyebrow": "Colectivo · Madrid",
+      "heroTitle": "Mujeres y Disidencias Djs",
+      "heroText": "Somos un colectivo de mujeres de distintos países que trabajamos en la música que no es mainstream. Estamos aquí para que la escena se parezca a quienes la hacemos.",
+      "seoTitle": "Selectas — colectivo de mujeres y disidencias DJs en Madrid",
+      "seoDescription": "Colectivo de mujeres y disidencias DJs. Visibilidad, promoción de la igualdad de género en la industria musical y coproducción de eventos. Desde Madrid.",
+      "about": "Selectas nació de la necesidad de reivindicar el papel de las mujeres DJs en la escena musical. Somos mujeres de diferentes países que trabajamos en la industria musical no mainstream, y nos juntamos para fomentar la equidad de género e impulsar el cambio en el sector: en las programaciones de los clubs, en los festivales y en quién decide qué suena.",
+      "contactText": "Dinos quién eres y qué buscas. Si eres DJ y quieres entrar, cuéntanos qué pinchas; si eres una sala, un festival o una organización, cuéntanos qué tienes en mente.",
+      "city": "Madrid"
+    },
+    "team": [
+      {
+        "name": "Sara Brito",
+        "role": "Psicodelia y música experimental",
+        "bio": [
+          {
+            "text": "Sara Brito forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
+          }
+        ],
+        "order": 0
+      },
+      {
+        "name": "Moomba",
+        "role": "Funk, soul, jazz, mambo y boogaloo",
+        "bio": [
+          {
+            "text": "Moomba forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
+          }
+        ],
+        "order": 1
+      },
+      {
+        "name": "La Jaguara",
+        "role": "BioDJ. Global bass y electroafrobeat",
+        "bio": [
+          {
+            "text": "La Jaguara forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
+          }
+        ],
+        "order": 2
+      },
+      {
+        "name": "Okeans",
+        "role": "Diseñadora sonora, productora musical y DJ",
+        "bio": [
+          {
+            "text": "Okeans forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
+          }
+        ],
+        "order": 3
+      },
+      {
+        "name": "Anita Sinausía",
+        "role": "Coordinadora cultural, artista y bailarina. DJ de rumbas quinquis",
+        "bio": [
+          {
+            "text": "Anita Sinausía forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
+          }
+        ],
+        "order": 4
+      },
+      {
+        "name": "Rachel Dalessandro",
+        "role": "Cantante brasileña e instrumentista. MPB",
+        "bio": [
+          {
+            "text": "Rachel Dalessandro forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
+          }
+        ],
+        "order": 5
+      },
+      {
+        "name": "Pimientas Selectoras",
+        "role": "Desde La Palma, del colectivo Pimienta Selectoras",
+        "bio": [
+          {
+            "text": "Pimientas Selectoras forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
+          }
+        ],
+        "order": 6
+      },
+      {
+        "name": "Miss Aleta",
+        "role": "Afrobeat, afrotrap, salsa, cumbia y reggae",
+        "bio": [
+          {
+            "text": "Miss Aleta forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
+          }
+        ],
+        "order": 7
+      },
+      {
+        "name": "Gee Contreras",
+        "role": "Vinyl selectora. Rap de los noventa, hard salsa, disco y funk",
+        "bio": [
+          {
+            "text": "Gee Contreras forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
+          }
+        ],
+        "order": 8
+      },
+      {
+        "name": "Sandunguera",
+        "role": "Desde el Pacífico colombiano. Afrobeat, funk, soul y salsa",
+        "bio": [
+          {
+            "text": "Sandunguera forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
+          }
+        ],
+        "order": 9
+      },
+      {
+        "name": "Wepa Selectors",
+        "role": "Wen Movilla y Pau Osorio. House, afrobeat y world",
+        "bio": [
+          {
+            "text": "Wepa Selectors forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
+          }
+        ],
+        "order": 10
+      },
+      {
+        "name": "La Lvcha",
+        "role": "DJ, productora creativa y chamana",
+        "bio": [
+          {
+            "text": "La Lvcha forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
+          }
+        ],
+        "order": 11
+      }
+    ],
+    "catalog": [
+      {
+        "title": "Visibilidad",
+        "summary": "Apoyo a la visibilidad de lxs artistas a través de la plataforma, talleres, conferencias y otras actividades.",
+        "order": 0
+      },
+      {
+        "title": "Promoción",
+        "summary": "Promoción de la igualdad de género en la industria musical, en medios y organizaciones del sector público y privado.",
+        "order": 1
+      },
+      {
+        "title": "Coproducción",
+        "summary": "Coproducción de eventos para las DJs de la plataforma.",
+        "order": 2
+      }
+    ],
+    "reviews": [
+      {
+        "text": "Primer episodio de la residencia de Radio Gladys Palmera para el proyecto RRWaves: «La Embajada de La Sabrosura», junto con Radio Relativa, presentación de Selectas.",
+        "author": "Radio Gladys Palmera y Radio Relativa",
+        "order": 0,
+        "active": true
+      },
+      {
+        "text": "Participamos en las presentaciones seleccionadas para Ideas Showroom 2023, en el CCCB de Barcelona.",
+        "author": "Primavera Pro",
+        "source": "Junio de 2023",
+        "order": 1,
+        "active": true
+      },
+      {
+        "text": "Selectas figura como organización en Keychange, el programa que da a las mujeres y a las personas de género expansivo las habilidades y las oportunidades para dar el siguiente paso en su carrera.",
+        "author": "Keychange",
+        "order": 2,
+        "active": true
+      },
+      {
+        "text": "Selectas surge ante la necesidad de reivindicar a nivel global el papel de las mujeres DJs en la escena musical. El objetivo es fomentar la igualdad en las programaciones de los clubs, festivales y eventos.",
+        "author": "Revista Enlace Funk",
+        "order": 3,
+        "active": true
+      }
+    ],
+    "faq": [
+      {
+        "question": "¿Quién puede entrar en la plataforma?",
+        "answer": "Mujeres y disidencias que pinchen o quieran empezar a hacerlo. No hace falta llevar años ni tener una agenda llena: hay quien llega para empezar y quien llega para consolidarse.",
+        "order": 0,
+        "active": true
+      },
+      {
+        "question": "¿Cómo se entra?",
+        "answer": "Escribiéndonos por el formulario y marcando «Quiero unirme a la plataforma». Cuéntanos qué pinchas y dónde se te puede escuchar.",
+        "order": 1,
+        "active": true
+      },
+      {
+        "question": "¿Cuesta algo formar parte?",
+        "answer": "No. Entrar en la plataforma no cuesta nada.",
+        "order": 2,
+        "active": true
+      },
+      {
+        "question": "¿Se puede contratar a una Selecta para una sesión?",
+        "answer": "Sí. Escríbenos por el formulario marcando «Quiero programaros o contrataros» y cuéntanos qué evento es, dónde y cuándo.",
+        "order": 3,
+        "active": true
+      },
+      {
+        "question": "¿Hay que estar en Madrid?",
+        "answer": "No. El colectivo opera principalmente desde Madrid, pero somos de distintos países y trabajamos allá donde salga.",
+        "order": 4,
+        "active": true
+      }
+    ]
+  }
+}

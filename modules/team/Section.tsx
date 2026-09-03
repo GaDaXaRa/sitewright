@@ -30,9 +30,12 @@ export default function TeamSection({
   return (
     <section className={`section ${tone ? `tone-${tone}` : ''}`} id="equipo">
       <div className="container">
-        <div className="section-head">
-          <h2>{title}</h2>
-        </div>
+        {/* En su propia página el <h1> es de la página: aquí no hace falta encabezado. */}
+        {title ? (
+          <div className="section-head">
+            <h2>{title}</h2>
+          </div>
+        ) : null}
 
         <ul className="members">
           {people.map((member) => {

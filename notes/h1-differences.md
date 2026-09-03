@@ -698,3 +698,16 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
     faltan siete versiones no ayuda si no dice qué traen. `core/CHANGELOG.md` se escribió
     hacia atrás desde el historial, y está redactado para quien decide si le compensa
     actualizar, no para quien escribió el código.
+
+
+90. **El módulo de equipo hacía fichas y no índice.** Para la junta de una asociación
+    bastaba con el trozo de portada, pero la quinta web es un colectivo cuyo sentido
+    declarado es la visibilidad de quienes lo forman: sin `/selectas` no hay página que
+    enlazar, ni que compartir, ni que indexe un buscador. Y era además la causa de que el
+    sitemap anunciara `/junta`, una ruta sin página. Ahora el módulo trae índice y entrada
+    de menú, como los demás.
+
+91. **La página propia de una sección pintaba un `<h2>` vacío.** El índice le pasa
+    `title=""` porque el encabezado es el `<h1>` de la página, y la sección lo pintaba
+    igual. Sólo le pasaba a `catalog` —lo comprobé en vez de suponerlo— y ahora, sin
+    título, no hay cabecera.
