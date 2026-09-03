@@ -33,3 +33,15 @@ export const loadSiteContent = cache(async () => {
   // upcoming or past depending on when React happened to run it.
   return { settings, now: Date.now() }
 })
+
+/**
+ * El menú, con sólo lo que tiene algo dentro.
+ *
+ * Un enlace a una página que dice «todavía no hay nada publicado» es peor que no tener
+ * enlace: se lo come quien entra y se lo come Google, que clasifica la web como fina y
+ * deja de indexarla. El generador escribe aquí una condición por sección; sin secciones,
+ * el menú es el que diga la configuración.
+ */
+export const visibleNav = cache(async (): Promise<{ href: string; label: string }[]> => [
+  ...site.nav,
+])

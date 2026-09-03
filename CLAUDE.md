@@ -7,7 +7,7 @@ blueprint produce una web Next.js + Payload desplegada. El núcleo es el paquete
 - **El código va en inglés**; lo que ve una persona, en español.
 - Los comentarios explican **por qué**, no qué hace la línea. Densidad baja.
 
-## Las diez reglas
+## Las once reglas
 
 Cada una existe porque se incumplió al menos una vez y costó tiempo real. Llevan al lado
 el comando que las comprueba: si no hay comando, no hay regla, hay buena intención.
@@ -15,25 +15,28 @@ el comando que las comprueba: si no hay comando, no hay regla, hay buena intenci
 1. **Publicar el núcleo es `npm run release`**, nunca `npm publish` a mano. El guion
    exige árbol limpio, comprueba contra el registro que la versión esté libre y pasa las
    puertas antes de subir nada.
-2. **Instalar el núcleo en un sitio es `npm run sync-core ../<sitio>`.** npm no refresca
+2. **Antes de tocar una web ya hecha, `npm run doctor -- ../<sitio>`**: dice qué núcleo
+   tiene, cuántas versiones se está perdiendo y qué hay en medio. Ninguna se actualiza
+   sola y hasta ahora nadie llevaba esa cuenta.
+3. **Instalar el núcleo en un sitio es `npm run sync-core -- ../<sitio>`.** npm no refresca
    una dependencia `file:` que conserva su versión, así que el guion la borra y compara el
    hash de lo instalado con lo que acaba de construir.
-3. **Los tipos se comprueban aparte: `npm run typecheck`.** `next build` con caché
+4. **Los tipos se comprueban aparte: `npm run typecheck`.** `next build` con caché
    ha dado por bueno un error de tipos que luego tumbó el despliegue.
-4. **Desplegar es `git push`.** Los proyectos están conectados a GitHub; lanzar `vercel
+5. **Desplegar es `git push`.** Los proyectos están conectados a GitHub; lanzar `vercel
    --prod` a mano despliega otra cosa distinta de lo que hay en el repositorio.
-5. **Una web no está terminada hasta que su auditoría pasa contra la URL pública**
+6. **Una web no está terminada hasta que su auditoría pasa contra la URL pública**
    (`AUDIT_URL=https://… npm run audit`). Ha encontrado algo real en todas las webs.
-6. **No inventar datos de una persona o un negocio**: precios, fechas, NIF, direcciones,
+7. **No inventar datos de una persona o un negocio**: precios, fechas, NIF, direcciones,
    aforos. Si no los ha dicho el cliente, el hueco se queda vacío y se pregunta.
-7. **Antes de suponer que algo no existe, mirarlo.** Un `repository` se borró suponiendo
+8. **Antes de suponer que algo no existe, mirarlo.** Un `repository` se borró suponiendo
    que el repo de GitHub no estaba creado; estaba. `git remote -v`, `gh repo view`, `ls`.
-8. **No afirmar un hecho de infraestructura sin el comando delante** — ver la tabla de
+9. **No afirmar un hecho de infraestructura sin el comando delante** — ver la tabla de
    abajo. Media docena de herramientas devuelven respuestas engañosas por diseño.
-9. **Migrar en producción después de haber usado el modo desarrollo** requiere arreglar
+10. **Migrar en producción después de haber usado el modo desarrollo** requiere arreglar
    antes la marca `batch = -1` que deja el empuje automático de esquema; si no,
    `payload migrate` se planta.
-10. **Al terminar cualquier cambio en el núcleo**: pruebas y mutación. El listón está en
+11. **Al terminar cualquier cambio en el núcleo**: pruebas y mutación. El listón está en
     95% y ha derivado dos veces sin que nadie se diera cuenta. Lo aplica `prepublishOnly`.
 
 ## Herramientas que mienten

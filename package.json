@@ -5,6 +5,7 @@
   "description": "Generador de sitios web profesionales. Punto de entrada único para las operaciones peligrosas.",
   "scripts": {
     "release": "node scripts/release.mjs",
-    "sync-core": "node scripts/sync-core.mjs"
+    "sync-core": "node scripts/sync-core.mjs",
+    "doctor": "node scripts/doctor.mjs"
   }
 }

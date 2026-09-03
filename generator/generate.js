@@ -122,6 +122,10 @@ function dataLoader(bp, modules, wirings) {
   const empties = queried.map((w) =>
     w.dataPick ? `      ${w.variable}: ${w.dataPick.empty},` : `      ${w.variable}: [],`,
   )
+  const navConditions = wirings
+    .filter((w) => w.indexPage && w.navLink)
+    .map((w) => `  '${modules[w.id].route}': (c) => c.${w.variable}.length > 0,`)
+    .join('\n')
 
   return `import { cache } from 'react'
 import { getPayload } from 'payload'
@@ -175,6 +179,25 @@ ${empties.join('\n')}
     }
   }
 })
+
+/**
+ * El menú, con sólo lo que tiene algo dentro.
+ *
+ * Un enlace a una página que dice «todavía no hay nada publicado» es peor que no tener
+ * enlace: se lo come quien entra y se lo come Google, que clasifica la web como fina y
+ * deja de indexarla. La condición es la misma que decide el sitemap, para que el menú y
+ * lo que se le cuenta a un buscador no puedan discrepar.
+ */
+type SiteContent = Awaited<ReturnType<typeof loadSiteContent>>
+
+const NAV_CONTENT: Record<string, (c: SiteContent) => boolean> = {
+${navConditions}
+}
+
+export const visibleNav = cache(async (): Promise<{ href: string; label: string }[]> => {
+  const content = await loadSiteContent()
+  return site.nav.filter((link) => NAV_CONTENT[link.href]?.(content) ?? true)
+})
 `
 }
 
@@ -217,7 +240,7 @@ ${imports}
 
 ${jsonldImports}
 
-import { loadSiteContent } from '@/lib/data'
+import { loadSiteContent, visibleNav } from '@/lib/data'
 import { buildHomeJsonLd } from '@/lib/jsonLd'
 import { site } from '@/site.config'
 import { alternateTones, mediaAlt, mediaFocal, mediaSize, mediaUrl${usesSplit ? ', splitEvents' : ''} } from 'sitewright-core'
@@ -248,6 +271,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const { settings, ${[...new Set(wirings.map((w) => w.variable).filter(Boolean))].join(', ')}, now } =
     await loadSiteContent()
+  const links = await visibleNav()
 
   // The tones alternate over the sections that are really painted: most disappear when the
   // client runs out of content, and then different pairs become neighbours.
@@ -269,7 +293,7 @@ ${overlays.map((w) => `      ${w.overlayRender()}`).join('\n')}
         name={settings.siteName}
         logoUrl={mediaUrl(settings.logo)}
         logoSize={mediaSize(settings.logo)}
-        links={[...site.nav]}
+        links={links}
         cta={site.cta ?? undefined}
       />
 
@@ -287,7 +311,7 @@ ${cta ? `        actions={[{ href: '${cta.href}', label: '${cta.label}' }]}\n` :
 
 ${sectioned.map((w) => `      ${w.sectionRender(modules[w.id], bp)}`).join('\n\n')}
 
-      <Footer settings={settings} links={[...site.nav]} />
+      <Footer settings={settings} links={links} />
     </>
   )
 }
@@ -457,11 +481,14 @@ function writeModulePages(target, bp, modules, wirings, write) {
 // ── sitemap ─────────────────────────────────────────────────────────────────────────────
 
 function sitemap(template, bp, modules, wirings) {
-  const fixed = Object.values(modules)
-    .filter((m) => m.route)
+  // Sólo las secciones que escriben una página, y sólo cuando tienen algo que enseñar.
+  // Anunciar una ruta sin página es mandar a Google a un 404; anunciar una que dice
+  // «todavía no hay nada publicado» es pedirle que clasifique la web como fina.
+  const fixed = wirings
+    .filter((w) => w.indexPage)
     .map(
-      (m) =>
-        `    {\n      url: \`\${SITE_URL}${m.route}\`,\n      lastModified: new Date(),\n      changeFrequency: 'weekly',\n      priority: 0.8,\n    },`,
+      (w) =>
+        `    ...(${w.variable}.length\n      ? [\n          {\n            url: \`\${SITE_URL}${modules[w.id].route}\`,\n            lastModified: new Date(),\n            changeFrequency: 'weekly' as const,\n            priority: 0.8,\n          },\n        ]\n      : []),`,
     )
     .join('\n')
 
@@ -471,7 +498,7 @@ function sitemap(template, bp, modules, wirings) {
     .filter((w) => w.detailPage)
     .map((w) => {
       const m = modules[w.id]
-      const collection = w.id === 'team' ? 'team' : 'catalog'
+      const collection = w.collectionSlug
       return `      const ${w.id}Docs = await payload.find({ collection: '${collection}', limit: 200, depth: 0 })
       for (const doc of ${w.id}Docs.docs) {
         if (doc.slug) {
@@ -486,10 +513,22 @@ function sitemap(template, bp, modules, wirings) {
     })
     .join('\n\n')
 
-  let out = template.replace(
-    "  // The generator adds one entry per module page here.",
-    fixed,
-  )
+  // Lo que se anuncia depende de lo que haya publicado, así que el sitemap lee el mismo
+  // cargador que las páginas: nunca puede prometer algo distinto de lo que se verá.
+  const read = wirings.filter((w) => w.indexPage).map((w) => w.variable)
+  let out = template
+    .replace(
+      '  // The generator reads here what each section actually has.',
+      read.length ? `  const { ${read.join(', ')} } = await loadSiteContent()` : '',
+    )
+    .replace('    // The generator adds one entry per module page here.', fixed)
+
+  if (read.length) {
+    out = out.replace(
+      "import { SITE_URL } from '@/lib/site'",
+      "import { SITE_URL } from '@/lib/site'\nimport { loadSiteContent } from '@/lib/data'",
+    )
+  }
 
   if (perDocument) {
     out = out.replace(

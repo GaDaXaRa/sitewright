@@ -14,6 +14,8 @@ import {
   checkLlmsTxt,
   checkPlaceholders,
   checkReachable,
+  checkAdvertisedEmpty,
+  checkCoreVersion,
   checkWeight,
   internalLinks,
 } from './checks/index.js'
@@ -22,6 +24,15 @@ import { checkMigrations, checkPooled } from './migrations.js'
 export type AuditOptions = {
   /** Where the site is answering right now: a dev server or the real thing. */
   baseUrl: string
+  /**
+   * Qué versión del núcleo usa la web y cuáles hay publicadas. Quien llama decide si
+   * pregunta al registro: la auditoría no debería quedarse colgada porque npm no conteste.
+   */
+  core?: {
+    declared: string | null
+    installed: string | null
+    published: string[] | null
+  }
   /** What the site says it is. Defaults to `baseUrl`. */
   siteUrl?: string
   siteName?: string
@@ -74,6 +85,9 @@ export async function runAudit(options: AuditOptions): Promise<Finding[]> {
   // A short crawl from the home page: what a person could reach by clicking, which is the
   // only honest way to tell an indexed page from an orphan one.
   const reachable = new Set<string>(['/'])
+  // Lo descargado se guarda: comprobar si una página anunciada está vacía no merece una
+  // segunda ronda de peticiones contra la web de un cliente.
+  const bodies = new Map<string, string>([['/', home.body]])
   const queue = internalLinks(home.body, base)
   const seen = new Set<string>(['/'])
   let budget = 25
@@ -85,6 +99,7 @@ export async function runAudit(options: AuditOptions): Promise<Finding[]> {
     budget -= 1
     const page = await get(`${base}${path}`)
     if (page.status === 200) {
+      bodies.set(path, page.body)
       for (const link of internalLinks(page.body, base)) {
         reachable.add(link)
         if (!seen.has(link)) queue.push(link)
@@ -107,6 +122,8 @@ export async function runAudit(options: AuditOptions): Promise<Finding[]> {
     ...checkPlaceholders(allPages),
     ...checkWeight(allPages),
     ...checkReachable(sitemapUrls, reachable),
+    ...checkAdvertisedEmpty(sitemapUrls, bodies),
+    ...(options.core ? checkCoreVersion(options.core) : []),
   ]
 
   if (options.cssPath) {

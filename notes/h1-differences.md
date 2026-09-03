@@ -675,3 +675,26 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
     de entorno decía `EMAIL_FROM_NAME=Subsuelo`, y eso viajó a todas: quien copiara el
     ejemplo sin mirarlo mandaría los correos de su cliente firmados por otro. Ahora lo
     escribe el generador con el nombre de quien encarga la web.
+
+
+86. **El sitemap se decidía al generar y no según lo que hay.** Anunciaba `/junta`, que
+    **no existe** —team sólo escribe fichas—, y anunciaba secciones que dicen «todavía no
+    hay nada publicado». Ahora se construye desde las páginas que de verdad se escriben y
+    desde el mismo cargador que las pinta, así que no puede prometer nada distinto de lo
+    que se verá. El menú usa la misma condición, para que lo que se le cuenta a un
+    buscador y lo que ve una persona no puedan discrepar.
+
+87. **La auditoría no sabía distinguir una sección vacía de una página vacía.** La primera
+    versión de la puerta marcó la portada de sandunguera, que enseña «todavía no hay bolos
+    confirmados» en una sección de cinco: eso es contenido. Una página está vacía cuando
+    **todas** sus secciones lo están.
+
+88. **Nadie llevaba la cuenta de cuánto se ha quedado atrás una web.** subsuelo lleva desde
+    agosto siete versiones por detrás del núcleo, con arreglos que le harían falta, y no
+    había forma de saberlo sin mirarlo a mano. `npm run doctor -- ../<sitio>` lo dice, y la
+    auditoría avisa —sin fallar: una web atrasada sigue funcionando—.
+
+89. **Publicar sin registro de cambios hace inútil saber que vas atrasado.** Saber que
+    faltan siete versiones no ayuda si no dice qué traen. `core/CHANGELOG.md` se escribió
+    hacia atrás desde el historial, y está redactado para quien decide si le compensa
+    actualizar, no para quien escribió el código.

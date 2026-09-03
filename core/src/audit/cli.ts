@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { runAudit } from './run.js'
 import { renderReport, exitCode } from './report.js'
 
@@ -19,7 +21,50 @@ if (!baseUrl) {
   process.exit(2)
 }
 
+/**
+ * Qué núcleo usa esta web y qué hay publicado.
+ *
+ * Se pregunta desde aquí y no desde la auditoría porque depende de la red y del disco: si
+ * npm no contesta o no hay `package.json`, la puerta se queda sin comprobar y lo dice, que
+ * es mejor que una auditoría que se cuelga o que aprueba sin mirar.
+ */
+async function coreVersions(root: string) {
+  const readVersion = (path: string): string | null => {
+    try {
+      return JSON.parse(readFileSync(path, 'utf8')).version ?? null
+    } catch {
+      return null
+    }
+  }
+
+  let declared: string | null = null
+  try {
+    const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
+    declared = pkg.dependencies?.['sitewright-core'] ?? null
+  } catch {
+    return null
+  }
+
+  let published: string[] | null = null
+  try {
+    const answer = await fetch('https://registry.npmjs.org/sitewright-core', {
+      headers: { accept: 'application/vnd.npm.install-v1+json' },
+      signal: AbortSignal.timeout(5000),
+    })
+    if (answer.ok) published = Object.keys(((await answer.json()) as { versions: object }).versions)
+  } catch {
+    // Sin registro no se afirma nada: la puerta lo dirá.
+  }
+
+  return {
+    declared,
+    installed: readVersion(join(root, 'node_modules/sitewright-core/package.json')),
+    published,
+  }
+}
+
 const findings = await runAudit({
+  core: (await coreVersions(arg('root') ?? process.cwd())) ?? undefined,
   baseUrl,
   siteUrl: arg('site-url'),
   siteName: arg('name'),

@@ -11,6 +11,8 @@ import {
   checkConsentGating,
   checkPlaceholders,
   checkReachable,
+  checkAdvertisedEmpty,
+  isEmptyPage,
   internalLinks,
   checkContrast,
   checkImages,
@@ -340,5 +342,79 @@ describe('el informe', () => {
     const report = renderReport(checkSecurityHeaders(page()))
     expect(report).toContain('NO pasa la auditoría')
     expect(report).toContain('No viaja')
+  })
+})
+
+describe('nada de lo anunciado está vacío', () => {
+  const lleno = '<section><h2>Bolos</h2><p>El sábado en la sala.</p></section>'
+  const vacio = '<section><p class="empty">Todavía no hay bolos confirmados.</p></section>'
+
+  it('protesta cuando el sitemap anuncia una página sin nada', () => {
+    const [finding] = checkAdvertisedEmpty(
+      ['https://x.es/bolos', 'https://x.es/sesiones'],
+      new Map([
+        ['/bolos', vacio],
+        ['/sesiones', lleno],
+      ]),
+    )
+    expect(finding!.status).toBe('fail')
+    expect(finding!.detail).toContain('/bolos')
+    expect(finding!.detail).not.toContain('/sesiones')
+  })
+
+  it('pasa cuando todo lo anunciado tiene contenido', () => {
+    const [finding] = checkAdvertisedEmpty(['https://x.es/sesiones'], new Map([['/sesiones', lleno]]))
+    expect(finding!.status).toBe('ok')
+    expect(finding!.detail).toContain('1 páginas')
+  })
+
+  it('no afirma nada de lo que no llegó a descargar', () => {
+    const [finding] = checkAdvertisedEmpty(['https://x.es/bolos'], new Map())
+    expect(finding!.status).toBe('skip')
+  })
+
+  it('la barra final no hace que una página parezca otra', () => {
+    const [finding] = checkAdvertisedEmpty(['https://x.es/bolos/'], new Map([['/bolos', vacio]]))
+    expect(finding!.status).toBe('fail')
+  })
+
+  it('la portada se comprueba como cualquier otra', () => {
+    const [finding] = checkAdvertisedEmpty(['https://x.es/'], new Map([['/', vacio]]))
+    expect(finding!.status).toBe('fail')
+    expect(finding!.detail).toContain('/')
+  })
+
+  it('una dirección que no es una dirección se ignora', () => {
+    const [finding] = checkAdvertisedEmpty(['no-es-una-url'], new Map([['/', lleno]]))
+    expect(finding!.status).toBe('skip')
+  })
+
+  it('una clase que sólo contiene "empty" dentro de otra palabra no cuenta', () => {
+    const [finding] = checkAdvertisedEmpty(
+      ['https://x.es/a'],
+      new Map([['/a', '<section class="not-emptyish">hola</section>']]),
+    )
+    expect(finding!.status).toBe('ok')
+  })
+
+  it('una sección vacía entre secciones llenas no vacía la página', () => {
+    const portada = `${lleno}${vacio}${lleno}`
+    const [finding] = checkAdvertisedEmpty(['https://x.es/'], new Map([['/', portada]]))
+    expect(finding!.status).toBe('ok')
+  })
+
+  it('una página sin secciones no se juzga vacía', () => {
+    expect(isEmptyPage('<main><p class="empty">nada</p></main>')).toBe(false)
+  })
+
+  it('todas las secciones vacías sí vacían la página', () => {
+    expect(isEmptyPage(`${vacio}${vacio}`)).toBe(true)
+  })
+
+  it('enumera hasta cuatro y luego cuenta', () => {
+    const urls = ['a', 'b', 'c', 'd', 'e', 'f'].map((p) => `https://x.es/${p}`)
+    const bodies = new Map(['a', 'b', 'c', 'd', 'e', 'f'].map((p) => [`/${p}`, vacio]))
+    const [finding] = checkAdvertisedEmpty(urls, bodies)
+    expect(finding!.detail).toContain('y 2 más')
   })
 })

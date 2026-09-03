@@ -86,3 +86,13 @@ export {
   cookiePolicy,
   type LegalSection,
 } from './lib/legalTexts.js'
+
+// Cuánto se ha quedado atrás una web
+export {
+  compareVersions,
+  normaliseVersion,
+  versionsAfter,
+  changelogSections,
+  diagnose,
+  type Diagnosis,
+} from './lib/versions.js'

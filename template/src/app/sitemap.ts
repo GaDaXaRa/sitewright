@@ -2,6 +2,8 @@ import type { MetadataRoute } from 'next'
 import { SITE_URL } from '@/lib/site'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // The generator reads here what each section actually has.
+
   const entries: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/`, lastModified: new Date(), changeFrequency: 'weekly', priority: 1 },
     // The generator adds one entry per module page here.

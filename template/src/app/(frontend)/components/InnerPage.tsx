@@ -3,6 +3,7 @@ import Link from 'next/link'
 import type { SiteSetting } from '@/payload-types'
 import { mediaSize, mediaUrl } from 'sitewright-core'
 import { site } from '@/site.config'
+import { visibleNav } from '@/lib/data'
 
 import Nav from './Nav'
 import Footer from './Footer'
@@ -12,7 +13,7 @@ import Footer from './Footer'
  * footer. Sections reused from the home page are told they are on a page (`context`) so
  * they drop their own heading and leave the <h1> to this one.
  */
-export default function InnerPage({
+export default async function InnerPage({
   settings,
   kicker,
   title,
@@ -25,13 +26,15 @@ export default function InnerPage({
   intro?: string
   children: React.ReactNode
 }) {
+  const links = await visibleNav()
+
   return (
     <>
       <Nav
         name={settings?.siteName ?? site.name}
         logoUrl={mediaUrl(settings?.logo)}
         logoSize={mediaSize(settings?.logo)}
-        links={[...site.nav]}
+        links={links}
         cta={site.cta ?? undefined}
       />
 

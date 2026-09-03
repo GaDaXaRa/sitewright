@@ -183,3 +183,54 @@ export function checkReachable(sitemapUrls: string[], reachable: Set<string>): F
         ),
   ]
 }
+
+/**
+ * Una página cuyas secciones están todas vacías.
+ *
+ * No basta con encontrar un «todavía no hay nada»: la portada de una web recién hecha
+ * enseña ese texto en una sección y cinco llenas alrededor, y esa página tiene contenido
+ * de sobra. Lo que no lo tiene es la página cuya única sección es el hueco.
+ */
+export function isEmptyPage(html: string): boolean {
+  const sections = html.split(/<section\b/i).slice(1)
+  if (!sections.length) return false
+  return sections.every((section) => /class="[^"]*\bempty\b/.test(section))
+}
+
+/**
+ * Nada de lo que se anuncia puede estar vacío.
+ *
+ * Una página que dice «todavía no hay nada publicado» no es contenido fino: es ninguno.
+ * Google la descubre, la rastrea y decide no indexarla, y de paso se lleva esa impresión
+ * de la web entera. Le pasó a la cuarta web hecha con esto: siete direcciones en el
+ * sitemap, tres vacías, tres legales y una sola con algo que leer.
+ *
+ * Se mira sólo lo que el rastreo llegó a descargar; de lo demás no se afirma nada.
+ */
+export function checkAdvertisedEmpty(sitemapUrls: string[], bodies: Map<string, string>): Finding[] {
+  const title = 'Nada de lo anunciado está vacío'
+  const paths = sitemapUrls
+    .map((url) => {
+      try {
+        return new URL(url).pathname.replace(/\/$/, '') || '/'
+      } catch {
+        return null
+      }
+    })
+    .filter((path): path is string => Boolean(path))
+    .filter((path) => bodies.has(path))
+
+  if (!paths.length) return [skip(GATE_REACH, title, 'No se descargó ninguna página del sitemap.')]
+
+  const empty = paths.filter((path) => isEmptyPage(bodies.get(path)!))
+
+  return [
+    empty.length
+      ? fail(
+          GATE_REACH,
+          title,
+          `Sin nada que enseñar: ${empty.slice(0, 4).join(', ')}${empty.length > 4 ? ` y ${empty.length - 4} más` : ''}.`,
+        )
+      : ok(GATE_REACH, title, `${paths.length} páginas comprobadas, todas con contenido.`),
+  ]
+}
