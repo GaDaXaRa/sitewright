@@ -128,128 +128,67 @@
       "seoTitle": "Selectas — colectivo de mujeres y disidencias DJs en Madrid",
       "seoDescription": "Colectivo de mujeres y disidencias DJs. Visibilidad, promoción de la igualdad de género en la industria musical y coproducción de eventos. Desde Madrid.",
       "about": "Selectas nació de la necesidad de reivindicar el papel de las mujeres DJs en la escena musical. Somos mujeres de diferentes países que trabajamos en la industria musical no mainstream, y nos juntamos para fomentar la equidad de género e impulsar el cambio en el sector: en las programaciones de los clubs, en los festivales y en quién decide qué suena.",
-      "contactText": "Dinos quién eres y qué buscas. Si eres DJ y quieres entrar, cuéntanos qué pinchas; si eres una sala, un festival o una organización, cuéntanos qué tienes en mente.",
-      "city": "Madrid"
+      "contactText": "Dinos quién eres y qué buscas. Si eres DJ y quieres entrar, cuéntanos qué pinchas; si eres una sala, un festival o una organización, cuéntanos qué tienes en mente."
     },
     "team": [
       {
         "name": "Sara Brito",
         "role": "Psicodelia y música experimental",
-        "bio": [
-          {
-            "text": "Sara Brito forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
-          }
-        ],
         "order": 0
       },
       {
         "name": "Moomba",
         "role": "Funk, soul, jazz, mambo y boogaloo",
-        "bio": [
-          {
-            "text": "Moomba forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
-          }
-        ],
         "order": 1
       },
       {
         "name": "La Jaguara",
         "role": "BioDJ. Global bass y electroafrobeat",
-        "bio": [
-          {
-            "text": "La Jaguara forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
-          }
-        ],
         "order": 2
       },
       {
         "name": "Okeans",
         "role": "Diseñadora sonora, productora musical y DJ",
-        "bio": [
-          {
-            "text": "Okeans forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
-          }
-        ],
         "order": 3
       },
       {
         "name": "Anita Sinausía",
         "role": "Coordinadora cultural, artista y bailarina. DJ de rumbas quinquis",
-        "bio": [
-          {
-            "text": "Anita Sinausía forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
-          }
-        ],
         "order": 4
       },
       {
         "name": "Rachel Dalessandro",
         "role": "Cantante brasileña e instrumentista. MPB",
-        "bio": [
-          {
-            "text": "Rachel Dalessandro forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
-          }
-        ],
         "order": 5
       },
       {
         "name": "Pimientas Selectoras",
         "role": "Desde La Palma, del colectivo Pimienta Selectoras",
-        "bio": [
-          {
-            "text": "Pimientas Selectoras forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
-          }
-        ],
         "order": 6
       },
       {
         "name": "Miss Aleta",
         "role": "Afrobeat, afrotrap, salsa, cumbia y reggae",
-        "bio": [
-          {
-            "text": "Miss Aleta forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
-          }
-        ],
         "order": 7
       },
       {
         "name": "Gee Contreras",
         "role": "Vinyl selectora. Rap de los noventa, hard salsa, disco y funk",
-        "bio": [
-          {
-            "text": "Gee Contreras forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
-          }
-        ],
         "order": 8
       },
       {
         "name": "Sandunguera",
         "role": "Desde el Pacífico colombiano. Afrobeat, funk, soul y salsa",
-        "bio": [
-          {
-            "text": "Sandunguera forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
-          }
-        ],
         "order": 9
       },
       {
         "name": "Wepa Selectors",
         "role": "Wen Movilla y Pau Osorio. House, afrobeat y world",
-        "bio": [
-          {
-            "text": "Wepa Selectors forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
-          }
-        ],
         "order": 10
       },
       {
         "name": "La Lvcha",
         "role": "DJ, productora creativa y chamana",
-        "bio": [
-          {
-            "text": "La Lvcha forma parte de la plataforma de Selectas. Aquí va su presentación: de dónde viene, qué pincha y dónde se la puede escuchar."
-          }
-        ],
         "order": 11
       }
     ],
