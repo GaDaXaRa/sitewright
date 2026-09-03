@@ -596,6 +596,12 @@ sin pedir permiso. Si el cambio sirve para cualquier web, va al repositorio de S
 
 // ── design ──────────────────────────────────────────────────────────────────────────────
 
+/** La hoja firma de quién es: en el repositorio de un cliente, «Sistema de diseño» a secas
+ * no dice nada, y el nombre de otra web dice algo falso. */
+function nameStylesheet(css, name) {
+  return css.replace(/^\/\* =+\n   Sistema de diseño$/m, (head) => head.replace('Sistema de diseño', `${name} — sistema de diseño`))
+}
+
 function applyPalette(css, design) {
   const { palette } = design
   const map = {
@@ -760,7 +766,10 @@ write('CLAUDE.md', siteGuide(bp, modules))
 const pages = writeModulePages(target, bp, modules, wirings, write)
 write(
   'src/app/(frontend)/styles.css',
-  moduleStyles(applyPalette(read('src/app/(frontend)/styles.css'), bp.design), target, modules),
+  nameStylesheet(
+    moduleStyles(applyPalette(read('src/app/(frontend)/styles.css'), bp.design), target, modules),
+    bp.identity.name,
+  ),
 )
 write(
   'src/app/(frontend)/layout.tsx',
