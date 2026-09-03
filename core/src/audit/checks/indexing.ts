@@ -194,7 +194,22 @@ export function checkReachable(sitemapUrls: string[], reachable: Set<string>): F
 export function isEmptyPage(html: string): boolean {
   const sections = html.split(/<section\b/i).slice(1)
   if (!sections.length) return false
-  return sections.every((section) => /class="[^"]*\bempty\b/.test(section))
+  return sections.every(hasEmptyState)
+}
+
+/**
+ * Si un trozo de html lleva el hueco que se pinta cuando no hay nada.
+ *
+ * La clase tiene que ser exactamente `empty`, no contenerla: `member-photo-empty` es el
+ * marco gris de una persona que aún no ha mandado su foto, y una página con doce de esos
+ * está llena de gente, no vacía. Con `\bempty\b` el guion cuenta como frontera de
+ * palabra y las doce fichas hacían pasar la página por hueca.
+ */
+function hasEmptyState(html: string): boolean {
+  for (const [, classes] of html.matchAll(/class="([^"]*)"/g)) {
+    if (classes!.split(/\s+/).includes('empty')) return true
+  }
+  return false
 }
 
 /**

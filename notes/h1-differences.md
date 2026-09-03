@@ -728,3 +728,9 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
 94. **Regenerar con `--force` borra el directorio entero**, `node_modules` incluido. Es lo
     que promete —y es lo correcto, porque media web vieja mezclada con media nueva es
     peor— pero cuesta una instalación completa cada vez.
+
+
+95. **`\bempty\b` cuenta el guion como frontera de palabra.** La puerta de páginas vacías
+    daba por hueca la página de las doce Selectas porque cada ficha sin retrato pinta un
+    `member-photo-empty`. Mi prueba cubría el sufijo (`not-emptyish`) y no el prefijo, que
+    es justo el caso real. La clase tiene que ser exactamente `empty`, no contenerla.

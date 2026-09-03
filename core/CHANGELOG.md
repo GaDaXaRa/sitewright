@@ -3,6 +3,13 @@
 Qué gana una web al actualizar. Escrito para quien tiene que decidir si le compensa, no
 para quien escribió el código.
 
+## 0.8.1 — 3 de septiembre de 2026
+
+- **Arreglada la puerta de páginas vacías**, que marcaba como huecas las páginas llenas de
+  fichas sin foto: el marco gris de un retrato que falta lleva la clase
+  `member-photo-empty`, y la comprobación aceptaba cualquier clase que *contuviera*
+  «empty». Ahora tiene que ser exactamente esa.
+
 ## 0.8.0 — 3 de septiembre de 2026
 
 - **La auditoría avisa de las páginas vacías que la web anuncia.** Una página que dice

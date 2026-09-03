@@ -397,6 +397,17 @@ describe('nada de lo anunciado está vacío', () => {
     expect(finding!.status).toBe('ok')
   })
 
+  it('el marco de una foto que falta no vacía la página', () => {
+    // Doce fichas sin retrato son doce personas, no una página hueca.
+    const fichas = '<section>' + '<div class="member-photo-empty"></div>'.repeat(12) + '</section>'
+    expect(isEmptyPage(fichas)).toBe(false)
+  })
+
+  it('la clase tiene que ser exactamente empty, esté donde esté en la lista', () => {
+    expect(isEmptyPage('<section><p class="lead empty small">nada</p></section>')).toBe(true)
+    expect(isEmptyPage('<section><p class="empty-state">nada</p></section>')).toBe(false)
+  })
+
   it('una sección vacía entre secciones llenas no vacía la página', () => {
     const portada = `${lleno}${vacio}${lleno}`
     const [finding] = checkAdvertisedEmpty(['https://x.es/'], new Map([['/', portada]]))
