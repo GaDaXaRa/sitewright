@@ -95,7 +95,13 @@ if (updated !== template) {
   writeFileSync(templatePath, updated)
   // `npm ci` se niega si el lockfile no cuadra con el package.json, así que cambiar uno
   // sin el otro deja la CI en rojo con un error que no menciona la publicación.
-  run('npm', ['install', '--package-lock-only', '--no-audit', '--no-fund'], join(root, 'template'))
+  // Sin --prefer-online npm resuelve de caché y deja el lockfile en la versión anterior,
+  // sin quejarse.
+  run(
+    'npm',
+    ['install', '--package-lock-only', '--prefer-online', '--no-audit', '--no-fund'],
+    join(root, 'template'),
+  )
   console.log(`\n  template → ^${version}, con su lockfile`)
 }
 
