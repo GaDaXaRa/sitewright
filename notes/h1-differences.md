@@ -711,3 +711,8 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
     `title=""` porque el encabezado es el `<h1>` de la página, y la sección lo pintaba
     igual. Sólo le pasaba a `catalog` —lo comprobé en vez de suponerlo— y ahora, sin
     título, no hay cabecera.
+
+
+92. **Cambiar el `package.json` de la plantilla sin su lockfile deja la CI en rojo.**
+    `npm ci` se niega si no cuadran, y el error no menciona la publicación que lo causó:
+    el guion de release actualizaba uno y no el otro. Ahora refresca los dos.

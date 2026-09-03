@@ -73,7 +73,10 @@ const updated = template.replace(
 )
 if (updated !== template) {
   writeFileSync(templatePath, updated)
-  console.log(`\n  template/package.json → ^${version}`)
+  // `npm ci` se niega si el lockfile no cuadra con el package.json, así que cambiar uno
+  // sin el otro deja la CI en rojo con un error que no menciona la publicación.
+  run('npm', ['install', '--package-lock-only', '--no-audit', '--no-fund'], join(root, 'template'))
+  console.log(`\n  template → ^${version}, con su lockfile`)
 }
 
 console.log(`
