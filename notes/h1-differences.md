@@ -897,3 +897,19 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
      regla es la de siempre —comprobar el efecto, no el código de salida— y aquí el efecto
      era mirar la página antes de enseñarla. Ahora la extracción comprueba que están las
      reglas antes de escribir nada.
+
+
+121. **El velo parcial se anclaba abajo y el texto puede ir en el centro.** Salió a
+     producción una portada ilegible en cuanto alguien eligió «sólo detrás del texto» con
+     el título centrado: el degradado cubría un sitio donde no había nada escrito. Ahora
+     sigue a la altura elegida —arriba, centro o abajo—, que son las tres que ofrece el
+     propio panel. Añadir una opción sin repasar con qué se combina es el fallo.
+
+122. **`--on-photo` no tenía contrario.** En una web clara vale lo mismo que `--ground`,
+     así que el texto de la portada sin velo era literalmente del color del fondo: el
+     título existía, se leía en el código, y no se veía. Ahora hay `--on-photo-alt` y el
+     panel elige entre los dos.
+
+123. **Lo encontró la clienta, no la auditoría.** La puerta de contraste mide pares de la
+     paleta, y ese par —texto sobre foto— no es un par de tokens: depende de una imagen que
+     alguien sube después. Es el hueco más claro que le queda a la auditoría.

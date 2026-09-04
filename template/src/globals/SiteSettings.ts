@@ -115,6 +115,20 @@ export const SiteSettings: GlobalConfig = {
           ],
         },
         {
+          name: 'heroTextColour',
+          label: 'Color del texto de la portada',
+          type: 'select',
+          defaultValue: 'light',
+          options: [
+            { label: 'Claro (sobre foto oscura)', value: 'light' },
+            { label: 'Oscuro (sobre foto clara)', value: 'dark' },
+          ],
+          admin: {
+            description:
+              'Si quitas el oscurecimiento sobre una foto clara, el texto claro desaparece: es del mismo color que el fondo de la web.',
+          },
+        },
+        {
           name: 'heroShade',
           label: 'Oscurecer la foto para que se lea el texto',
           type: 'select',

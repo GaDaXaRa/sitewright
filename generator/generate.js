@@ -253,6 +253,7 @@ ${overlays.map((w) => `      ${w.overlayRender()}`).join('\n')}
         textPosition={settings.heroTextPosition}
         textHeight={settings.heroTextHeight}
         shade={settings.heroShade}
+        textColour={settings.heroTextColour}
 ${cta ? `        actions={[{ href: '${cta.href}', label: '${cta.label}' }]}\n` : ''}      />
 
 ${sectioned.map((w) => `      ${w.sectionRender(modules[w.id], bp)}`).join('\n\n')}
@@ -558,6 +559,8 @@ function applyPalette(css, design) {
     // scheme — "light" here means whichever token actually reads as light in this palette:
     // --ground in a light site, --ink in a dark one, where ground is the near-black.
     'on-photo': design.scheme === 'light' ? palette.ground : palette.ink,
+    // Y el contrario, para quien elija texto oscuro sobre la foto.
+    'on-photo-alt': design.scheme === 'light' ? palette.ink : palette.ground,
   }
 
   // Measured, not chosen: which ink reads on this accent has a right answer.

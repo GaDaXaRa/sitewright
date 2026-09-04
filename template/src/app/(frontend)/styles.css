@@ -38,6 +38,8 @@
      ser claro pase lo que pase — pero "claro" es --ground en un sitio claro e --ink en uno
      oscuro como este. El generador escribe el valor que corresponda a cada blueprint. */
   --on-photo: #f2efe9;
+  /* El contrario, para cuando el texto tiene que ser oscuro sobre la foto. */
+  --on-photo-alt: #0b0b0d;
 
   --radius: 2px;
   --radius-lg: 6px;
@@ -434,26 +436,56 @@ img {
   color: var(--on-photo);
 }
 
+/* Claro u oscuro sobre la foto. Por defecto va el claro, que es lo que había, pero una
+   foto clara con el velo quitado pide justo lo contrario: en una web crema el texto claro
+   es del mismo color que el fondo y el título desaparece. */
+.hero.ink-dark {
+  --on-photo: var(--on-photo-alt);
+}
+
 /* ── cuánto se oscurece la foto ──────────────────────────────────────────────────────────
 
    Por defecto se oscurece entera, que es lo único que garantiza que el título se lea
    encima de cualquier foto. Las otras dos opciones respetan más la imagen y piden a cambio
    que alguien las mire: por eso se eligen en el panel y no se deducen. */
 
-/* Sólo detrás del texto: la foto queda intacta arriba y se apaga hacia abajo, que es
-   donde está escrito. Un degradado anclado al borde no tiene cantos; el primer intento
-   fue un recuadro alrededor del texto y se veía como una tarjeta pegada encima. */
+/* Sólo detrás del texto: la foto queda intacta y se apaga donde está escrito. El velo
+   sigue a la altura elegida, porque anclarlo abajo dejaba el título sin nada detrás en
+   cuanto alguien lo ponía en el centro — y así salió a producción una portada ilegible.
+   Un degradado no tiene cantos porque no termina en ninguna parte. */
 .hero-has-image.shade-text .hero-img {
   filter: none;
 }
 
-.hero-has-image.shade-text .hero-overlay {
+.hero-has-image.shade-text .hero-overlay,
+.hero-has-image.shade-text.height-bottom .hero-overlay {
   background: linear-gradient(
     180deg,
     transparent 28%,
     rgba(0, 0, 0, 0.3) 58%,
     rgba(0, 0, 0, 0.62) 86%,
     rgba(0, 0, 0, 0.72) 100%
+  );
+}
+
+.hero-has-image.shade-text.height-center .hero-overlay {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.55) 28%,
+    rgba(0, 0, 0, 0.62) 50%,
+    rgba(0, 0, 0, 0.55) 72%,
+    transparent 100%
+  );
+}
+
+.hero-has-image.shade-text.height-top .hero-overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.72) 0%,
+    rgba(0, 0, 0, 0.62) 14%,
+    rgba(0, 0, 0, 0.3) 42%,
+    transparent 72%
   );
 }
 
