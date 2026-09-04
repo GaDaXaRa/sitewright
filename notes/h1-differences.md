@@ -784,3 +784,11 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
      invertida dentro de una plantilla literal —escribiendo, precisamente, la lección
      sobre la marca de modo dev— y se subió roto: ningún trabajo de la CI lo llamaba.
      Ahora lo llama uno.
+
+
+104. **El `--url` que escribe una persona no ganaba al del guion.** El `audit` de cada web
+     trae su propio `--url` por defecto, y el CLI se quedaba con la primera aparición: con
+     el servidor local levantado, `npm run audit -- --url https://…` auditaba localhost y
+     el informe no decía contra qué. Varias veces di por auditada producción cuando estaba
+     leyendo mi portátil. Ahora gana el último, y la auditoría de producción de verdad
+     —lanzada llamando al CLI directamente— sale en 37 de 37.
