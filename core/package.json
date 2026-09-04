@@ -1,6 +1,6 @@
 {
   "name": "sitewright-core",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Shared runtime for Next.js + Payload CMS sites: image backup and versioning, public-form abuse brakes, real cookie consent, generated legal pages, SEO/GEO helpers, and an audit CLI that gates deploys.",
   "license": "MIT",
   "type": "module",

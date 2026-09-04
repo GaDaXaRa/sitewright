@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { arg as readArg } from './args.js'
 import { runAudit } from './run.js'
 import { renderReport, exitCode } from './report.js'
 
@@ -10,17 +11,7 @@ import { renderReport, exitCode } from './report.js'
  * Everything is optional except the URL, and every gate that cannot run says so rather than
  * passing quietly — a green report that skipped half the checks is worse than a red one.
  */
-/**
- * El último gana.
- *
- * El guion `audit` de cada web trae ya un `--url` con el valor por defecto, así que
- * `npm run audit -- --url https://…` pasa dos: quedándose con el primero, la orden de
- * quien la escribe no servía de nada y se auditaba localhost creyendo auditar producción.
- */
-function arg(name: string): string | undefined {
-  const index = process.argv.lastIndexOf(`--${name}`)
-  return index > -1 ? process.argv[index + 1] : undefined
-}
+const arg = (name: string) => readArg(process.argv, name)
 
 const baseUrl = arg('url')
 if (!baseUrl) {

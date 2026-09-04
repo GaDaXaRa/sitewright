@@ -1,3 +1,4 @@
+import { arg } from '../src/audit/args.js'
 import { describe, it, expect } from 'vitest'
 import type { Fetched } from '../src/audit/types.js'
 import {
@@ -427,5 +428,36 @@ describe('nada de lo anunciado está vacío', () => {
     const bodies = new Map(['a', 'b', 'c', 'd', 'e', 'f'].map((p) => [`/${p}`, vacio]))
     const [finding] = checkAdvertisedEmpty(urls, bodies)
     expect(finding!.detail).toContain('y 2 más')
+  })
+})
+
+describe('leer un argumento de la línea de órdenes', () => {
+  const base = ['node', 'cli.js']
+
+  it('devuelve el valor que sigue a la bandera', () => {
+    expect(arg([...base, '--url', 'https://x.es'], 'url')).toBe('https://x.es')
+  })
+
+  it('el último gana, que es el que escribe una persona', () => {
+    // El guion `audit` de cada web trae ya su propio --url por defecto.
+    const argv = [...base, '--url', 'http://localhost:3000', '--url', 'https://x.es']
+    expect(arg(argv, 'url')).toBe('https://x.es')
+  })
+
+  it('una bandera que no está no vale nada', () => {
+    expect(arg(base, 'url')).toBeUndefined()
+  })
+
+  it('una bandera sin valor al final no se lleva lo que no hay', () => {
+    expect(arg([...base, '--url'], 'url')).toBeUndefined()
+  })
+
+  it('la bandera siguiente no es el valor de esta', () => {
+    expect(arg([...base, '--url', '--css', 'estilos.css'], 'url')).toBeUndefined()
+    expect(arg([...base, '--url', '--css', 'estilos.css'], 'css')).toBe('estilos.css')
+  })
+
+  it('no confunde una bandera con otra que empieza igual', () => {
+    expect(arg([...base, '--url-canonica', 'no', '--url', 'sí'], 'url')).toBe('sí')
   })
 })

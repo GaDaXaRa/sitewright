@@ -3,6 +3,13 @@
 Qué gana una web al actualizar. Escrito para quien tiene que decidir si le compensa, no
 para quien escribió el código.
 
+## 0.8.2 — 3 de septiembre de 2026
+
+- **El `--url` que se escribe a mano gana.** El guion `audit` de cada web trae ya su propio
+  `--url`, y el CLI se quedaba con el primero: con el servidor local levantado,
+  `npm run audit -- --url https://…` auditaba localhost creyendo auditar producción, y el
+  informe no decía contra qué dirección hablaba.
+
 ## 0.8.1 — 3 de septiembre de 2026
 
 - **Arreglada la puerta de páginas vacías**, que marcaba como huecas las páginas llenas de
