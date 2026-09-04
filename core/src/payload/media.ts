@@ -1,6 +1,7 @@
 import type { CollectionConfig, CollectionAfterChangeHook, CollectionAfterDeleteHook } from 'payload'
 import { saveOriginalCopy, versionUrls } from './images.js'
 import { restoreOriginalEndpoint } from './restoreOriginal.js'
+import { imageOpsEndpoint } from './imageOps.js'
 
 /**
  * The uploads collection, with the whole image story attached: versioned URLs so an edit is
@@ -39,7 +40,7 @@ export function mediaCollection({
         ? { afterChange: [revalidation.afterChange], afterDelete: [revalidation.afterDelete] }
         : {}),
     },
-    endpoints: [restoreOriginalEndpoint(slug)],
+    endpoints: [restoreOriginalEndpoint(slug), imageOpsEndpoint(slug)],
     fields: [
       {
         name: 'alt',

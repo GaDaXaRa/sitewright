@@ -861,3 +861,20 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
      cuando toca no hacer nada, y la regla se escribe una sola vez en vez de dos veces por
      esquema. Lo mismo con `--logo-box-blend`: `multiply` borra un recuadro blanco sobre
      claro, y `screen` lo borra sobre oscuro una vez invertido.
+
+
+115. **«Quitar el fondo» son dos cosas de dificultad muy distinta.** Un fondo plano —el
+     recuadro blanco de un logo— se quita mirando las cuatro esquinas y volviendo
+     transparente lo que se les parezca; recortar de verdad una foto necesita un modelo de
+     segmentación, que serían 170 MB en cada despliegue o mandar las imágenes de una
+     clienta a un tercero. Se ha hecho lo primero, y se llama por su nombre.
+
+116. **Negarse es una respuesta.** Si las esquinas no coinciden no hay fondo que quitar, y
+     si el fondo es casi toda la imagen quitarlo la dejaría en blanco. En los dos casos se
+     dice por qué en vez de devolver algo estropeado: un botón que a veces arruina la
+     imagen es peor que uno que a veces dice que no.
+
+117. **Un array de bytes no recorta lo que se sale, le da la vuelta.** Al calcular la
+     transparencia de un borde, un valor por encima de 255 no queda en 255 sino en el
+     resto de dividir entre 256: un píxel casi opaco acababa casi transparente. El tope va
+     explícito, y esa línea es justo la que mató tres mutantes.

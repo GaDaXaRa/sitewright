@@ -6,6 +6,7 @@
  */
 export { versionUrls, saveOriginalCopy } from './images.js'
 export { restoreOriginalEndpoint } from './restoreOriginal.js'
+export { imageOpsEndpoint, invertImage, clearImageBackdrop, OPS_ERROR } from './imageOps.js'
 export { mediaCollection } from './media.js'
 export { usersCollection } from './users.js'
 export { createRevalidation, type Revalidator } from './revalidate.js'

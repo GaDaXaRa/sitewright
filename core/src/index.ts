@@ -96,3 +96,15 @@ export {
   diagnose,
   type Diagnosis,
 } from './lib/versions.js'
+
+// Qué es fondo en una imagen que lo tiene plano
+export {
+  colourDistance,
+  isBackdrop,
+  flatBackdrop,
+  backdropShare,
+  clearBackdrop,
+  NO_BACKDROP,
+  TOO_MUCH_BACKDROP,
+  type Rgb,
+} from './lib/backdrop.js'

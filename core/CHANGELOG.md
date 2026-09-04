@@ -3,6 +3,16 @@
 Qué gana una web al actualizar. Escrito para quien tiene que decidir si le compensa, no
 para quien escribió el código.
 
+## 0.9.0 — 4 de septiembre de 2026
+
+- **Dos ediciones más para las imágenes, desde el panel**: «Invertir colores» y «Quitar el
+  fondo». Las dos son seguras porque la copia original ya se guardaba al subir, así que
+  «Volver al original» deshace cualquiera.
+- Quitar el fondo **sólo funciona si el fondo es plano**: mira las cuatro esquinas y, si no
+  coinciden, se niega y lo dice. No es un recorte inteligente, y con una foto la respuesta
+  correcta es no tocarla. El borde suavizado se desvanece en vez de recortarse, que es lo
+  que evita el halo del color viejo.
+
 ## 0.8.2 — 3 de septiembre de 2026
 
 - **El `--url` que se escribe a mano gana.** El guion `audit` de cada web trae ya su propio
