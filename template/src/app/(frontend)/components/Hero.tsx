@@ -13,6 +13,8 @@ type Props = {
   focalY?: number | null
   textPosition?: string | null
   textHeight?: string | null
+  /** Cuánto se oscurece la foto para que el título se lea encima. */
+  shade?: string | null
   /** Buttons under the title. The first one is the loud one. */
   actions?: { href: string; label: string }[]
 }
@@ -34,14 +36,18 @@ export default function Hero({
   focalY,
   textPosition,
   textHeight,
+  shade,
   actions = [],
 }: Props) {
   const position = textPosition || 'left'
   const height = textHeight || 'bottom'
   const objectPosition = `${focalX ?? 50}% ${focalY ?? 50}%`
+  // Oscurecer toda la foto es lo seguro y por eso es lo de siempre; quien quiera respetar
+  // la imagen lo dice en el panel y se hace cargo de mirarlo.
+  const veil = shade || 'full'
 
   return (
-    <header className={`hero text-${position} height-${height} ${imageUrl ? 'hero-has-image' : ''}`} id="inicio">
+    <header className={`hero text-${position} height-${height} shade-${veil} ${imageUrl ? 'hero-has-image' : ''}`} id="inicio">
       {imageUrl ? (
         // The cover image is the largest element on the page (LCP): served through
         // next/image with `priority` so it starts loading immediately.

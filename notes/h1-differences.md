@@ -878,3 +878,15 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
      transparencia de un borde, un valor por encima de 255 no queda en 255 sino en el
      resto de dividir entre 256: un píxel casi opaco acababa casi transparente. El tope va
      explícito, y esa línea es justo la que mató tres mutantes.
+
+
+118. **El velo de la portada no era una opción, eran dos cosas a la vez**: `brightness(0.5)`
+     sobre la foto **y** un degradado negro del 35 al 50% encima. Apagar la foto entera es
+     lo único que garantiza que el título se lea sobre cualquier imagen, y por eso sigue
+     siendo lo de siempre; pero quien ha elegido esa foto quiere que se vea.
+
+119. **«Sólo detrás del texto» es la respuesta de diseño, no el interruptor.** Un degradado
+     radial que nace donde está escrito deja la foto intacta y el título legible. Se sale
+     del bloque de texto a propósito: un velo que termina justo en la letra se nota.
+     Ofrecer sólo «sí/no» habría dejado a la gente eligiendo entre una foto apagada y un
+     título ilegible.

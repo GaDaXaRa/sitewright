@@ -434,6 +434,51 @@ img {
   color: var(--on-photo);
 }
 
+/* ── cuánto se oscurece la foto ──────────────────────────────────────────────────────────
+
+   Por defecto se oscurece entera, que es lo único que garantiza que el título se lea
+   encima de cualquier foto. Las otras dos opciones respetan más la imagen y piden a cambio
+   que alguien las mire: por eso se eligen en el panel y no se deducen. */
+
+/* Sólo detrás del texto: la foto queda intacta y el título se apoya en un degradado que
+   nace donde está escrito. Es lo que haría un diseñador antes que apagar la foto entera. */
+.hero-has-image.shade-text .hero-img {
+  filter: none;
+}
+
+.hero-has-image.shade-text .hero-overlay {
+  background: none;
+}
+
+.hero-has-image.shade-text .hero-content {
+  position: relative;
+  isolation: isolate;
+}
+
+.hero-has-image.shade-text .hero-content::before {
+  content: '';
+  position: absolute;
+  /* Se sale del bloque de texto porque un velo que termina justo en la letra se nota. */
+  inset: -1.5rem -2rem;
+  z-index: -1;
+  border-radius: 10px;
+  background: radial-gradient(
+    120% 120% at 30% 50%,
+    rgba(0, 0, 0, 0.62) 0%,
+    rgba(0, 0, 0, 0.45) 55%,
+    transparent 100%
+  );
+}
+
+/* Nada: la foto tal cual. Funciona si es oscura de por sí, y si no, se ve enseguida. */
+.hero-has-image.shade-none .hero-img {
+  filter: none;
+}
+
+.hero-has-image.shade-none .hero-overlay {
+  background: none;
+}
+
 .hero-has-image .hero-text {
   color: color-mix(in srgb, var(--on-photo) 85%, transparent);
 }

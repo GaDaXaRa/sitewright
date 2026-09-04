@@ -114,6 +114,21 @@ export const SiteSettings: GlobalConfig = {
             },
           ],
         },
+        {
+          name: 'heroShade',
+          label: 'Oscurecer la foto para que se lea el texto',
+          type: 'select',
+          defaultValue: 'full',
+          options: [
+            { label: 'Toda la foto', value: 'full' },
+            { label: 'Sólo detrás del texto', value: 'text' },
+            { label: 'Nada', value: 'none' },
+          ],
+          admin: {
+            description:
+              'El título va encima de la foto, así que casi siempre hace falta oscurecerla. «Sólo detrás del texto» respeta la imagen y sigue siendo legible; «Nada» deja la foto intacta y funciona sólo si es oscura de por sí — míralo antes de publicar.',
+          },
+        },
         { name: 'heroEyebrow', label: 'Titulillo superior', type: 'text' },
         { name: 'heroTitle', label: 'Título de la portada', type: 'text' },
         { name: 'heroText', label: 'Texto introductorio', type: 'textarea' },

@@ -252,6 +252,7 @@ ${overlays.map((w) => `      ${w.overlayRender()}`).join('\n')}
         focalY={mediaFocal(settings.heroImage).y}
         textPosition={settings.heroTextPosition}
         textHeight={settings.heroTextHeight}
+        shade={settings.heroShade}
 ${cta ? `        actions={[{ href: '${cta.href}', label: '${cta.label}' }]}\n` : ''}      />
 
 ${sectioned.map((w) => `      ${w.sectionRender(modules[w.id], bp)}`).join('\n\n')}
