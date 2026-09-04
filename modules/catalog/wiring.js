@@ -27,41 +27,8 @@ export const wiring = {
   llmsName: 'catalogSection',
   navLink: (m) => ({ href: m.route, label: m.labels.plural }),
 
-  indexPage: (m) => ({
-    path: `src/app/(frontend)${m.route}/page.tsx`,
-    source: `import React from 'react'
-import type { Metadata } from 'next'
-
-import InnerPage from '../components/InnerPage'
-import CatalogSection from '@/modules/catalog/Section'
-import { loadSiteContent } from '@/lib/data'
-
-export const revalidate = 300
-
-export const metadata: Metadata = {
-  title: '${m.labels.plural}',
-  alternates: { canonical: '${m.route}' },
-}
-
-export default async function CatalogIndexPage() {
-  const { settings, catalog } = await loadSiteContent()
-
-  return (
-    <InnerPage settings={settings} title="${m.labels.plural}">
-      {catalog.length ? (
-        <CatalogSection items={catalog} title="" route="${m.route}" />
-      ) : (
-        <section className="section">
-          <div className="container">
-            <p className="empty">Todavía no hay nada publicado.</p>
-          </div>
-        </section>
-      )}
-    </InnerPage>
-  )
-}
-`,
-  }),
+  pagePath: '@/modules/catalog/Page',
+  indexPage: true,
   detailPage: (m) => ({
     path: `src/app/(frontend)${m.route}/[slug]/page.tsx`,
     source: `import React from 'react'

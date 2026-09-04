@@ -22,41 +22,8 @@ export const wiring = {
   // Un colectivo cuyo sentido es la visibilidad de quienes lo forman necesita una página
   // donde estén todas, no sólo un trozo de la portada: es lo que se enlaza, lo que se
   // comparte y lo que indexa un buscador.
-  indexPage: (m) => ({
-    path: `src/app/(frontend)${m.route}/page.tsx`,
-    source: `import React from 'react'
-import type { Metadata } from 'next'
-
-import InnerPage from '../components/InnerPage'
-import TeamSection from '@/modules/team/Section'
-import { loadSiteContent } from '@/lib/data'
-
-export const revalidate = 300
-
-export const metadata: Metadata = {
-  title: '${m.labels.plural}',
-  alternates: { canonical: '${m.route}' },
-}
-
-export default async function TeamIndexPage() {
-  const { settings, team } = await loadSiteContent()
-
-  return (
-    <InnerPage settings={settings} title="${m.labels.plural}">
-      {team.length ? (
-        <TeamSection items={team} title="" route="${m.route}" />
-      ) : (
-        <section className="section">
-          <div className="container">
-            <p className="empty">Todavía no hay nadie publicado.</p>
-          </div>
-        </section>
-      )}
-    </InnerPage>
-  )
-}
-`,
-  }),
+  pagePath: '@/modules/team/Page',
+  indexPage: true,
 
   navLink: (m) => ({ href: m.route, label: m.labels.plural }),
 

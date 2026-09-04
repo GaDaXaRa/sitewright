@@ -14,45 +14,8 @@ export const wiring = {
   llmsName: 'mediaSection',
   navLink: (m) => ({ href: m.route, label: m.labels.plural }),
 
-  indexPage: (m) => ({
-    path: `src/app/(frontend)${m.route}/page.tsx`,
-    source: `import React from 'react'
-import type { Metadata } from 'next'
-
-import InnerPage from '../components/InnerPage'
-import { MediaCard } from '@/modules/media/Section'
-import { loadSiteContent } from '@/lib/data'
-
-export const revalidate = 300
-
-export const metadata: Metadata = {
-  title: '${m.labels.plural}',
-  alternates: { canonical: '${m.route}' },
-}
-
-export default async function MediaPage() {
-  const { settings, embeds } = await loadSiteContent()
-
-  return (
-    <InnerPage settings={settings} title="${m.labels.plural}">
-      <section className="section">
-        <div className="container">
-          {embeds.length ? (
-            <div className="session-grid">
-              {embeds.map((item) => (
-                <MediaCard key={item.id} item={item} />
-              ))}
-            </div>
-          ) : (
-            <p className="empty">Todavía no hay nada publicado.</p>
-          )}
-        </div>
-      </section>
-    </InnerPage>
-  )
-}
-`,
-  }),
+  pagePath: '@/modules/media/Page',
+  indexPage: true,
 
   seed: () => `  const embedsCount = await payload.count({ collection: 'embeds' })
   if (embedsCount.totalDocs === 0) {

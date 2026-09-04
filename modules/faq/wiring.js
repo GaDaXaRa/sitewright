@@ -13,49 +13,8 @@ export const wiring = {
   llmsImport: "import { faqSection } from '@/modules/faq/llms'",
   llmsName: 'faqSection',
 
-  indexPage: (m) => ({
-    path: `src/app/(frontend)${m.route}/page.tsx`,
-    source: `import React from 'react'
-import type { Metadata } from 'next'
-
-import InnerPage from '../components/InnerPage'
-import JsonLd from '../components/JsonLd'
-import FaqSection from '@/modules/faq/Section'
-import { faqNode } from '@/modules/faq/jsonld'
-import { loadSiteContent } from '@/lib/data'
-import { buildHomeJsonLd } from '@/lib/jsonLd'
-
-export const revalidate = 300
-
-export const metadata: Metadata = {
-  title: '${m.labels.plural}',
-  alternates: { canonical: '${m.route}' },
-}
-
-export default async function FaqPage() {
-  const { settings, faqs } = await loadSiteContent()
-
-  return (
-    <>
-      <JsonLd
-        data={buildHomeJsonLd(settings, faqs.length ? [faqNode(faqs, '${m.route}#faq')] : [])}
-      />
-      <InnerPage settings={settings} title="${m.labels.plural}">
-        {faqs.length ? (
-          <FaqSection items={faqs} title="" context="page" />
-        ) : (
-          <section className="section">
-            <div className="container">
-              <p className="empty">Todavía no hay preguntas publicadas.</p>
-            </div>
-          </section>
-        )}
-      </InnerPage>
-    </>
-  )
-}
-`,
-  }),
+  pagePath: '@/modules/faq/Page',
+  indexPage: true,
 
   seed: () => `  const faqsCount = await payload.count({ collection: 'faqs' })
   if (faqsCount.totalDocs === 0) {

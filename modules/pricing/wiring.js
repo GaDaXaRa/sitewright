@@ -16,39 +16,8 @@ export const wiring = {
   llmsName: 'pricingSection',
   navLink: (m) => ({ href: m.route, label: m.labels.plural }),
 
-  indexPage: (m, bp) => ({
-    path: `src/app/(frontend)${m.route}/page.tsx`,
-    source: `import React from 'react'
-import type { Metadata } from 'next'
-
-import InnerPage from '../components/InnerPage'
-import JsonLd from '../components/JsonLd'
-import PricingSection from '@/modules/pricing/Section'
-import { pricingNodes } from '@/modules/pricing/jsonld'
-import { loadSiteContent } from '@/lib/data'
-import { buildHomeJsonLd } from '@/lib/jsonLd'
-
-export const revalidate = 300
-
-export const metadata: Metadata = {
-  title: '${m.labels.plural}',
-  alternates: { canonical: '${m.route}' },
-}
-
-export default async function PricingPage() {
-  const { settings, pricing } = await loadSiteContent()
-
-  return (
-    <>
-      <JsonLd data={buildHomeJsonLd(settings, pricingNodes(pricing, '${m.route}', '${m.title}'))} />
-      <InnerPage settings={settings} title="${m.labels.plural}">
-        <PricingSection items={pricing} title=""${bp.modules.contact ? ' ctaHref="/#contacto"' : ''} />
-      </InnerPage>
-    </>
-  )
-}
-`,
-  }),
+  pagePath: '@/modules/pricing/Page',
+  indexPage: true,
 
   seed: (m) => `  const pricingCount = await payload.count({ collection: 'pricing' })
   if (pricingCount.totalDocs === 0) {

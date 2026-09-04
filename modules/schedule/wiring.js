@@ -23,73 +23,8 @@ export const wiring = {
   options: () => ({ past: 'Anteriores' }),
   navLink: (m) => ({ href: m.route, label: m.labels.plural }),
 
-  indexPage: (m) => ({
-    path: `src/app/(frontend)${m.route}/page.tsx`,
-    source: `import React from 'react'
-import type { Metadata } from 'next'
-
-import InnerPage from '../components/InnerPage'
-import JsonLd from '../components/JsonLd'
-import ScheduleRow from '@/modules/schedule/Row'
-import { scheduleNodes } from '@/modules/schedule/jsonld'
-import { loadSiteContent } from '@/lib/data'
-import { buildHomeJsonLd } from '@/lib/jsonLd'
-import { groupByYear, splitEvents } from 'sitewright-core'
-
-export const revalidate = 300
-
-export const metadata: Metadata = {
-  title: '${m.labels.plural}',
-  alternates: { canonical: '${m.route}' },
-}
-
-export default async function SchedulePage() {
-  const { settings, schedule, now } = await loadSiteContent()
-  const { upcoming, past } = splitEvents(schedule, now)
-  const archive = groupByYear(past)
-
-  return (
-    <>
-      <JsonLd data={buildHomeJsonLd(settings, scheduleNodes(schedule, '${m.route}'))} />
-      <InnerPage settings={settings} title="${m.labels.plural}">
-        <section className="section">
-          <div className="container">
-            <h2 className="sub">Próximas</h2>
-            {upcoming.length ? (
-              <div className="events">
-                {upcoming.map((item) => (
-                  <ScheduleRow key={item.id} event={item} />
-                ))}
-              </div>
-            ) : (
-              <p className="empty">${m.emptyText ?? 'No hay nada convocado ahora mismo.'}</p>
-            )}
-          </div>
-        </section>
-
-        {archive.length > 0 && (
-          <section className="section tone-mid">
-            <div className="container">
-              <h2 className="sub">Archivo</h2>
-              {archive.map(({ year, events }) => (
-                <div key={year} className="archive-year">
-                  <h3>{year}</h3>
-                  <div className="events">
-                    {events.map((item) => (
-                      <ScheduleRow key={item.id} event={item} past />
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-      </InnerPage>
-    </>
-  )
-}
-`,
-  }),
+  pagePath: '@/modules/schedule/Page',
+  indexPage: true,
 
   seed: (m) => `  const scheduleCount = await payload.count({ collection: 'schedule' })
   if (scheduleCount.totalDocs === 0) {

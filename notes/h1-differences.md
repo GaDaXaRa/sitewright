@@ -827,3 +827,21 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
      uniforme no hay bucle posible, así que todas reciben `items`. Y las ocho funciones de
      `llms.txt` pedían cada una lo suyo —una la ruta, otra el reloj, otra dos encabezados—:
      ahora reciben `(items, ctx)`.
+
+
+110. **Las páginas de las secciones eran JSX dentro de una cadena de texto.** Sesenta
+     líneas de componente metidas en `wiring.js`, sin resaltado, sin autocompletado y sin
+     comprobar hasta que alguien generaba una web. Ahora cada módulo trae su `Page.tsx` y
+     **una sola ruta** —`[seccion]`— las sirve todas: el generador pasó de escribir ocho
+     páginas a escribir dos, y las dos que quedan son las fichas, que necesitan su propio
+     `generateStaticParams`.
+
+111. **El manifiesto lo lee también la configuración de Payload**, así que importar desde
+     él los componentes de página arrastraba React hasta el CLI y este se atragantaba con
+     la primera hoja de estilos que encontraba (`react-image-crop`). Se cargan en diferido:
+     `Page: () => import('…')`. Una función que nadie llama no arrastra nada.
+
+112. **El título de una sección no es el nombre de su página.** En la portada puede
+     llamarse «La plataforma» y su página seguir siendo «Selectas», que es lo que la gente
+     escribe y busca. Al unificar las páginas se perdió esa distinción durante un rato: el
+     manifiesto lleva ahora las dos.

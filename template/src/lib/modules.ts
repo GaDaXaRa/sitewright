@@ -1,4 +1,6 @@
+import type { ComponentType } from 'react'
 import type { CollectionConfig, Where } from 'payload'
+import type { SiteSetting } from '@/payload-types'
 import type { LlmsContext, LlmsSection } from './llmsTxt'
 
 /**
@@ -33,8 +35,15 @@ export type SiteModule = {
    * contrato.
    */
   variable: string | null
-  /** El encabezado que ve una persona, en las palabras del cliente. */
+  /** El encabezado de su sección en la portada, en las palabras del cliente. */
   title: string
+  /**
+   * Cómo se llama en plural: «Selectas», «Bolos», «Tarifas».
+   *
+   * No es lo mismo que el título: en la portada la sección puede llamarse «La plataforma»
+   * y su página seguir siendo «Selectas», que es lo que la gente escribe y busca.
+   */
+  plural?: string
   /** Dónde vive su página, si tiene. */
   route?: string
   /** La colección de Payload, cuando el módulo guarda algo. */
@@ -50,10 +59,37 @@ export type SiteModule = {
   llms?: (items: never[], ctx: LlmsContext) => LlmsSection | LlmsSection[]
   /** Lo específico del blueprint que su sección necesita, como el segundo encabezado. */
   options?: Record<string, unknown>
+  /**
+   * Su página propia, si la tiene. Vive en el módulo, no la escribe el generador: era
+   * JSX dentro de una cadena de texto, sin resaltado y sin comprobar hasta generarla.
+   *
+   * Se carga en diferido porque este manifiesto lo lee también la configuración de
+   * Payload, y arrastrar componentes de React hasta el CLI hace que se atragante con la
+   * primera hoja de estilos que encuentre.
+   */
+  Page?: () => Promise<{ default: ComponentType<ModulePageProps> }>
   /** Si escribe una página índice —y por tanto puede anunciarse y enlazarse—. */
   indexPage?: boolean
   /** Si cada documento tiene página propia, bajo qué ruta. */
   documentPages?: boolean
+}
+
+/**
+ * Lo que recibe la página propia de un módulo.
+ *
+ * `items` va tipado como `never[]` a propósito: es lo que permite que un componente que
+ * declara `items: Question[]` encaje en el registro sin perder su propio tipado por
+ * dentro. Lo que se pierde es la comprobación de que lo que trae la base encaja con lo que
+ * pinta —por eso la portada, donde están casi todas las llamadas, sigue generada—.
+ */
+export type ModulePageProps = {
+  items: never[]
+  settings: SiteSetting
+  now: number
+  /** El encabezado de la página, que es su <h1>. */
+  title: string
+  route: string
+  options?: Record<string, unknown>
 }
 
 /** Los que guardan algo, que son los que Payload tiene que conocer. */

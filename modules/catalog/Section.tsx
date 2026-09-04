@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { mediaAlt, mediaUrl, type Tone } from 'sitewright-core'
 
-type Item = {
+export type Item = {
   id: number | string
   title: string
   slug?: string | null

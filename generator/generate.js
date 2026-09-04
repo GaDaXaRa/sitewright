@@ -102,12 +102,14 @@ function siteModules(bp, modules, wirings) {
     if (w.pickImport) imports.push(w.pickImport)
 
     const campos = [`id: '${w.id}'`, `variable: ${JSON.stringify(w.variable)}`, `title: ${JSON.stringify(m.title)}`]
+    if (m.labels?.plural) campos.push(`plural: ${JSON.stringify(m.labels.plural)}`)
     if (m.route) campos.push(`route: '${m.route}'`)
     if (w.collectionCall) campos.push(`collection: ${w.collectionCall(m, bp)}`)
     if (w.query) campos.push(`query: ${JSON.stringify(w.query).replace(/"([a-zA-Z_$][\w$]*)":/g, '$1:')}`)
     if (w.pickName) campos.push(`pick: ${w.pickName}`)
     if (w.llmsName) campos.push(`llms: ${w.llmsName}`)
     if (w.options) campos.push(`options: ${JSON.stringify(w.options(m, bp))}`)
+    if (w.pagePath) campos.push(`Page: () => import('${w.pagePath}')`)
     if (w.indexPage) campos.push('indexPage: true')
     if (w.detailPage) campos.push('documentPages: true')
 
@@ -381,7 +383,9 @@ await seed()
 function writeModulePages(target, bp, modules, wirings, write) {
   const written = []
   for (const w of wirings) {
-    for (const build of [w.indexPage, w.detailPage]) {
+    // Las páginas índice ya no se escriben: cada módulo trae la suya y una sola ruta las
+    // sirve. Quedan las fichas, que necesitan su propio `generateStaticParams`.
+    for (const build of [w.detailPage]) {
       if (!build) continue
       const page = build(modules[w.id], bp)
       mkdirSync(join(target, dirname(page.path)), { recursive: true })
