@@ -10,6 +10,12 @@
      sin esto, Chrome invierte los colores de una web oscura y la deja en blanco y negro. */
   color-scheme: dark;
 
+  /* Qué hacerle a un logo ajeno para que se vea en este fondo. Van como números porque un
+     selector no puede preguntar por el esquema, pero sí usarlo en un cálculo:
+     `invert(var(--logo-invert))` es no hacer nada cuando vale 0. */
+  --logo-invert: 1;
+  --logo-box-blend: screen;
+
   --ground: #0b0b0d;
   --ground-2: #101014;
   --surface: #16161a;

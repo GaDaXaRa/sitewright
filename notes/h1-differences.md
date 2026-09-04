@@ -845,3 +845,19 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
      llamarse «La plataforma» y su página seguir siendo «Selectas», que es lo que la gente
      escribe y busca. Al unificar las páginas se perdió esa distinción durante un rato: el
      manifiesto lleva ahora las dos.
+
+
+113. **El problema de una tira de logos no es el fichero, es que llegan mezclados**: uno en
+     PNG transparente con tinta negra, otro en JPG con recuadro blanco, otro a todo color.
+     Sobre fondo crema los recuadros se ven como rectángulos; sobre fondo oscuro la tinta
+     negra desaparece. Se arregla **sin tocar la imagen**: el panel pregunta cómo es el
+     logo y el CSS hace el resto. Un logo es la marca de otra persona y editarlo puede
+     saltarse sus normas de uso; casi todas las organizaciones tienen ya su versión en
+     negativo, y pedirla es más rápido que fabricarla.
+
+114. **Un selector no puede preguntar por el esquema de color, pero sí usarlo en un
+     cálculo.** El generador escribe `--logo-invert: 0` en una web clara y `1` en una
+     oscura, así que `filter: invert(var(--logo-invert))` es literalmente no hacer nada
+     cuando toca no hacer nada, y la regla se escribe una sola vez en vez de dos veces por
+     esquema. Lo mismo con `--logo-box-blend`: `multiply` borra un recuadro blanco sobre
+     claro, y `screen` lo borra sobre oscuro una vez invertido.

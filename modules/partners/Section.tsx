@@ -7,6 +7,7 @@ export type Partner = {
   name: string
   logo?: unknown
   url?: string | null
+  treatment?: ('color' | 'boxed' | 'dark' | 'light') | null
 }
 
 /**
@@ -15,6 +16,10 @@ export type Partner = {
  * Los logos llegan con proporciones que no se parecen en nada —uno cuadrado, otro cuatro
  * veces más ancho que alto— así que se sirven a altura fija y el ancho lo pone cada uno.
  * Igualarlos por ancho encoge los apaisados hasta lo ilegible.
+ *
+ * Y llegan mezclados: uno transparente, otro con recuadro blanco, otro a color. Lo que
+ * dice el panel sobre cada uno se traduce aquí en una clase, y el arreglo es de CSS: el
+ * fichero de otra empresa no se toca.
  */
 export default function PartnersSection({
   items,
@@ -48,6 +53,7 @@ export default function PartnersSection({
                 width={220}
                 height={96}
                 sizes="220px"
+                className={`logo-${partner.treatment ?? 'color'}`}
               />
             ) : (
               <span className="partner-name">{partner.name}</span>

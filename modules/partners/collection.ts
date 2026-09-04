@@ -45,6 +45,22 @@ export function partnersCollection({
         },
       },
       {
+        name: 'treatment',
+        label: '¿Cómo es este logo?',
+        type: 'select',
+        defaultValue: 'color',
+        options: [
+          { label: 'A color — se deja tal cual', value: 'color' },
+          { label: 'Tiene un recuadro de fondo', value: 'boxed' },
+          { label: 'De un solo color oscuro, con fondo transparente', value: 'dark' },
+          { label: 'De un solo color claro, con fondo transparente', value: 'light' },
+        ],
+        admin: {
+          description:
+            'Sirve para que todos se vean parejos sobre el fondo de la web. No modifica el fichero: si te equivocas, cámbialo y ya está.',
+        },
+      },
+      {
         name: 'url',
         label: 'Enlace',
         type: 'text',

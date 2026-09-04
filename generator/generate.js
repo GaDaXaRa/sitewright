@@ -569,10 +569,14 @@ function applyPalette(css, design) {
   map['on-accent'] = button.text
   map['accent-hover'] = button.hover
 
-  let out = css.replace(
-    /color-scheme:\s*\w+;/,
-    `color-scheme: ${design.scheme === 'light' ? 'light' : 'dark'};`,
-  )
+  const claro = design.scheme === 'light'
+  let out = css
+    .replace(/color-scheme:\s*\w+;/, `color-scheme: ${claro ? 'light' : 'dark'};`)
+    // Un logo monocromo oscuro se ve solo sobre fondo claro y hay que invertirlo sobre uno
+    // oscuro; un recuadro blanco desaparece con `multiply` sobre claro y con `screen`
+    // sobre oscuro, una vez invertido.
+    .replace(/--logo-invert:\s*[^;]+;/, `--logo-invert: ${claro ? 0 : 1};`)
+    .replace(/--logo-box-blend:\s*[^;]+;/, `--logo-box-blend: ${claro ? 'multiply' : 'screen'};`)
   for (const [token, value] of Object.entries(map)) {
     // The hover can be a `color-mix(...)` rather than a hex, so the old value is matched up
     // to its semicolon instead of assuming six hex digits.

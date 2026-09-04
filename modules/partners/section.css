@@ -25,6 +25,29 @@
   object-fit: contain;
 }
 
+/* Qué se le hace a cada logo para que se vea en este fondo, según lo que diga el panel.
+   Nada de esto toca el fichero: se puede cambiar de opinión sin volver a subirlo.
+
+   `--logo-invert` vale 0 en una web clara y 1 en una oscura, así que `invert(0)` es
+   literalmente no hacer nada y la regla puede escribirse una sola vez. */
+
+/* Un recuadro blanco desaparece con `multiply` sobre fondo claro; sobre fondo oscuro hay
+   que invertir primero —el recuadro se vuelve negro— y entonces desaparece con `screen`. */
+.partners .logo-boxed {
+  filter: invert(var(--logo-invert));
+  mix-blend-mode: var(--logo-box-blend);
+}
+
+/* Tinta oscura: se lee sola sobre fondo claro, hay que invertirla sobre fondo oscuro. */
+.partners .logo-dark {
+  filter: invert(var(--logo-invert));
+}
+
+/* Tinta clara: justo al revés. */
+.partners .logo-light {
+  filter: invert(calc(1 - var(--logo-invert)));
+}
+
 .partners a {
   display: block;
   border-radius: 2px;
