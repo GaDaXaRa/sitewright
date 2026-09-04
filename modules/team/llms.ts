@@ -1,13 +1,13 @@
-import type { LlmsSection } from '@/lib/llmsTxt'
+import type { LlmsContext, LlmsSection } from '@/lib/llmsTxt'
 import { SITE_URL } from '@/lib/site'
 import type { Person } from './Section'
 
-export function teamSection(people: Person[], title: string, route: string): LlmsSection {
+export function teamSection(items: Person[], ctx: LlmsContext): LlmsSection {
   return {
-    title,
-    lines: people.map((person) => {
+    title: ctx.title,
+    lines: items.map((person) => {
       const role = person.role ? ` — ${person.role}` : ''
-      const url = person.slug ? ` (${SITE_URL}${route}/${person.slug})` : ''
+      const url = person.slug ? ` (${SITE_URL}${ctx.route}/${person.slug})` : ''
       return `- ${person.name}${role}${url}`
     }),
   }

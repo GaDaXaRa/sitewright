@@ -173,8 +173,9 @@ export const WIRING_KEYS = [
   'collectionImport',
   'collectionCall',
   'settingsFields',
-  'dataQuery',
-  'dataPick',
+  'query',
+  'pickImport',
+  'pickName',
   'sectionImport',
   'sectionRender',
   'renders',
@@ -184,8 +185,8 @@ export const WIRING_KEYS = [
   'jsonldNodes',
   'jsonldFirst',
   'llmsImport',
-  'llmsSection',
-  'llmsSpread',
+  'llmsName',
+  'options',
   'navLink',
   'navCta',
   'indexPage',
@@ -204,7 +205,7 @@ export function validateWiring(id, wiring) {
   if (!('variable' in wiring)) {
     errors.push(`modules/${id}/wiring.js: falta \`variable\` (null si no ata ningún dato)`)
   }
-  if (wiring.dataQuery && typeof wiring.variable !== 'string') {
+  if (wiring.query && typeof wiring.variable !== 'string') {
     errors.push(`modules/${id}/wiring.js: consulta datos, así que \`variable\` tiene que nombrarlos`)
   }
 
@@ -213,10 +214,16 @@ export function validateWiring(id, wiring) {
       errors.push(`modules/${id}/wiring.js: "${key}" no es una clave que el generador lea`)
     }
   }
-  // Una consulta cuyo resultado nadie recoge es trabajo contra la base de datos que no
-  // llega a ninguna página.
-  if (wiring.dataPick && !wiring.dataQuery) {
-    errors.push(`modules/${id}/wiring.js: \`dataPick\` sin \`dataQuery\``)
+  // Elegir entre lo que no se ha pedido no tiene sentido.
+  if (wiring.pickName && !wiring.query) {
+    errors.push(`modules/${id}/wiring.js: \`pickName\` sin \`query\``)
+  }
+  if (wiring.pickName && !wiring.pickImport) {
+    errors.push(`modules/${id}/wiring.js: \`pickName\` sin \`pickImport\``)
+  }
+  // Una consulta sin colección no se puede ejecutar.
+  if (wiring.query && !wiring.query.collection) {
+    errors.push(`modules/${id}/wiring.js: \`query\` sin colección`)
   }
   if (wiring.collectionCall && !wiring.collectionImport) {
     errors.push(`modules/${id}/wiring.js: \`collectionCall\` sin \`collectionImport\``)

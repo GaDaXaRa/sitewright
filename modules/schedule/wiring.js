@@ -5,7 +5,7 @@ export const wiring = {
   collectionImport: "import { scheduleCollection } from './modules/schedule/collection'",
   collectionCall: (m) =>
     `scheduleCollection({ labels: ${JSON.stringify(m.labels)}, route: '${m.route}'${m.online ? ', place: false' : ''} })`,
-  dataQuery: () => `payload.find({ collection: 'schedule', limit: 200, sort: '-startsAt' })`,
+  query: { collection: 'schedule', limit: 200, sort: '-startsAt' },
   sectionImport: "import ScheduleSection from '@/modules/schedule/Section'",
   sectionRender: (m) =>
     // `emptyText` se pasa sólo si el blueprint lo pide: la sección se esconde cuando no
@@ -18,8 +18,9 @@ export const wiring = {
   jsonldImport: "import { scheduleNodes } from '@/modules/schedule/jsonld'",
   jsonldNodes: (m) => `...scheduleNodes(splitEvents(schedule, now).upcoming, '${m.route}')`,
   llmsImport: "import { scheduleSections } from '@/modules/schedule/llms'",
-  llmsSpread: (m) =>
-    `...scheduleSections(schedule, now, { upcoming: '${m.title}', past: 'Anteriores' })`,
+  llmsName: 'scheduleSections',
+  // Escribe dos secciones y el encabezado de la segunda no está en el blueprint.
+  options: () => ({ past: 'Anteriores' }),
   navLink: (m) => ({ href: m.route, label: m.labels.plural }),
 
   indexPage: (m) => ({

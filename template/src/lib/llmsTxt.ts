@@ -13,6 +13,20 @@ import { SITE_URL } from './site'
  */
 export type LlmsSection = { title: string; lines: string[] }
 
+/**
+ * Lo que un módulo necesita para escribir su parte, con una sola firma.
+ *
+ * Antes cada uno pedía lo suyo —uno la ruta, otro el reloj, otro dos encabezados— y no
+ * había forma de llamarlos en un bucle. `options` es lo específico del blueprint.
+ */
+export type LlmsContext = {
+  title: string
+  route?: string
+  now: number
+  settings: SiteSetting | null | undefined
+  options?: Record<string, unknown>
+}
+
 function render(section: LlmsSection): string[] {
   return section.lines.length ? ['', `## ${section.title}`, '', ...section.lines] : []
 }

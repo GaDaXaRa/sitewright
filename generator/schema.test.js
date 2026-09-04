@@ -113,7 +113,7 @@ test('no declarar `variable` es distinto de declararla nula', () => {
 })
 
 test('quien consulta datos tiene que nombrarlos', () => {
-  const errors = validateWiring('faq', { id: 'faq', variable: null, dataQuery: () => '' })
+  const errors = validateWiring('faq', { id: 'faq', variable: null, query: { collection: 'faqs' } })
   assert.match(errors.join(), /`variable` tiene que nombrarlos/)
 })
 
@@ -121,9 +121,10 @@ test('elegir entre datos que no se han pedido no tiene sentido', () => {
   const errors = validateWiring('notices', {
     id: 'notices',
     variable: 'notice',
-    dataPick: { from: 'notices', empty: 'null', code: '' },
+    pickImport: "import { pickNotice } from '…'",
+    pickName: 'pickNotice',
   })
-  assert.match(errors.join(), /`dataPick` sin `dataQuery`/)
+  assert.match(errors.join(), /`pickName` sin `query`/)
 })
 
 test('los diez módulos reales cumplen su propio contrato', async () => {

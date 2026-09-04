@@ -12,6 +12,8 @@ import { mediaCollection, usersCollection } from 'sitewright-core/payload'
 import { mediaRevalidation } from './collections/hooks/revalidate'
 import { SiteSettings } from './globals/SiteSettings'
 import { site } from './site.config'
+import { modules } from './site.modules'
+import { moduleCollections } from './lib/modules'
 
 /**
  * The tests create real bookings, and the hook that announces each one sends email.
@@ -44,8 +46,8 @@ export default buildConfig({
     importMap: { baseDir: path.resolve(dirname) },
     meta: { titleSuffix: `— ${site.name}` },
   },
-  // The generator appends each module's collection here.
-  collections: [Users, Media],
+  // Cada módulo aporta la suya desde el manifiesto.
+  collections: [Users, Media, ...moduleCollections(modules)],
   globals: [SiteSettings],
   editor: lexicalEditor(),
   // The admin panel is in Spanish: the people who use it are not developers.

@@ -17,15 +17,15 @@ export type Partner = {
  * Igualarlos por ancho encoge los apaisados hasta lo ilegible.
  */
 export default function PartnersSection({
-  partners,
+  items,
   title,
   tone,
 }: {
-  partners: Partner[]
+  items: Partner[]
   title: string
   tone?: Tone
 }) {
-  if (!partners.length) return null
+  if (!items.length) return null
 
   return (
     <section className={`section ${tone ? `tone-${tone}` : ''}`} id="colaboran">
@@ -36,8 +36,8 @@ export default function PartnersSection({
           </div>
         ) : null}
 
-        <ul className="partners">
-          {partners.map((partner) => {
+        <ul className="items">
+          {items.map((partner) => {
             const logo = mediaUrl(partner.logo)
             // El nombre es el texto alternativo: describe el logo a quien no lo ve, y sin
             // él la imagen no aporta nada a quien navega con lector de pantalla.

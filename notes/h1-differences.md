@@ -807,3 +807,23 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
      anunciado antes de tener su imagen es normal mientras se recopilan—, y los logos se
      sirven **a altura fija**, porque igualarlos por ancho encoge los apaisados hasta lo
      ilegible. Sin semilla: un logo de ejemplo no existe.
+
+
+107. **Menos generación y más configuración: el manifiesto.** El generador escribía a mano
+     en la configuración de Payload, el cargador de datos, el sitemap y `llms.txt`, así que
+     llevar un módulo a una web ya desplegada eran quince ediciones —lo medí añadiendo
+     «Colaboran» a Selectas—. Ahora escribe un solo fichero, `src/site.modules.ts`, con qué
+     módulos hay, qué le pide cada uno a la base y qué aporta; y esos cuatro consumidores
+     son bucles genéricos de la plantilla. El generador pasó de mil líneas a 776.
+
+108. **Lo que no se movió al manifiesto, y por qué.** La portada sigue generada. Un
+     registro genérico de componentes obliga a tipar sus props como `any`, y hoy cada
+     llamada de la portada se comprueba una por una; esa comprobación vale más que el bucle
+     que se ahorraría. El tipo del contenido sí sale del manifiesto, derivado del esquema
+     de Payload (`Config['collections'][…]`), así que no puede quedarse viejo.
+
+109. **Las once secciones no llamaban igual a lo mismo.** `faqs`, `people`, `prices`,
+     `partners`, `reviews`: cinco nombres para «lo que esta sección pinta». Sin un contrato
+     uniforme no hay bucle posible, así que todas reciben `items`. Y las ocho funciones de
+     `llms.txt` pedían cada una lo suyo —una la ruta, otra el reloj, otra dos encabezados—:
+     ahora reciben `(items, ctx)`.

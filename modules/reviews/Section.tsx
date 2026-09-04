@@ -10,15 +10,15 @@ export type Review = {
 }
 
 export default function ReviewsSection({
-  reviews,
+  items,
   title,
   tone,
 }: {
-  reviews: Review[]
+  items: Review[]
   title: string
   tone?: Tone
 }) {
-  if (!reviews.length) return null
+  if (!items.length) return null
 
   return (
     <section className={`section ${tone ? `tone-${tone}` : ''}`} id="opiniones">
@@ -28,7 +28,7 @@ export default function ReviewsSection({
         </div>
 
         <ul className="quotes">
-          {reviews.map((quote) => (
+          {items.map((quote) => (
             <li key={quote.id}>
               <figure>
                 <blockquote>{quote.text}</blockquote>

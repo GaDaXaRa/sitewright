@@ -4,15 +4,14 @@ export const wiring = {
   variable: 'faqs',
   collectionImport: "import { faqCollection } from './modules/faq/collection'",
   collectionCall: (m) => `faqCollection({ labels: ${JSON.stringify(m.labels)}, route: '${m.route}' })`,
-  dataQuery: () =>
-    `payload.find({ collection: 'faqs', where: { active: { equals: true } }, limit: 100, sort: 'order' })`,
+  query: { collection: 'faqs', where: { active: { equals: true } }, limit: 100, sort: 'order' },
   sectionImport: "import FaqSection from '@/modules/faq/Section'",
-  sectionRender: (m) => `<FaqSection faqs={faqs} title="${m.title}" tone={faqTone ?? undefined} />`,
+  sectionRender: (m) => `<FaqSection items={faqs} title="${m.title}" tone={faqTone ?? undefined} />`,
   renders: 'faqs.length > 0',
   jsonldImport: "import { faqNode } from '@/modules/faq/jsonld'",
   jsonldNodes: () => `...(faqs.length ? [faqNode(faqs)] : [])`,
   llmsImport: "import { faqSection } from '@/modules/faq/llms'",
-  llmsSection: (m) => `faqSection(faqs, '${m.title}')`,
+  llmsName: 'faqSection',
 
   indexPage: (m) => ({
     path: `src/app/(frontend)${m.route}/page.tsx`,
@@ -43,7 +42,7 @@ export default async function FaqPage() {
       />
       <InnerPage settings={settings} title="${m.labels.plural}">
         {faqs.length ? (
-          <FaqSection faqs={faqs} title="" context="page" />
+          <FaqSection items={faqs} title="" context="page" />
         ) : (
           <section className="section">
             <div className="container">

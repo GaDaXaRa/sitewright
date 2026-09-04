@@ -14,18 +14,18 @@ export type Person = {
 }
 
 export default function TeamSection({
-  people,
+  items,
   title,
   route,
   tone,
 }: {
-  people: Person[]
+  items: Person[]
   title: string
   /** Where each person's page lives, e.g. `/equipo`. */
   route: string
   tone?: Tone
 }) {
-  if (!people.length) return null
+  if (!items.length) return null
 
   return (
     <section className={`section ${tone ? `tone-${tone}` : ''}`} id="equipo">
@@ -38,7 +38,7 @@ export default function TeamSection({
         ) : null}
 
         <ul className="members">
-          {people.map((member) => {
+          {items.map((member) => {
             const photo = mediaUrl(member.photo)
             const first = member.bio?.[0]?.text
             return (

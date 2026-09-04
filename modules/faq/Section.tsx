@@ -4,18 +4,18 @@ import type { Tone } from 'sitewright-core'
 export type Question = { id: number | string; question: string; answer: string }
 
 export default function FaqSection({
-  faqs,
+  items,
   title,
   tone,
   context = 'home',
 }: {
-  faqs: Question[]
+  items: Question[]
   title: string
   tone?: Tone
   /** On its own page the <h1> belongs to the page, so the section drops its heading. */
   context?: 'home' | 'page'
 }) {
-  if (!faqs.length) return null
+  if (!items.length) return null
 
   return (
     <section className={`section ${tone ? `tone-${tone}` : ''}`} id="faq">
@@ -26,8 +26,8 @@ export default function FaqSection({
           </div>
         ) : null}
 
-        <div className="faqs">
-          {faqs.map((faq) => (
+        <div className="items">
+          {items.map((faq) => (
             <details key={faq.id}>
               <summary>{faq.question}</summary>
               <p>{faq.answer}</p>

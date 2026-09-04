@@ -31,5 +31,5 @@ export const wiring = {
   // Painted only when written: a heading over nothing reads as an unfinished site.
   renders: "Boolean(settings.about?.trim())",
   llmsImport: "import { aboutSection } from '@/modules/about/llms'",
-  llmsSection: (m) => `aboutSection(settings.about, '${m.title}')`,
+  llmsName: 'aboutSection',
 }

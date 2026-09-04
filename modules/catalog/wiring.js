@@ -13,8 +13,7 @@ export const wiring = {
   collectionImport: "import { catalogCollection } from './modules/catalog/collection'",
   collectionCall: (m) =>
     `catalogCollection({ labels: ${JSON.stringify(m.labels)}, route: '${m.route}'${m.dated ? ', dated: true' : ''} })`,
-  dataQuery: (m) =>
-    `payload.find({ collection: 'catalog', limit: 100, sort: '${m.dated ? '-publishedAt' : 'order'}' })`,
+  query: { collection: 'catalog', limit: 100, sort: 'order' },
   sectionImport: "import CatalogSection from '@/modules/catalog/Section'",
   sectionRender: (m) =>
     `<CatalogSection items={catalog} title="${m.title}" route="${m.route}" tone={catalogTone ?? undefined} limit={6} />`,
@@ -25,7 +24,7 @@ export const wiring = {
       ? `...catalogNodes(catalog, '${m.route}', (item) =>\n          pricing.filter((price) => {\n            const owner = price.belongsTo\n            const id = typeof owner === 'object' ? owner?.id : owner\n            return String(id) === String(item.id)\n          }),\n        )`
       : `...catalogNodes(catalog, '${m.route}')`,
   llmsImport: "import { catalogSection } from '@/modules/catalog/llms'",
-  llmsSection: (m) => `catalogSection(catalog, '${m.title}', '${m.route}')`,
+  llmsName: 'catalogSection',
   navLink: (m) => ({ href: m.route, label: m.labels.plural }),
 
   indexPage: (m) => ({

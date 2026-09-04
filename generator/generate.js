@@ -81,123 +81,66 @@ export const ALWAYS_STALE = ['/', '/llms.txt']
 `
 }
 
-// ── payload.config.ts ───────────────────────────────────────────────────────────────────
-
-function payloadConfig(template, bp, modules, wirings) {
-  // A module can be a section and nothing else (`about` lives in the settings), so only the
-  // ones that bring a collection are wired here.
-  const withCollection = wirings.filter((w) => w.collectionImport)
-  const imports = withCollection.map((w) => w.collectionImport).join('\n')
-  const calls = withCollection
-    .map((w) => `    ${w.collectionCall(modules[w.id], bp)},`)
-    .join('\n')
-
-  return template
-    .replace(
-      "import { site } from './site.config'",
-      `import { site } from './site.config'\n${imports}`,
-    )
-    .replace(
-      `  // The generator appends each module's collection here.\n  collections: [Users, Media],`,
-      `  collections: [\n    Users,\n    Media,\n${calls}\n  ],`,
-    )
-    .replace(
-      "altExample: 'Una foto del equipo trabajando',",
-      `altExample: '${bp.design.altExample ?? 'Una foto del equipo trabajando'}',`,
-    )
-}
-
-// ── lib/data.ts ─────────────────────────────────────────────────────────────────────────
-
-function dataLoader(bp, modules, wirings) {
-  const queried = wirings.filter((w) => w.dataQuery)
-  // Un módulo que elige entre lo que trae la consulta liga el resultado con otro nombre:
-  // `notices` es lo que hay en la base, `notice` es el que toca enseñar hoy.
-  const names = queried.map((w) => w.dataPick?.from ?? w.variable)
-  const queries = queried.map((w) => `        ${w.dataQuery(modules[w.id], bp)},`).join('\n')
-  const picks = queried.filter((w) => w.dataPick).map((w) => `    ${w.dataPick.code}`)
-  const returned = queried.map((w) =>
-    w.dataPick ? `      ${w.variable},` : `      ${w.variable}: ${w.variable}.docs,`,
-  )
-  const empties = queried.map((w) =>
-    w.dataPick ? `      ${w.variable}: ${w.dataPick.empty},` : `      ${w.variable}: [],`,
-  )
-  const navConditions = wirings
-    .filter((w) => w.indexPage && w.navLink)
-    .map((w) => `  '${modules[w.id].route}': (c) => c.${w.variable}.length > 0,`)
-    .join('\n')
-
-  return `import { cache } from 'react'
-import { getPayload } from 'payload'
-import config from '@/payload.config'
-import { site } from '@/site.config'
-import type { SiteSetting } from '@/payload-types'
+// ── src/site.modules.ts ─────────────────────────────────────────────────────────────────
 
 /**
- * What the public pages read from the CMS, cached per render.
+ * El manifiesto: el único fichero que cambia al añadir o quitar una sección.
  *
- * Two things it guarantees. First, \`generateMetadata\` and the page share a single query
- * instead of asking twice. Second, **the site degrades instead of breaking**: if the
- * database is unreachable while a page is generated, the build still produces a page with
- * the defaults rather than failing.
+ * Antes cada módulo se enchufaba a mano en la configuración de Payload, el cargador, el
+ * sitemap y `llms.txt`, y llevarlo a una web ya desplegada eran quince ediciones. Todo eso
+ * lo recorren ahora bucles genéricos que leen esto.
  */
-const FALLBACK = { id: 0, siteName: site.name } as SiteSetting
+function siteModules(bp, modules, wirings) {
+  const imports = []
+  const entradas = []
+  const tipos = []
 
-export const loadSettings = cache(async (): Promise<SiteSetting> => {
-  try {
-    const payload = await getPayload({ config: await config })
-    return (await payload.findGlobal({ slug: 'site-settings' })) ?? FALLBACK
-  } catch (err) {
-    console.error('No se pudieron leer los ajustes del sitio:', err)
-    return FALLBACK
-  }
-})
+  for (const w of wirings) {
+    const m = modules[w.id]
+    if (w.collectionImport) imports.push(w.collectionImport)
+    if (w.llmsImport) imports.push(w.llmsImport)
+    if (w.pickImport) imports.push(w.pickImport)
 
-export const loadSiteContent = cache(async () => {
-  try {
-    const payload = await getPayload({ config: await config })
-    const [settings${names.length ? ', ' + names.join(', ') : ''}] = await Promise.all([
-        payload.findGlobal({ slug: 'site-settings' }),
-${queries}
-      ])
+    const campos = [`id: '${w.id}'`, `variable: ${JSON.stringify(w.variable)}`, `title: ${JSON.stringify(m.title)}`]
+    if (m.route) campos.push(`route: '${m.route}'`)
+    if (w.collectionCall) campos.push(`collection: ${w.collectionCall(m, bp)}`)
+    if (w.query) campos.push(`query: ${JSON.stringify(w.query).replace(/"([a-zA-Z_$][\w$]*)":/g, '$1:')}`)
+    if (w.pickName) campos.push(`pick: ${w.pickName}`)
+    if (w.llmsName) campos.push(`llms: ${w.llmsName}`)
+    if (w.options) campos.push(`options: ${JSON.stringify(w.options(m, bp))}`)
+    if (w.indexPage) campos.push('indexPage: true')
+    if (w.detailPage) campos.push('documentPages: true')
 
-    // The moment the page is generated: a component must not read the clock while
-    // rendering, or the same render would place a dated item differently.
-    const now = Date.now()
-${picks.join('\n')}
-    return {
-      settings: settings ?? FALLBACK,
-${returned.join('\n')}
-      now,
-    }
-  } catch (err) {
-    console.error('No se pudo cargar el contenido del sitio:', err)
-    return {
-      settings: FALLBACK,
-${empties.join('\n')}
-      now: Date.now(),
+    entradas.push(`  {\n    ${campos.join(',\n    ')},\n  },`)
+
+    // El tipo sale del esquema de Payload, así que no puede quedarse viejo.
+    if (w.query) {
+      const docs = `Config['collections']['${w.query.collection}']`
+      tipos.push(`  ${w.variable}: ${w.pickName ? `${docs} | null` : `${docs}[]`}`)
     }
   }
-})
+
+  return `import type { Config, SiteSetting } from '@/payload-types'
+import type { SiteModule } from '@/lib/modules'
+${imports.join('\n')}
 
 /**
- * El menú, con sólo lo que tiene algo dentro.
- *
- * Un enlace a una página que dice «todavía no hay nada publicado» es peor que no tener
- * enlace: se lo come quien entra y se lo come Google, que clasifica la web como fina y
- * deja de indexarla. La condición es la misma que decide el sitemap, para que el menú y
- * lo que se le cuenta a un buscador no puedan discrepar.
+ * Los módulos de esta web. **Lo escribe el generador**: es el único fichero que cambia
+ * cuando se añade o se quita una sección.
  */
-type SiteContent = Awaited<ReturnType<typeof loadSiteContent>>
+export const modules: SiteModule[] = [
+${entradas.join('\n')}
+]
 
-const NAV_CONTENT: Record<string, (c: SiteContent) => boolean> = {
-${navConditions}
+/**
+ * La forma de lo que devuelve el cargador. Los tipos salen del esquema de Payload, así que
+ * no pueden quedarse viejos, y la portada se sigue comprobando llamada por llamada.
+ */
+export type Content = {
+  settings: SiteSetting
+  now: number
+${tipos.join('\n')}
 }
-
-export const visibleNav = cache(async (): Promise<{ href: string; label: string }[]> => {
-  const content = await loadSiteContent()
-  return site.nav.filter((link) => NAV_CONTENT[link.href]?.(content) ?? true)
-})
 `
 }
 
@@ -314,54 +257,6 @@ ${sectioned.map((w) => `      ${w.sectionRender(modules[w.id], bp)}`).join('\n\n
       <Footer settings={settings} links={links} />
     </>
   )
-}
-`
-}
-
-// ── llms.txt ────────────────────────────────────────────────────────────────────────────
-
-function llmsRoute(bp, modules, wirings) {
-  const contributors = wirings.filter((w) => w.llmsSection || w.llmsSpread)
-  const imports = contributors.map((w) => w.llmsImport).join('\n')
-  // A module can contribute a section without having data of its own (`about` reads the
-  // settings), and a null in this list writes an empty hole into the destructuring.
-  const vars = [...new Set(contributors.map((w) => w.variable).filter(Boolean))]
-  const usesNow = contributors.some((w) => w.llmsSpread)
-  const sections = contributors
-    .map((w) =>
-      w.llmsSpread ? `    ${w.llmsSpread(modules[w.id], bp)},` : `    ${w.llmsSection(modules[w.id], bp)},`,
-    )
-    .join('\n')
-
-  return `import { loadSiteContent } from '@/lib/data'
-import { buildLlmsTxt } from '@/lib/llmsTxt'
-${imports}
-
-/**
- * /llms.txt — a plain-text summary for AI assistants.
- *
- * Generated from the CMS, so it cannot fall out of date, and **nothing is invented**: what
- * the client has not written does not appear. A made-up detail here is what an assistant
- * repeats as fact.
- */
-export const revalidate = 3600
-
-export async function GET() {
-  const { settings${vars.length ? ', ' + vars.join(', ') : ''}${usesNow ? ', now' : ''} } = await loadSiteContent()
-
-  const text = buildLlmsTxt({
-    settings,
-    sections: [
-${sections}
-    ],
-  })
-
-  return new Response(text, {
-    headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
-      'Cache-Control': 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400',
-    },
-  })
 }
 `
 }
@@ -495,81 +390,6 @@ function writeModulePages(target, bp, modules, wirings, write) {
     }
   }
   return written
-}
-
-// ── sitemap ─────────────────────────────────────────────────────────────────────────────
-
-function sitemap(template, bp, modules, wirings) {
-  // Sólo las secciones que escriben una página, y sólo cuando tienen algo que enseñar.
-  // Anunciar una ruta sin página es mandar a Google a un 404; anunciar una que dice
-  // «todavía no hay nada publicado» es pedirle que clasifique la web como fina.
-  const fixed = wirings
-    .filter((w) => w.indexPage)
-    .map(
-      (w) =>
-        `    ...(${w.variable}.length\n      ? [\n          {\n            url: \`\${SITE_URL}${modules[w.id].route}\`,\n            lastModified: new Date(),\n            changeFrequency: 'weekly' as const,\n            priority: 0.8,\n          },\n        ]\n      : []),`,
-    )
-    .join('\n')
-
-  // Modules with a page per document need the database, so they go inside the try/catch:
-  // with it unreachable the fixed pages must still come out.
-  const perDocument = wirings
-    .filter((w) => w.detailPage)
-    .map((w) => {
-      const m = modules[w.id]
-      const collection = w.collectionSlug
-      return `      const ${w.id}Docs = await payload.find({ collection: '${collection}', limit: 200, depth: 0 })
-      for (const doc of ${w.id}Docs.docs) {
-        if (doc.slug) {
-          entries.push({
-            url: \`\${SITE_URL}${m.route}/\${doc.slug}\`,
-            lastModified: doc.updatedAt ? new Date(doc.updatedAt) : new Date(),
-            changeFrequency: 'monthly',
-            priority: 0.7,
-          })
-        }
-      }`
-    })
-    .join('\n\n')
-
-  // Lo que se anuncia depende de lo que haya publicado, así que el sitemap lee el mismo
-  // cargador que las páginas: nunca puede prometer algo distinto de lo que se verá.
-  const read = wirings.filter((w) => w.indexPage).map((w) => w.variable)
-  let out = template
-    .replace(
-      '  // The generator reads here what each section actually has.',
-      read.length ? `  const { ${read.join(', ')} } = await loadSiteContent()` : '',
-    )
-    .replace('    // The generator adds one entry per module page here.', fixed)
-
-  if (read.length) {
-    out = out.replace(
-      "import { SITE_URL } from '@/lib/site'",
-      "import { SITE_URL } from '@/lib/site'\nimport { loadSiteContent } from '@/lib/data'",
-    )
-  }
-
-  if (perDocument) {
-    out = out.replace(
-      `import type { MetadataRoute } from 'next'`,
-      `import type { MetadataRoute } from 'next'\nimport { getPayload } from 'payload'\nimport config from '@/payload.config'`,
-    ).replace(
-      `  // Modules with a page per document (a member, a project) add their entries here, inside
-  // a try/catch: with the database unavailable, the fixed pages must still be returned.
-`,
-      `  try {
-    const payload = await getPayload({ config: await config })
-
-${perDocument}
-  } catch {
-    // With the database unavailable, at least the fixed pages are returned.
-  }
-
-`,
-    )
-  }
-
-  return out
 }
 
 // ── CLAUDE.md ───────────────────────────────────────────────────────────────────────────
@@ -869,12 +689,9 @@ const read = (path) => readFileSync(join(target, path), 'utf8')
 const write = (path, content) => writeFileSync(join(target, path), content)
 
 write('src/site.config.ts', siteConfig(bp, modules, wirings))
-write('src/payload.config.ts', payloadConfig(read('src/payload.config.ts'), bp, modules, wirings))
+write('src/site.modules.ts', siteModules(bp, modules, wirings))
 write('src/globals/SiteSettings.ts', siteSettings(read('src/globals/SiteSettings.ts'), bp, modules, wirings))
-write('src/lib/data.ts', dataLoader(bp, modules, wirings))
 write('src/app/(frontend)/page.tsx', homePage(bp, modules, wirings, order))
-write('src/app/llms.txt/route.ts', llmsRoute(bp, modules, wirings))
-write('src/app/sitemap.ts', sitemap(read('src/app/sitemap.ts'), bp, modules, wirings))
 write('scripts/seed.ts', seedScript(bp, modules, wirings))
 write('CLAUDE.md', siteGuide(bp, modules))
 write('README.md', siteReadme(bp, modules))

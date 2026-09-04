@@ -19,20 +19,20 @@ export function priceLabel(price: Price): string {
 }
 
 export default function PricingSection({
-  prices,
+  items,
   title,
   tone,
   ctaHref,
   ctaLabel = 'Me interesa',
 }: {
-  prices: Price[]
+  items: Price[]
   title: string
   tone?: Tone
   /** Where the button goes — usually the contact form, carrying the choice along. */
   ctaHref?: string
   ctaLabel?: string
 }) {
-  if (!prices.length) return null
+  if (!items.length) return null
 
   return (
     <section className={`section ${tone ? `tone-${tone}` : ''}`} id="tarifas">
@@ -41,8 +41,8 @@ export default function PricingSection({
           <h2>{title}</h2>
         </div>
 
-        <div className="prices">
-          {prices.map((price) => (
+        <div className="items">
+          {items.map((price) => (
             <article
               key={price.id}
               className={`price ${price.highlighted ? 'price-highlighted' : ''}`}

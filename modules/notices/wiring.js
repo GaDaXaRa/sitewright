@@ -5,20 +5,11 @@ export const wiring = {
   collectionImport: "import { noticesCollection } from './modules/notices/collection'",
   collectionCall: (m, bp) =>
     `noticesCollection({ labels: ${JSON.stringify(m.labels)}, buttonUrl: '${m.buttonUrl ?? Object.values(bp.modules).find((x) => x.route)?.route ?? '/'}' })`,
-  // The notice is picked in the loader, not here: only the first active *and in date* one
-  // shows, and that is a decision, not a query.
-  dataQuery: () =>
-    `payload.find({ collection: 'notices', where: { active: { equals: true } }, limit: 10, sort: '-updatedAt' })`,
-  dataPick: {
-    from: 'notices',
-    empty: 'null',
-    code: `const notice =
-      notices.docs.find((n) => {
-        const from = n.startsAt ? new Date(n.startsAt).getTime() : null
-        const to = n.endsAt ? new Date(n.endsAt).getTime() : null
-        return (from === null || from <= now) && (to === null || to >= now)
-      }) ?? null`,
-  },
+  // El aviso se elige en el cargador, no aquí: sólo sale el primero activo **y en fecha**,
+  // y eso es una decisión, no una consulta.
+  pickImport: "import { pickNotice } from '@/modules/notices/pick'",
+  pickName: 'pickNotice',
+  query: { collection: 'notices', where: { active: { equals: true } }, limit: 10, sort: '-updatedAt' },
   sectionImport: "import NoticePopup from '@/modules/notices/Popup'",
   // Not a section: it is an overlay, so it is painted before everything and takes no tone.
   overlay: true,
