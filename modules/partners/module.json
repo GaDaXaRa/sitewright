@@ -1,0 +1,17 @@
+{
+  "id": "partners",
+  "title": "Colaboran",
+  "note": "La tira de logos: quién apoya, patrocina o programa. Un colectivo la necesita antes que casi nada.",
+  "collection": "partners",
+  "defaultLabels": {
+    "singular": "Colaborador",
+    "plural": "Colaboradores"
+  },
+  "routes": {},
+  "section": "colaboran",
+  "contributes": {
+    "jsonld": false,
+    "llms": true,
+    "seed": false
+  }
+}

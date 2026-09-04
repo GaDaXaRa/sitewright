@@ -20,6 +20,7 @@ export const MODULE_IDS = [
   'reviews',
   'faq',
   'notices',
+  'partners',
   'contact',
 ]
 

@@ -798,3 +798,12 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
      estaba dentro de `cli.ts`, que se ejecuta al importarlo: probarlo exigía lanzar una
      auditoría entera, así que nadie lo probó y el fallo del `--url` entró sin resistencia.
      Ahora está en `args.ts` con seis pruebas, incluida la que fija que gana el último.
+
+
+106. **Faltaba el módulo de la tira de logos.** «Colaboran», «con el apoyo de»,
+     «patrocinan»: lo necesita cualquier colectivo, asociación u ONG antes que casi nada,
+     y no estaba. Dos decisiones que no son obvias: el **nombre es obligatorio y el logo
+     no** —un logo sin nombre no se puede describir a quien no lo ve, y un colaborador
+     anunciado antes de tener su imagen es normal mientras se recopilan—, y los logos se
+     sirven **a altura fija**, porque igualarlos por ancho encoge los apaisados hasta lo
+     ilegible. Sin semilla: un logo de ejemplo no existe.

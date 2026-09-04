@@ -71,6 +71,13 @@
         "sponsor": "Patrocinio, subvención o colaboración",
         "press": "Prensa"
       }
+    },
+    "partners": {
+      "labels": {
+        "singular": "Colaborador",
+        "plural": "Colaboradores"
+      },
+      "title": "Colaboran"
     }
   },
   "design": {
@@ -112,7 +119,8 @@
       "schedule",
       "reviews",
       "faq",
-      "contact"
+      "contact",
+      "partners"
     ]
   },
   "legal": {
