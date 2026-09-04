@@ -10,6 +10,7 @@ export type ScheduleItem = {
   endsAt?: string | null
   venue?: string | null
   city?: string | null
+  address?: string | null
   description?: string | null
   /** El cartel. La colección lo pedía desde el principio y nadie lo pintaba: llegaba al
       JSON-LD, así que Google lo veía y una persona no. */
@@ -20,13 +21,6 @@ export type ScheduleItem = {
 }
 
 /**
- * One dated item, as a row.
- *
- * Past dates keep the same shape as upcoming ones — only the action changes — because the
- * archive is what shows a collective has a history, and rewriting it as a lesser thing
- * would waste it.
- */
-/**
  * Si en esta lista hay algún cartel.
  *
  * La columna del cartel se reserva para toda la lista o para ninguna: si sólo la tuvieran
@@ -36,9 +30,31 @@ export function conCartel(items: ScheduleItem[]): boolean {
   return items.some((item) => Boolean(item.image))
 }
 
+/**
+ * Los párrafos de una descripción escrita en el panel.
+ *
+ * En un campo de texto plano, un párrafo es una línea en blanco: es lo que teclea quien
+ * escribe. Sin esto llegaba todo pegado en un solo bloque, y una descripción larga se
+ * volvía ilegible.
+ */
+function paragraphs(text: string): string[] {
+  return text
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean)
+}
+
+/**
+ * Una fecha, como fila.
+ *
+ * Dos columnas: el cartel a la izquierda y todo lo demás a la derecha, con el botón
+ * debajo. Las fechas pasadas conservan la misma forma que las próximas —sólo cambia la
+ * acción— porque el archivo es lo que demuestra que un colectivo tiene historia.
+ */
 export default function ScheduleRow({ event, past = false }: { event: ScheduleItem; past?: boolean }) {
   const price = event.free ? 'Entrada libre' : event.price != null ? `${event.price} €` : ''
   const poster = mediaUrl(event.image)
+  const where = [event.venue, event.city].filter(Boolean).join(', ')
 
   return (
     <article
@@ -50,31 +66,41 @@ export default function ScheduleRow({ event, past = false }: { event: ScheduleIt
           <Image
             src={poster}
             alt={mediaAlt(event.image) || event.title}
-            width={160}
-            height={160}
-            sizes="160px"
+            width={480}
+            height={480}
+            sizes="(max-width: 760px) 60vw, 200px"
           />
         </div>
       ) : null}
-      <div className="event-when">
-        <time dateTime={event.startsAt}>
-          {formatEventDate(event.startsAt, event.endsAt, { showYear: past })}
-        </time>
-      </div>
-      <div className="event-what">
+
+      <div className="event-body">
+        <div className="event-when">
+          <time dateTime={event.startsAt}>
+            {formatEventDate(event.startsAt, event.endsAt, { showYear: past })}
+          </time>
+        </div>
+
         <h3>{event.title}</h3>
-        {event.venue || event.city ? (
-          <p className="event-where">{[event.venue, event.city].filter(Boolean).join(', ')}</p>
-        ) : null}
-        {event.description ? <p className="event-text">{event.description}</p> : null}
-      </div>
-      <div className="event-action">
-        {price ? <span className="event-price">{price}</span> : null}
-        {!past && event.ticketsUrl ? (
-          <a className="btn btn-primary" href={event.ticketsUrl} target="_blank" rel="noreferrer">
-            Reservar
-          </a>
-        ) : null}
+
+        {where ? <p className="event-where">{where}</p> : null}
+        {event.address ? <p className="event-address">{event.address}</p> : null}
+
+        {event.description
+          ? paragraphs(event.description).map((p, i) => (
+              <p key={i} className="event-text">
+                {p}
+              </p>
+            ))
+          : null}
+
+        <div className="event-action">
+          {price ? <span className="event-price">{price}</span> : null}
+          {!past && event.ticketsUrl ? (
+            <a className="btn btn-primary" href={event.ticketsUrl} target="_blank" rel="noreferrer">
+              Reservar
+            </a>
+          ) : null}
+        </div>
       </div>
     </article>
   )

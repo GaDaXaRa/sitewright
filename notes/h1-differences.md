@@ -941,3 +941,17 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
 
 128. **A ancho de móvil, un cartel cuadrado a ancho completo se recorta en una franja** y
      se come la fila entera. Sigue siendo una miniatura en las dos anchuras.
+
+
+129. **La regla que colapsa una fila hay que escribirla sobre la fila.** La escribí sobre
+     la lista (`.events-with-posters { … }` en vez de `.events-with-posters .event { … }`)
+     y en pantalla estrecha la rejilla de cuatro columnas sobrevivía: el título se montaba
+     encima del botón y el texto salía a una palabra por línea. Salió así a producción.
+
+130. **Un `textarea` no es un párrafo.** La descripción de un evento llegaba entera en un
+     solo bloque, y una línea en blanco al escribir —que es como se separa una idea de la
+     siguiente— se perdía. Se parten por línea en blanco, que es lo que teclea una persona.
+
+131. **La dirección tampoco se pintaba.** Mismo caso que el cartel: el campo existía en el
+     panel y ningún componente lo usaba. Al revisar un módulo conviene comprobar la lista
+     de campos contra lo que se pinta, porque nada avisa de un campo huérfano.

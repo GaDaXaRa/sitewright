@@ -699,30 +699,40 @@ img {
 
 .event {
   display: grid;
-  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr) auto;
-  gap: 16px 28px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px 26px;
   align-items: start;
-  padding: 22px 0;
+  padding: 24px 0;
   border-bottom: 1px solid var(--line);
 }
 
-/* El cartel, cuando lo hay. La columna la reserva **la lista**, no la fila: si sólo la
-   tuvieran las filas con imagen, las fechas de unas y otras no quedarían alineadas. */
+/* Con cartel son dos columnas: la imagen a la izquierda y todo lo demás a la derecha, con
+   el botón debajo del texto. La columna la reserva **la lista**, no la fila, o las filas
+   con y sin cartel no quedarían alineadas entre sí. */
 .events-with-posters .event {
-  grid-template-columns: 92px minmax(140px, 200px) minmax(0, 1fr) auto;
+  grid-template-columns: 200px minmax(0, 1fr);
 }
 
-/* Y una fila sin cartel empieza en la segunda columna, dejando el hueco. */
-.events-with-posters .event:not(.event-with-poster) .event-when {
-  grid-column: 2;
+.event-poster {
+  grid-column: 1;
 }
 
 .event-poster img {
-  width: 92px;
-  height: 92px;
-  object-fit: cover;
+  width: 100%;
+  height: auto;
   border-radius: 4px;
   display: block;
+}
+
+.events-with-posters .event-body {
+  grid-column: 2;
+}
+
+.event-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .event-when time {
@@ -734,14 +744,21 @@ img {
   font-variant-numeric: tabular-nums;
 }
 
-.event-what h3 {
-  font-size: clamp(19px, 2.4vw, 25px);
-  margin-bottom: 4px;
+.event-body h3 {
+  font-size: clamp(19px, 2.2vw, 24px);
+  margin: 6px 0 2px;
 }
 
 .event-where {
   margin: 0;
   color: var(--ink-soft);
+}
+
+/* La dirección: estaba en el panel y no se pintaba en ninguna parte. */
+.event-address {
+  margin: 2px 0 0;
+  color: var(--ink-faint);
+  font-size: 14px;
 }
 
 .event-lineup {
@@ -752,8 +769,10 @@ img {
   text-transform: uppercase;
 }
 
+/* Cada párrafo del panel es un párrafo aquí: una línea en blanco al escribir separa dos
+   ideas, y pegarlas en un bloque hace ilegible una descripción larga. */
 .event-text {
-  margin: 8px 0 0;
+  margin: 10px 0 0;
   color: var(--ink-soft);
   max-width: 62ch;
 }
@@ -761,7 +780,9 @@ img {
 .event-action {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 14px;
+  margin-top: 16px;
 }
 
 .event-price {
@@ -777,7 +798,7 @@ img {
 }
 
 .event-past .event-when time,
-.event-past .event-what h3 {
+.event-past .event-body h3 {
   color: var(--ink-soft);
 }
 
@@ -793,24 +814,19 @@ img {
 }
 
 @media (max-width: 760px) {
-  .event {
-    grid-template-columns: 1fr;
-    gap: 8px;
+  /* La regla tiene que ir sobre **la fila**, no sobre la lista: escrita sobre la lista, la
+     rejilla de dos columnas sobrevivía en estrecho y el título se montaba sobre el botón. */
+  .events-with-posters .event {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
   }
 
-  /* En una columna sigue siendo una miniatura: a ancho completo se recorta un cartel
-     cuadrado en una franja y se come la fila entera. */
-  .event-with-poster {
-    grid-template-columns: 1fr;
+  .events-with-posters .event-body {
+    grid-column: 1;
   }
 
   .event-poster img {
-    width: 84px;
-    height: 84px;
-  }
-
-  .event-action {
-    margin-top: 6px;
+    max-width: 240px;
   }
 }
 
