@@ -41,7 +41,7 @@ export default function PartnersSection({
           </div>
         ) : null}
 
-        <ul className="items">
+        <ul className="partners">
           {items.map((partner) => {
             const logo = mediaUrl(partner.logo)
             // El nombre es el texto alternativo: describe el logo a quien no lo ve, y sin

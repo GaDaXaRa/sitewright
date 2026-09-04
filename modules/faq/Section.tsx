@@ -26,7 +26,7 @@ export default function FaqSection({
           </div>
         ) : null}
 
-        <div className="items">
+        <div className="faqs">
           {items.map((faq) => (
             <details key={faq.id}>
               <summary>{faq.question}</summary>

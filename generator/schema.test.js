@@ -135,3 +135,32 @@ test('los diez módulos reales cumplen su propio contrato', async () => {
     assert.deepEqual(validateWiring(id, wiring), [], `modules/${id}`)
   }
 })
+
+// ── las clases de CSS, que no las comprueba ningún compilador ───────────────────────────
+
+test('cada clase que define un módulo la usa su componente', async () => {
+  // Un renombrado masivo cambió `className="partners"` por `className="items"` y la tira
+  // de logos perdió su maquetación en producción sin que fallara nada: TypeScript no mira
+  // dentro de una cadena, y el CSS no se queja de una regla que no encaja con nadie.
+  const { readdirSync, readFileSync, existsSync } = await import('node:fs')
+  const raiz = new URL('../modules/', import.meta.url)
+
+  for (const { name: id } of readdirSync(raiz, { withFileTypes: true }).filter((d) => d.isDirectory())) {
+    const hoja = new URL(`${id}/section.css`, raiz)
+    if (!existsSync(hoja)) continue
+
+    const clases = [...readFileSync(hoja, 'utf8').matchAll(/^\.([a-z][a-z0-9-]*)/gm)].map((m) => m[1])
+    const componentes = readdirSync(new URL(`${id}/`, raiz))
+      .filter((f) => f.endsWith('.tsx'))
+      .map((f) => readFileSync(new URL(`${id}/${f}`, raiz), 'utf8'))
+      .join(' ')
+
+    for (const clase of new Set(clases)) {
+      assert.match(
+        componentes,
+        new RegExp(`(?<![\\w-])${clase.replace(/-/g, '\\-')}(?![\\w-])`),
+        `modules/${id}: el CSS define .${clase} y ningún componente la usa`,
+      )
+    }
+  }
+})

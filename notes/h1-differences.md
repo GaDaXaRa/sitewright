@@ -913,3 +913,16 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
 123. **Lo encontró la clienta, no la auditoría.** La puerta de contraste mide pares de la
      paleta, y ese par —texto sobre foto— no es un par de tokens: depende de una imagen que
      alguien sube después. Es el hueco más claro que le queda a la auditoría.
+
+
+124. **Un renombrado masivo cambió tres nombres de clase de CSS.** Al unificar las props en
+     `items`, la expresión regular se llevó también `className="partners"`, `"faqs"` y
+     `"prices"`: la tira de logos, las preguntas y las tarifas perdieron su maquetación en
+     todas las webs generadas desde entonces, **y nada falló**. TypeScript no mira dentro
+     de una cadena, el CSS no se queja de una regla que no encaja con nadie, y la
+     auditoría no sabe qué aspecto debería tener una sección. Lo vio la clienta.
+
+125. **Es la tercera vez que un renombrado con expresiones regulares rompe algo** —las
+     rutas de importación, una palabra dentro de un comentario, y ahora las clases—. Las
+     dos primeras las cazó el `typecheck`; esta no la cazaba nadie. Ahora hay una prueba:
+     cada clase que define el CSS de un módulo tiene que aparecer en su componente.

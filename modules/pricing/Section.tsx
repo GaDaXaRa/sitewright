@@ -41,7 +41,7 @@ export default function PricingSection({
           <h2>{title}</h2>
         </div>
 
-        <div className="items">
+        <div className="prices">
           {items.map((price) => (
             <article
               key={price.id}
