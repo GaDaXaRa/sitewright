@@ -440,33 +440,20 @@ img {
    encima de cualquier foto. Las otras dos opciones respetan más la imagen y piden a cambio
    que alguien las mire: por eso se eligen en el panel y no se deducen. */
 
-/* Sólo detrás del texto: la foto queda intacta y el título se apoya en un degradado que
-   nace donde está escrito. Es lo que haría un diseñador antes que apagar la foto entera. */
+/* Sólo detrás del texto: la foto queda intacta arriba y se apaga hacia abajo, que es
+   donde está escrito. Un degradado anclado al borde no tiene cantos; el primer intento
+   fue un recuadro alrededor del texto y se veía como una tarjeta pegada encima. */
 .hero-has-image.shade-text .hero-img {
   filter: none;
 }
 
 .hero-has-image.shade-text .hero-overlay {
-  background: none;
-}
-
-.hero-has-image.shade-text .hero-content {
-  position: relative;
-  isolation: isolate;
-}
-
-.hero-has-image.shade-text .hero-content::before {
-  content: '';
-  position: absolute;
-  /* Se sale del bloque de texto porque un velo que termina justo en la letra se nota. */
-  inset: -1.5rem -2rem;
-  z-index: -1;
-  border-radius: 10px;
-  background: radial-gradient(
-    120% 120% at 30% 50%,
-    rgba(0, 0, 0, 0.62) 0%,
-    rgba(0, 0, 0, 0.45) 55%,
-    transparent 100%
+  background: linear-gradient(
+    180deg,
+    transparent 28%,
+    rgba(0, 0, 0, 0.3) 58%,
+    rgba(0, 0, 0, 0.62) 86%,
+    rgba(0, 0, 0, 0.72) 100%
   );
 }
 

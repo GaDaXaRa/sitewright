@@ -885,8 +885,15 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
      lo único que garantiza que el título se lea sobre cualquier imagen, y por eso sigue
      siendo lo de siempre; pero quien ha elegido esa foto quiere que se vea.
 
-119. **«Sólo detrás del texto» es la respuesta de diseño, no el interruptor.** Un degradado
-     radial que nace donde está escrito deja la foto intacta y el título legible. Se sale
-     del bloque de texto a propósito: un velo que termina justo en la letra se nota.
-     Ofrecer sólo «sí/no» habría dejado a la gente eligiendo entre una foto apagada y un
-     título ilegible.
+119. **«Sólo detrás del texto» es la respuesta de diseño, no el interruptor.** Ofrecer
+     sólo «sí/no» deja a la gente eligiendo entre una foto apagada y un título ilegible.
+     El primer intento fue un recuadro alrededor del bloque de texto y **se veía como una
+     tarjeta pegada sobre la foto**: lo que funciona es un degradado anclado al borde
+     inferior, que no tiene cantos porque no termina en ninguna parte.
+
+120. **Mandé una comparación que no comparaba nada.** Monté la página extrayendo el CSS de
+     la hoja de estilos con una búsqueda de índices frágil, y el corte se llevó todas las
+     reglas: las tres portadas se pintaron idénticas y lo dije como si demostrara algo. La
+     regla es la de siempre —comprobar el efecto, no el código de salida— y aquí el efecto
+     era mirar la página antes de enseñarla. Ahora la extracción comprueba que están las
+     reglas antes de escribir nada.
