@@ -792,3 +792,9 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
      el informe no decía contra qué. Varias veces di por auditada producción cuando estaba
      leyendo mi portátil. Ahora gana el último, y la auditoría de producción de verdad
      —lanzada llamando al CLI directamente— sale en 37 de 37.
+
+
+105. **La única lógica del binario vivía donde no se podía probar.** Leer un argumento
+     estaba dentro de `cli.ts`, que se ejecuta al importarlo: probarlo exigía lanzar una
+     auditoría entera, así que nadie lo probó y el fallo del `--url` entró sin resistencia.
+     Ahora está en `args.ts` con seis pruebas, incluida la que fija que gana el último.
