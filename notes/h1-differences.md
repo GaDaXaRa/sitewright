@@ -926,3 +926,18 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
      rutas de importación, una palabra dentro de un comentario, y ahora las clases—. Las
      dos primeras las cazó el `typecheck`; esta no la cazaba nadie. Ahora hay una prueba:
      cada clase que define el CSS de un módulo tiene que aparecer en su componente.
+
+
+126. **La agenda pedía un cartel y no lo enseñaba nunca.** El campo «Imagen o cartel»
+     existía en la colección desde el principio y llegaba al JSON-LD —así que Google veía
+     la imagen— pero ningún componente la pintaba. Un panel que pide algo que la web no
+     usa es peor que no pedirlo: alguien sube el cartel, mira la web y no entiende nada.
+     Lo encontró la clienta.
+
+127. **La columna del cartel la reserva la lista, no la fila.** Si sólo la tuvieran las
+     filas con imagen, las fechas de unas y otras no quedarían alineadas y la lista se
+     vería descuadrada. Una fila sin cartel empieza en la segunda columna y deja el hueco;
+     una lista donde nadie trae cartel se ve exactamente igual que antes.
+
+128. **A ancho de móvil, un cartel cuadrado a ancho completo se recorta en una franja** y
+     se come la fila entera. Sigue siendo una miniatura en las dos anchuras.

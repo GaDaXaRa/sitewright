@@ -1,5 +1,6 @@
 import React from 'react'
-import { formatEventDate } from 'sitewright-core'
+import Image from 'next/image'
+import { formatEventDate, mediaAlt, mediaUrl } from 'sitewright-core'
 
 export type ScheduleItem = {
   id: number | string
@@ -10,6 +11,9 @@ export type ScheduleItem = {
   venue?: string | null
   city?: string | null
   description?: string | null
+  /** El cartel. La colección lo pedía desde el principio y nadie lo pintaba: llegaba al
+      JSON-LD, así que Google lo veía y una persona no. */
+  image?: unknown
   free?: boolean | null
   price?: number | null
   ticketsUrl?: string | null
@@ -22,11 +26,36 @@ export type ScheduleItem = {
  * archive is what shows a collective has a history, and rewriting it as a lesser thing
  * would waste it.
  */
+/**
+ * Si en esta lista hay algún cartel.
+ *
+ * La columna del cartel se reserva para toda la lista o para ninguna: si sólo la tuvieran
+ * las filas que traen imagen, las fechas de unas y otras no quedarían alineadas.
+ */
+export function conCartel(items: ScheduleItem[]): boolean {
+  return items.some((item) => Boolean(item.image))
+}
+
 export default function ScheduleRow({ event, past = false }: { event: ScheduleItem; past?: boolean }) {
   const price = event.free ? 'Entrada libre' : event.price != null ? `${event.price} €` : ''
+  const poster = mediaUrl(event.image)
 
   return (
-    <article className={`event ${past ? 'event-past' : ''}`} id={event.slug ?? undefined}>
+    <article
+      className={`event ${poster ? 'event-with-poster' : ''} ${past ? 'event-past' : ''}`}
+      id={event.slug ?? undefined}
+    >
+      {poster ? (
+        <div className="event-poster">
+          <Image
+            src={poster}
+            alt={mediaAlt(event.image) || event.title}
+            width={160}
+            height={160}
+            sizes="160px"
+          />
+        </div>
+      ) : null}
       <div className="event-when">
         <time dateTime={event.startsAt}>
           {formatEventDate(event.startsAt, event.endsAt, { showYear: past })}

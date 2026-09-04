@@ -706,6 +706,25 @@ img {
   border-bottom: 1px solid var(--line);
 }
 
+/* El cartel, cuando lo hay. La columna la reserva **la lista**, no la fila: si sólo la
+   tuvieran las filas con imagen, las fechas de unas y otras no quedarían alineadas. */
+.events-with-posters .event {
+  grid-template-columns: 92px minmax(140px, 200px) minmax(0, 1fr) auto;
+}
+
+/* Y una fila sin cartel empieza en la segunda columna, dejando el hueco. */
+.events-with-posters .event:not(.event-with-poster) .event-when {
+  grid-column: 2;
+}
+
+.event-poster img {
+  width: 92px;
+  height: 92px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+
 .event-when time {
   font-family: var(--font-display);
   font-size: 15px;
@@ -777,6 +796,17 @@ img {
   .event {
     grid-template-columns: 1fr;
     gap: 8px;
+  }
+
+  /* En una columna sigue siendo una miniatura: a ancho completo se recorta un cartel
+     cuadrado en una franja y se come la fila entera. */
+  .event-with-poster {
+    grid-template-columns: 1fr;
+  }
+
+  .event-poster img {
+    width: 84px;
+    height: 84px;
   }
 
   .event-action {

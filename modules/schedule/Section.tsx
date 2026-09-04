@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { splitEvents, type Tone } from 'sitewright-core'
-import ScheduleRow, { type ScheduleItem } from './Row'
+import ScheduleRow, { conCartel, type ScheduleItem } from './Row'
 
 /**
  * What is coming, on the home page.
@@ -41,7 +41,7 @@ export default function ScheduleSection({
         </div>
 
         {upcoming.length ? (
-          <div className="events">
+          <div className={`events ${conCartel(upcoming) ? 'events-with-posters' : ''}`}>
             {upcoming.slice(0, limit).map((item) => (
               <ScheduleRow key={item.id} event={item} />
             ))}

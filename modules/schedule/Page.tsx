@@ -4,7 +4,7 @@ import React from 'react'
 
 import InnerPage from '@/app/(frontend)/components/InnerPage'
 import JsonLd from '@/app/(frontend)/components/JsonLd'
-import ScheduleRow from '@/modules/schedule/Row'
+import ScheduleRow, { conCartel } from '@/modules/schedule/Row'
 import { scheduleNodes } from '@/modules/schedule/jsonld'
 import { buildHomeJsonLd } from '@/lib/jsonLd'
 import { groupByYear, splitEvents } from 'sitewright-core'
@@ -23,7 +23,7 @@ export default function SchedulePage({ items, settings, now, title, route }: Mod
           <div className="container">
             <h2 className="sub">Próximas</h2>
             {upcoming.length ? (
-              <div className="events">
+              <div className={`events ${conCartel(upcoming) ? 'events-with-posters' : ''}`}>
                 {upcoming.map((item) => (
                   <ScheduleRow key={item.id} event={item} />
                 ))}
@@ -41,7 +41,7 @@ export default function SchedulePage({ items, settings, now, title, route }: Mod
               {archive.map(({ year, events }) => (
                 <div key={year} className="archive-year">
                   <h3>{year}</h3>
-                  <div className="events">
+                  <div className={`events ${conCartel(events) ? 'events-with-posters' : ''}`}>
                     {events.map((item) => (
                       <ScheduleRow key={item.id} event={item} past />
                     ))}
