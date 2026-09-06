@@ -30,6 +30,9 @@ export const site = {
   nav: [] as { href: string; label: string }[],
 
   /** The one loud action, when the site has one. */
+  /** A quién escribe la clienta si algo no cuadra. Sale del blueprint; puede no haberlo. */
+  support: null as { name?: string; email?: string } | null,
+
   cta: null as { href: string; label: string } | null,
 } as const
 

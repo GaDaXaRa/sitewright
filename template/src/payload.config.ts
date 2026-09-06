@@ -45,6 +45,18 @@ export default buildConfig({
     user: Users.slug,
     importMap: { baseDir: path.resolve(dirname) },
     meta: { titleSuffix: `— ${site.name}` },
+    components: {
+      // La guía de la clienta, dentro de su propio panel: un documento aparte se queda
+      // viejo el día que cambia algo y nadie vuelve a abrirlo.
+      views: {
+        guia: {
+          Component: '@/components/admin/Guia#default',
+          path: '/guia',
+          meta: { title: 'Cómo se maneja esto' },
+        },
+      },
+      afterNavLinks: ['@/components/admin/GuiaLink#default'],
+    },
   },
   // Cada módulo aporta la suya desde el manifiesto.
   collections: [Users, Media, ...moduleCollections(modules)],

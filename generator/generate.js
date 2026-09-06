@@ -73,6 +73,8 @@ ${routes.join('\n')}
 ${nav.join('\n')}
   ] as { href: string; label: string }[],
 
+  support: ${bp.support ? JSON.stringify(bp.support) : 'null'} as { name?: string; email?: string } | null,
+
   cta: ${cta ? `{ href: '${cta.href}', label: '${cta.label}' }` : 'null'} as { href: string; label: string } | null,
 } as const
 

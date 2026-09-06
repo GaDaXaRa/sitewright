@@ -3,6 +3,13 @@
 Qué gana una web al actualizar. Escrito para quien tiene que decidir si le compensa, no
 para quien escribió el código.
 
+## 0.11.0 — 4 de septiembre de 2026
+
+- **La guía de la clienta, dentro de su panel.** Explica su web con los nombres que ella le
+  puso —«Bolos», no «agenda»—, y vive donde trabaja en vez de en un documento que se queda
+  viejo el día que cambia algo. Cubre publicar, las fotos y sus tres ediciones, la portada
+  y el banner de cookies; los datos legales se quedan fuera a propósito.
+
 ## 0.10.0 — 4 de septiembre de 2026
 
 - **Puerta nueva: que el título de la portada se lea sobre la foto.** Era el hueco que
