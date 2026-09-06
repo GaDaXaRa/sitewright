@@ -173,3 +173,63 @@ export function checkWeight(pages: Fetched[], maxBytes = 250_000): Finding[] {
         )
   })
 }
+
+// ── portada ─────────────────────────────────────────────────────────────────────────────
+
+const GATE_HERO = 'portada'
+
+/**
+ * Que el título de la portada se lea encima de la foto.
+ *
+ * Es el hueco que dejaba la puerta de contraste: mide pares de la paleta, y «texto sobre
+ * foto» no es un par de tokens —depende de una imagen que alguien sube después—. Sin
+ * descargar la foto sí se puede juzgar el caso que de verdad rompió una web: quitar el
+ * velo y dejar un texto del mismo color que el fondo del sitio. El título existe, está en
+ * el código, y no se ve.
+ */
+export function checkHeroLegibility(home: Fetched, css: string): Finding[] {
+  const title = 'El título de la portada se lee sobre la foto'
+  const hero = home.body.match(/<header[^>]*class="([^"]*hero[^"]*)"/)?.[1]
+
+  if (!hero || !/\bhero-has-image\b/.test(hero)) {
+    return [skip(GATE_HERO, title, 'La portada no lleva foto de fondo.')]
+  }
+
+  const veil = hero.match(/\bshade-(full|text|none)\b/)?.[1] ?? 'full'
+  if (veil !== 'none') {
+    return [ok(GATE_HERO, title, veil === 'full' ? 'La foto se oscurece entera.' : 'Se oscurece detrás del texto.')]
+  }
+
+  const tokens = cssTokens(css)
+  const ground: string | undefined = tokens['ground']
+  const ink: string | undefined = /\bink-dark\b/.test(hero)
+    ? tokens['on-photo-alt']
+    : tokens['on-photo']
+
+  if (!ground || !ink) {
+    return [skip(GATE_HERO, title, 'No se pudo leer el color del texto en la hoja de estilos.')]
+  }
+
+  // Sin velo, lo único medible es el propio color del texto. Si además coincide con el
+  // fondo de la web, no hay foto que lo salve: es el fallo exacto que llegó a producción.
+  // Un color que no se entiende no se juzga: `contrastRatio` devuelve null y se pasa.
+  const ratio = contrastRatio(ink, ground)
+  if (ratio !== null && ratio < 1.5) {
+    return [
+      fail(
+        GATE_HERO,
+        title,
+        `Sin oscurecer la foto y con el texto en ${ink}, que es el color del fondo de la web. ` +
+          'Elige el otro color de texto, o vuelve a oscurecer la foto.',
+      ),
+    ]
+  }
+
+  return [
+    warn(
+      GATE_HERO,
+      title,
+      'La foto no se oscurece, así que la legibilidad depende de la imagen. Míralo antes de publicar.',
+    ),
+  ]
+}

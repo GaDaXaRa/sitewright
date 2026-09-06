@@ -3,6 +3,14 @@
 Qué gana una web al actualizar. Escrito para quien tiene que decidir si le compensa, no
 para quien escribió el código.
 
+## 0.10.0 — 4 de septiembre de 2026
+
+- **Puerta nueva: que el título de la portada se lea sobre la foto.** Era el hueco que
+  dejaba la de contraste, que compara pares de la paleta —y «texto sobre foto» depende de
+  una imagen que alguien sube después—. Falla cuando se quita el oscurecimiento y el texto
+  queda del mismo color que el fondo de la web, que es el fallo exacto que llegó a
+  producción; avisa cuando no hay velo y el color es otro, porque ahí depende de la foto.
+
 ## 0.9.0 — 4 de septiembre de 2026
 
 - **Dos ediciones más para las imágenes, desde el panel**: «Invertir colores» y «Quitar el

@@ -16,6 +16,7 @@ import {
   checkReachable,
   checkAdvertisedEmpty,
   checkCoreVersion,
+  checkHeroLegibility,
   checkWeight,
   internalLinks,
 } from './checks/index.js'
@@ -128,7 +129,9 @@ export async function runAudit(options: AuditOptions): Promise<Finding[]> {
 
   if (options.cssPath) {
     try {
-      findings.push(...checkContrast(readFileSync(options.cssPath, 'utf8'), options.contrastPairs))
+      const css = readFileSync(options.cssPath, 'utf8')
+      findings.push(...checkContrast(css, options.contrastPairs))
+      findings.push(...checkHeroLegibility(home, css))
     } catch (err) {
       findings.push(skip('contraste', 'Contraste de la paleta', `No se pudo leer el CSS: ${err}`))
     }

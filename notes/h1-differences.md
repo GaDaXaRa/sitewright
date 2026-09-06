@@ -969,3 +969,11 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
      `media` escondía al de `catalog`. Y el patrón no puede excluir el punto, porque un
      campo se usa precisamente así, `item.campo` — con el punto fuera, la prueba señalaba
      como huérfano algo que sí se usaba.
+
+
+134. **El contraste del texto sobre una foto no es un par de tokens.** La puerta de
+     contraste compara colores de la paleta, y la foto la sube alguien después, así que ese
+     par no existía para la auditoría. Sin descargar la imagen sí se puede juzgar el caso
+     que rompió una web: quitar el velo y dejar el texto del mismo color que el fondo del
+     sitio. Lo demás —sin velo y con otro color— es un aviso, porque ahí de verdad depende
+     de la foto y sólo lo puede decidir alguien mirándola.

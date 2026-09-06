@@ -2,6 +2,7 @@ import { arg } from '../src/audit/args.js'
 import { describe, it, expect } from 'vitest'
 import type { Fetched } from '../src/audit/types.js'
 import {
+  checkHeroLegibility,
   checkCanonicalAnswers,
   checkIdentity,
   checkSecurityHeaders,
@@ -459,5 +460,53 @@ describe('leer un argumento de la línea de órdenes', () => {
 
   it('no confunde una bandera con otra que empieza igual', () => {
     expect(arg([...base, '--url-canonica', 'no', '--url', 'sí'], 'url')).toBe('sí')
+  })
+})
+
+describe('el título de la portada se lee sobre la foto', () => {
+  const css = ':root { --ground: #faf6ef; --on-photo: #faf6ef; --on-photo-alt: #15120e; }'
+  const hero = (clases: string) =>
+    ({ status: 200, body: `<header class="hero ${clases}" id="inicio"></header>`, headers: {} }) as never
+
+  it('sin foto de fondo no hay nada que juzgar', () => {
+    const [f] = checkHeroLegibility(hero('text-left height-bottom shade-full ink-light'), css)
+    expect(f!.status).toBe('skip')
+  })
+
+  it('con la foto oscurecida entera, pasa', () => {
+    const [f] = checkHeroLegibility(hero('shade-full ink-light hero-has-image'), css)
+    expect(f!.status).toBe('ok')
+  })
+
+  it('oscurecida detrás del texto, también', () => {
+    const [f] = checkHeroLegibility(hero('shade-text ink-light hero-has-image'), css)
+    expect(f!.status).toBe('ok')
+  })
+
+  it('sin velo y con el texto del color del fondo, falla', () => {
+    // El fallo exacto que llegó a producción: el título existía y no se veía.
+    const [f] = checkHeroLegibility(hero('shade-none ink-light hero-has-image'), css)
+    expect(f!.status).toBe('fail')
+    expect(f!.detail).toContain('#faf6ef')
+  })
+
+  it('sin velo pero con el texto contrario, sólo avisa', () => {
+    const [f] = checkHeroLegibility(hero('shade-none ink-dark hero-has-image'), css)
+    expect(f!.status).toBe('warn')
+  })
+
+  it('sin clase de velo se supone la que oscurece entera, que es la de siempre', () => {
+    const [f] = checkHeroLegibility(hero('ink-light hero-has-image'), css)
+    expect(f!.status).toBe('ok')
+  })
+
+  it('si la hoja no dice los colores, no se afirma nada', () => {
+    const [f] = checkHeroLegibility(hero('shade-none ink-light hero-has-image'), ':root { }')
+    expect(f!.status).toBe('skip')
+  })
+
+  it('una portada sin cabecera tampoco se juzga', () => {
+    const [f] = checkHeroLegibility({ status: 200, body: '<main></main>', headers: {} } as never, css)
+    expect(f!.status).toBe('skip')
   })
 })
