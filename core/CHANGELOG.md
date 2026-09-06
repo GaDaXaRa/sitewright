@@ -3,12 +3,18 @@
 Qué gana una web al actualizar. Escrito para quien tiene que decidir si le compensa, no
 para quien escribió el código.
 
+## 0.12.0 — 4 de septiembre de 2026
+
+- **La guía de la clienta, dentro de su panel, y documenta el CMS entero.** Habla de su web
+  con los nombres que ella le puso —«Bolos», no «agenda»—, y vive donde trabaja en vez de
+  en un documento que se queda viejo el día que cambia algo. Ocho apartados y treinta y
+  siete campos explicados: cada colección, las fotos y sus tres ediciones, la portada, los
+  buscadores, el banner de cookies y **los datos legales**, incluido qué pasa si se
+  equivoca en ellos.
+
 ## 0.11.0 — 4 de septiembre de 2026
 
-- **La guía de la clienta, dentro de su panel.** Explica su web con los nombres que ella le
-  puso —«Bolos», no «agenda»—, y vive donde trabaja en vez de en un documento que se queda
-  viejo el día que cambia algo. Cubre publicar, las fotos y sus tres ediciones, la portada
-  y el banner de cookies; los datos legales se quedan fuera a propósito.
+- Primera versión de la guía, sin la parte legal.
 
 ## 0.10.0 — 4 de septiembre de 2026
 

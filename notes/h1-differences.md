@@ -977,3 +977,14 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
      que rompió una web: quitar el velo y dejar el texto del mismo color que el fondo del
      sitio. Lo demás —sin velo y con otro color— es un aviso, porque ahí de verdad depende
      de la foto y sólo lo puede decidir alguien mirándola.
+
+
+135. **La guía va dentro del panel, no en un documento aparte.** Un PDF se queda viejo el
+     día que cambia algo y nadie vuelve a abrirlo; la guía vive donde se trabaja y habla de
+     **su** web —dice «Bolos» si su sección se llama así—, leyendo el manifiesto. Cero
+     ficheros generados: es lo primero que paga la arquitectura nueva.
+
+136. **Esconder lo peligroso no lo hace más seguro.** La primera versión dejaba fuera los
+     datos legales, con un «no toques esto». Documentarlos es mejor: un dato legal
+     equivocado **no da error** —la web sigue funcionando y las páginas legales siguen ahí
+     diciendo algo que no es cierto—, así que lo único que protege es entender qué son.
