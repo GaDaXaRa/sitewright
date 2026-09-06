@@ -955,3 +955,17 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
 131. **La dirección tampoco se pintaba.** Mismo caso que el cartel: el campo existía en el
      panel y ningún componente lo usaba. Al revisar un módulo conviene comprobar la lista
      de campos contra lo que se pinta, porque nada avisa de un campo huérfano.
+
+
+132. **Un campo del panel que nadie pinta es una promesa que la web no cumple.** Van tres:
+     el cartel de un evento, su dirección, y una casilla que dice «Destacado en la portada»
+     y no la leía nadie. Ninguna falla nada —el campo existe, se guarda, y la web sigue sin
+     usarlo— así que sólo se descubre cuando un cliente sube algo y no lo ve. Ahora hay una
+     prueba, y la casilla hace lo que promete: lo destacado va primero cuando la portada
+     sólo enseña unos pocos.
+
+133. **La prueba hay que hacerla en el módulo propio.** Buscar en todos a la vez dejaba que
+     el uso de uno tapara el huérfano de otro: `featured` existe en dos módulos y el de
+     `media` escondía al de `catalog`. Y el patrón no puede excluir el punto, porque un
+     campo se usa precisamente así, `item.campo` — con el punto fuera, la prueba señalaba
+     como huérfano algo que sí se usaba.

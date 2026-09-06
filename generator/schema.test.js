@@ -164,3 +164,44 @@ test('cada clase que define un módulo la usa su componente', async () => {
     }
   }
 })
+
+test('un campo del panel que nadie pinta es una promesa que la web no cumple', async () => {
+  // Ha pasado tres veces: el cartel de un evento, su dirección y «Destacado en la portada».
+  // Ninguna falla nada — el campo existe, se guarda, y la web sigue sin usarlo — así que
+  // sólo se descubre cuando un cliente sube algo y no lo ve.
+  const { readdirSync, readFileSync, existsSync } = await import('node:fs')
+  const raiz = new URL('../modules/', import.meta.url)
+
+  // Los que ordenan o filtran, y no se pintan.
+  const ESTRUCTURALES = new Set(['order', 'active', 'slug'])
+  // El formulario guarda lo que llega de fuera: nada de eso sale en la web, a propósito.
+  const SOLO_PANEL = new Set(['contact'])
+  // Y los contados casos que lee otro módulo: el precio se enlaza desde el catálogo.
+  const LOS_LEE_OTRO = new Set(['pricing.belongsTo'])
+
+  for (const { name: id } of readdirSync(raiz, { withFileTypes: true }).filter((d) => d.isDirectory())) {
+    if (SOLO_PANEL.has(id)) continue
+    const coleccion = new URL(`${id}/collection.ts`, raiz)
+    if (!existsSync(coleccion)) continue
+
+    // Se busca **en su propio módulo**: mirar en todos deja que el uso de uno tape el
+    // huérfano de otro, y `featured` existe en dos módulos distintos.
+    const suyo = readdirSync(new URL(`${id}/`, raiz))
+      .filter((f) => /\.(ts|tsx|js)$/.test(f) && f !== 'collection.ts')
+      .map((f) => readFileSync(new URL(`${id}/${f}`, raiz), 'utf8'))
+      .join(' ')
+
+    const campos = [...readFileSync(coleccion, 'utf8').matchAll(/name: '([a-zA-Z][a-zA-Z0-9]*)'/g)]
+      .map((m) => m[1])
+      .filter((campo) => !ESTRUCTURALES.has(campo) && !LOS_LEE_OTRO.has(`${id}.${campo}`))
+
+    for (const campo of new Set(campos)) {
+      assert.match(
+        suyo,
+        // Sin excluir el punto: un campo se usa precisamente así, `item.campo`.
+        new RegExp(`(?<![\\w])${campo}(?![\\w])`),
+        `modules/${id}: el panel pide "${campo}" y ningún componente lo usa`,
+      )
+    }
+  }
+})

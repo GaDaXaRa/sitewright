@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { mediaAlt, mediaUrl, type Tone } from 'sitewright-core'
 
 export type Item = {
+  /** «Destacado en la portada»: sale primero cuando la portada sólo muestra unos pocos. */
+  featured?: boolean | null
   id: number | string
   title: string
   slug?: string | null
@@ -35,7 +37,12 @@ export default function CatalogSection({
   moreLabel?: string
 }) {
   if (!items.length) return null
-  const shown = limit ? items.slice(0, limit) : items
+
+  // La casilla del panel dice «Destacado en la portada», así que lo destacado va delante
+  // cuando la portada sólo enseña unos pocos. En su propia página se ven todos y el orden
+  // que decidió el cliente manda.
+  const ordered = limit ? [...items].sort((a, b) => Number(b.featured) - Number(a.featured)) : items
+  const shown = limit ? ordered.slice(0, limit) : ordered
 
   return (
     <section className={`section ${tone ? `tone-${tone}` : ''}`} id="catalogo">
