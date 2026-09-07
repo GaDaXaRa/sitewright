@@ -45,8 +45,12 @@ el comando que las comprueba: si no hay comando, no hay regla, hay buena intenci
    snapshot de las migraciones —Payload lo hace sin conectarse a nada, igual que su
    `migrate:create`—: caza el campo añadido sin `migrate:create`, que no rompe el
    despliegue y revienta el panel más tarde. Lo corre la CI de cada web en cada push.
-   El otro escalón, la base contra las migraciones, lo mira la auditoría, y **hoy se
-   salta por no tener `DATABASE_URL`**: es el «1 sin comprobar» de todas las auditorías.
+   El otro escalón, la base contra las migraciones, lo mira la auditoría de despliegue con
+   un rol que sólo puede leer `payload_migrations` (`npm run audit-role -- --project <id>
+   --repo <owner/repo>`, que también sirve para rotar la contraseña, porque no se guarda en
+   ninguna parte). Ese rol va en el secreto `AUDIT_DATABASE_URL` del repositorio de la web,
+   y `audit.yml` instala `pg` junto al núcleo: sin él la puerta se salta, porque la
+   auditoría corre sobre el repositorio pelado.
    Y migrar en producción después de haber usado el modo desarrollo requiere arreglar
    antes la marca `batch = -1` que deja el empuje automático de esquema; si no,
    `payload migrate` se planta.
@@ -67,6 +71,7 @@ No es descuido: estas devuelven algo que parece una respuesta y no lo es.
 | `~/.zshrc` con la variable repetida | Vale la primera | Vale **la última**. `zsh -lc 'echo $NPM_TOKEN' \| head -c 8`. |
 | `next build` | Compila de cero | Reutiliza caché y puede ocultar errores de tipos. `npm run typecheck`. |
 | Stryker | Marca supervivientes | Los mutantes estáticos salen como supervivientes sin serlo (`ignoreStatic`). |
+| `neonctl roles create` | Crea un rol nuevo y limitado | Nace dentro de `neon_superuser`, y el dueño de la base **no puede sacarlo** («permission denied to revoke role»). Un rol de verdad limitado se crea con SQL: `npm run audit-role`. |
 | Un guion que termina con éxito | Ha hecho su trabajo | `core:sync` borraba `node_modules/@sitewright`, nombre muerto desde el renombrado: terminaba bien sin hacer nada. Y `sync-core` decía «verificado» comparando sólo `dist/index.js`, que tres versiones seguidas dejaron idéntico. Comprueba el efecto, y que lo comprobado sea lo que cambió. |
 
 ## La CI

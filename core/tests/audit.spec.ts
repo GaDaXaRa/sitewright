@@ -23,7 +23,7 @@ import {
   checkAdminPrivate,
   cssTokens,
 } from '../src/audit/checks/index.js'
-import { checkPooled } from '../src/audit/migrations.js'
+import { checkPooled, describeDbError } from '../src/audit/migrations.js'
 import { contrastRatio } from '../src/lib/color.js'
 import { exitCode, renderReport } from '../src/audit/report.js'
 
@@ -557,5 +557,40 @@ describe('la conexión con la que se miran las migraciones', () => {
 
     const [agrupada] = checkPooled('postgres://u:p@ep-uno-pooler.eu-central-1.aws.neon.tech/neondb')
     expect(agrupada!.status).toBe('ok')
+  })
+})
+
+describe('por qué no se pudo consultar la base', () => {
+  it('desenvuelve el AggregateError, que a solas no dice nada', () => {
+    // Es lo que lanza `pg` al no poder conectarse: un intento por cada dirección que
+    // resuelve el nombre. Su toString() es «AggregateError», y así quedaba en el informe.
+    const err = new AggregateError(
+      [Object.assign(new Error('connect ECONNREFUSED'), { code: 'ECONNREFUSED' })],
+      'AggregateError',
+    )
+    expect(describeDbError(err)).toBe('nadie contesta en ese puerto')
+  })
+
+  it('un nombre que no resuelve se dice con palabras', () => {
+    const err = new AggregateError([Object.assign(new Error('getaddrinfo'), { code: 'ENOTFOUND' })], '')
+    expect(describeDbError(err)).toBe('no se encuentra ese servidor')
+  })
+
+  it('los motivos repetidos no se repiten', () => {
+    const uno = () => Object.assign(new Error('igual'), { code: 'OTRO' })
+    expect(describeDbError(new AggregateError([uno(), uno()], ''))).toBe('igual')
+  })
+
+  it('varios motivos distintos se cuentan todos', () => {
+    const err = new AggregateError([new Error('uno'), new Error('dos')], '')
+    expect(describeDbError(err)).toBe('uno; dos')
+  })
+
+  it('un error normal conserva su mensaje', () => {
+    expect(describeDbError(new Error('la contraseña no vale'))).toBe('la contraseña no vale')
+  })
+
+  it('algo que no es un error tampoco se queda en blanco', () => {
+    expect(describeDbError('')).toBe('sin motivo')
   })
 })

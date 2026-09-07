@@ -3,6 +3,13 @@
 Qué gana una web al actualizar. Escrito para quien tiene que decidir si le compensa, no
 para quien escribió el código.
 
+## 0.12.5 — 7 de septiembre de 2026
+
+- Cuando la base no contesta, la auditoría dice por qué. Antes escribía «No se pudo
+  consultar la base: AggregateError», que es lo que `pg` lanza al no poder conectarse y no
+  informa de nada: ahora nombra el motivo —no resuelve el servidor, nadie contesta en ese
+  puerto, la contraseña no vale—.
+
 ## 0.12.4 — 7 de septiembre de 2026
 
 - **La puerta del esquema puede mirar producción sin que la de la conexión mienta.** Antes

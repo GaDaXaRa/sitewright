@@ -47,6 +47,35 @@ export function checkPooled(databaseUrl?: string): Finding[] {
   ]
 }
 
+/**
+ * Qué decirle a una persona cuando la base no contesta.
+ *
+ * `pg` lanza un `AggregateError` cuando falla al conectarse —un intento por cada dirección
+ * que resuelve el nombre—, y su `toString()` es literalmente «AggregateError»: un mensaje
+ * que no dice nada de lo que ha pasado. Los motivos están dentro, y son los de siempre:
+ * el nombre no resuelve, nadie escucha en ese puerto, o la contraseña no vale.
+ */
+export function describeDbError(err: unknown): string {
+  const causes =
+    err instanceof AggregateError && err.errors?.length
+      ? err.errors
+      : [err]
+
+  const seen = new Set<string>()
+  for (const cause of causes) {
+    const reason = cause as { message?: string; code?: string }
+    const text =
+      reason?.code === 'ENOTFOUND'
+        ? 'no se encuentra ese servidor'
+        : reason?.code === 'ECONNREFUSED'
+          ? 'nadie contesta en ese puerto'
+          : (reason?.message ?? String(cause))
+    if (text) seen.add(text)
+  }
+
+  return [...seen].join('; ') || 'sin motivo'
+}
+
 export async function checkMigrations({
   databaseUrl,
   migrationsDir,
@@ -121,7 +150,7 @@ export async function checkMigrations({
         ),
       ]
     }
-    return [fail(GATE, 'Migraciones al día', `No se pudo consultar la base: ${err}`)]
+    return [fail(GATE, 'Migraciones al día', `No se pudo consultar la base: ${describeDbError(err)}`)]
   } finally {
     await client.end().catch(() => {})
   }
