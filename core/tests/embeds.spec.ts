@@ -83,6 +83,10 @@ describe('parseEmbed', () => {
     expect(parseEmbed('https://bandcamp.com/subsuelo/album/x')).toBeNull()
   })
 
+  it('refuses somebody else\'s /EmbeddedPlayer path: the host is what makes it Bandcamp', () => {
+    expect(parseEmbed('https://example.com/EmbeddedPlayer/album=123')).toBeNull()
+  })
+
   it('refuses a youtube address with no video in it', () => {
     expect(parseEmbed('https://www.youtube.com/@subsuelo')).toBeNull()
     expect(parseEmbed('https://youtu.be/')).toBeNull()

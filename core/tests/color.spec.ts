@@ -21,11 +21,16 @@ describe('contrastRatio', () => {
     // Ni con algo que empieza por seis dígitos válidos y sigue: un color de ocho no es
     // este color, y aceptarlo a medias sería medir otra cosa.
     expect(contrastRatio('#ffffffff', '#000000')).toBeNull()
+    // Y da igual cuál de los dos sea: con el fondo inválido la medida tampoco existe.
+    expect(contrastRatio('#000000', 'verde')).toBeNull()
   })
 
   it('entiende la forma corta de tres dígitos', () => {
     expect(contrastRatio('#fff', '#000')!).toBeCloseTo(21, 1)
     expect(contrastRatio('#fff', '#000000')).toBe(contrastRatio('#ffffff', '#000000'))
+    // Con tres dígitos iguales, doblar cada uno y repetir la terna dan lo mismo, así que
+    // hace falta uno con los tres distintos: `#abc` es `#aabbcc`, no `#abcabc`.
+    expect(contrastRatio('#abc', '#ffffff')).toBe(contrastRatio('#aabbcc', '#ffffff'))
   })
 
   it('mide bien los tonos muy oscuros, que van por otra rama de la fórmula', () => {
