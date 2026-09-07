@@ -3,7 +3,7 @@
 Qué gana una web al actualizar. Escrito para quien tiene que decidir si le compensa, no
 para quien escribió el código.
 
-## Sin publicar
+## 0.13.0 — 7 de septiembre de 2026
 
 - **Una entrada menos en la auditoría: se va `--migrations-db` (y `AUDIT_DATABASE_URL`).**
   Servía para mirar la base de producción con un rol de sólo lectura después de cada
