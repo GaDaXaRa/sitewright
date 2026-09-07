@@ -28,3 +28,6 @@ template/node_modules/
 template/.next/
 template/src/payload-types.ts
 .verify/
+
+# La vista previa de la guía, que se regenera con npm run preview:guide
+.preview/

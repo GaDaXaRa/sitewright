@@ -3,6 +3,14 @@
 Qué gana una web al actualizar. Escrito para quien tiene que decidir si le compensa, no
 para quien escribió el código.
 
+## 0.12.1 — 7 de septiembre de 2026
+
+- **La guía se lee mejor.** La plantilla del panel no pone relleno vertical a una vista
+  propia, así que el título salía pegado al borde de arriba y el texto ocupaba toda la
+  pantalla de ancho. Ahora tiene márgenes, ancho de lectura, índice en tarjeta y los
+  campos en forma de tabla de referencia, que es como se consultan: buscando uno, no
+  leyendo de corrido. Con `npm run preview:guide` se ve sin levantar el panel.
+
 ## 0.12.0 — 4 de septiembre de 2026
 
 - **La guía de la clienta, dentro de su panel, y documenta el CMS entero.** Habla de su web

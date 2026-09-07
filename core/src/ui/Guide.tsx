@@ -111,26 +111,75 @@ const MODULES: Record<string, { what: string; fields: [string, string][] }> = {
 }
 
 const STYLE = `
-.sw-guide { max-width: 60rem; padding: 0 0 5rem; line-height: 1.6; }
-.sw-guide h1 { margin: 0 0 .35rem; }
-.sw-guide .sw-lede { color: var(--theme-elevation-600); margin: 0 0 2rem; font-size: 1.05rem; }
+/* La vista de una guía no es la de un documento de Payload: la plantilla no pone relleno
+   vertical ninguno, así que el título acaba pegado al borde de arriba. Y el ancho se
+   limita por legibilidad —una línea de 100 caracteres no se lee—, no por capricho. */
+.sw-guide {
+  container-type: inline-size;
+  max-width: calc(46rem + var(--gutter-h) * 2);
+  padding: calc(var(--base) * 1.75) var(--gutter-h) var(--spacing-view-bottom);
+  font-size: 1.05rem;
+  line-height: 1.65;
+}
+.sw-guide h1 { margin: 0 0 .4rem; font-size: 2rem; letter-spacing: -.02em; }
+.sw-guide .sw-lede {
+  margin: 0 0 calc(var(--base) * 1.4); max-width: 36rem;
+  color: var(--theme-elevation-600); font-size: 1.15rem; line-height: 1.5;
+}
 .sw-guide h2 {
-  margin: 3rem 0 .5rem; font-size: 1.2rem;
-  padding-top: 1rem; border-top: 1px solid var(--theme-elevation-100);
+  margin: calc(var(--base) * 2.2) 0 calc(var(--base) * .5);
+  padding-top: calc(var(--base) * 1.1);
+  border-top: 1px solid var(--theme-elevation-150);
+  font-size: 1.45rem; letter-spacing: -.01em;
 }
-.sw-guide h3 { margin: 1.5rem 0 .35rem; font-size: 1rem; }
+.sw-guide h3 {
+  margin: calc(var(--base) * 1.3) 0 .3rem;
+  font-size: 1.15rem; color: var(--theme-elevation-800);
+}
+/* El enlace del índice deja el destino bajo la cabecera fija si no se reserva sitio. */
+.sw-guide h2, .sw-guide h3 { scroll-margin-top: calc(var(--app-header-height) + var(--base)); }
 .sw-guide p { margin: 0 0 .75rem; }
-.sw-guide ul { margin: 0 0 .75rem; padding-left: 1.15rem; }
-.sw-guide li { margin-bottom: .35rem; }
-.sw-guide dl { margin: 0 0 1rem; }
-.sw-guide dt { font-weight: 600; margin-top: .6rem; }
-.sw-guide dd { margin: 0; color: var(--theme-elevation-700); }
-.sw-guide .sw-note {
-  border-left: 3px solid var(--theme-elevation-300); padding: .6rem 0 .6rem 1rem;
-  margin: 1rem 0; color: var(--theme-elevation-700);
+.sw-guide a { color: inherit; text-underline-offset: 2px; text-decoration-color: var(--theme-elevation-300); }
+.sw-guide a:hover { text-decoration-color: currentColor; }
+.sw-guide ul { margin: 0 0 .9rem; padding-left: 1.15rem; }
+.sw-guide li { margin-bottom: .4rem; }
+
+/* El índice: una tarjeta, no una lista de la compra. */
+.sw-guide .sw-toc {
+  columns: 2; gap: calc(var(--base) * 1.5);
+  margin: 0 0 calc(var(--base) * 1.5);
+  padding: calc(var(--base) * .7) calc(var(--base) * .9);
+  list-style: none;
+  background: var(--theme-elevation-50);
+  border: 1px solid var(--theme-elevation-100);
+  border-radius: var(--style-radius-m);
 }
-.sw-guide .sw-toc { columns: 2; gap: 2rem; margin-bottom: 1rem; }
-@media (max-width: 640px) { .sw-guide .sw-toc { columns: 1; } }
+.sw-guide .sw-toc li { margin: 0; break-inside: avoid; }
+.sw-guide .sw-toc a { display: block; padding: .3rem 0; text-decoration: none; }
+.sw-guide .sw-toc a:hover { text-decoration: underline; }
+
+/* Los campos, como una tabla de referencia: se leen buscando uno, no de corrido. */
+.sw-guide dl { margin: .6rem 0 calc(var(--base) * 1); }
+.sw-guide dt { font-weight: 600; margin-top: .7rem; }
+.sw-guide dd { margin: 0; color: var(--theme-elevation-650); }
+@container (min-width: 38rem) {
+  .sw-guide dl { display: grid; grid-template-columns: 13rem 1fr; column-gap: calc(var(--base) * 1); }
+  .sw-guide dt, .sw-guide dd { padding: .5rem 0; border-top: 1px solid var(--theme-elevation-100); }
+  .sw-guide dt { margin-top: 0; }
+  .sw-guide dt:first-of-type, .sw-guide dt:first-of-type + dd { border-top: 0; padding-top: 0; }
+}
+
+.sw-guide .sw-note {
+  margin: calc(var(--base) * 1) 0;
+  padding: calc(var(--base) * .7) calc(var(--base) * .9);
+  background: var(--theme-elevation-50);
+  border-left: 3px solid var(--theme-elevation-250);
+  border-radius: 0 var(--style-radius-m) var(--style-radius-m) 0;
+  color: var(--theme-elevation-750);
+}
+.sw-guide .sw-note p:last-child { margin-bottom: 0; }
+
+@container (max-width: 26rem) { .sw-guide .sw-toc { columns: 1; } }
 `
 
 export const Guide: React.FC<GuideProps> = ({ siteName, sections, support }) => {
@@ -138,7 +187,7 @@ export const Guide: React.FC<GuideProps> = ({ siteName, sections, support }) => 
   const named = (s: GuideSection) => s.plural ?? s.title
 
   return (
-    <div className="sw-guide gutter--left gutter--right">
+    <div className="sw-guide">
       <style dangerouslySetInnerHTML={{ __html: STYLE }} />
 
       <h1>Cómo se maneja {siteName}</h1>
