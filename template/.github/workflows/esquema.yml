@@ -24,7 +24,11 @@ jobs:
       - run: npm ci
       - name: Tipos
         run: npm run typecheck
-      # Sin DATABASE_URL a propósito: Payload compara el esquema del código con el último
-      # snapshot de las migraciones, y para eso no hace falta conectarse a ninguna base.
       - name: Esquema
         run: npm run schema:check
+        env:
+          # Payload exige estos dos para arrancar, pero **no se conecta**: el guion pide
+          # `disableDBConnect`, igual que hace su propio `migrate:create`. La dirección es
+          # deliberadamente falsa, para que se note si algún día alguien intenta usarla.
+          PAYLOAD_SECRET: ci
+          DATABASE_URL: postgres://localhost:5432/ninguna

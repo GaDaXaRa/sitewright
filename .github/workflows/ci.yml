@@ -71,7 +71,7 @@ jobs:
       # de Payload que cambió de sitio.
       - run: npm run schema:check
         env:
-          DATABASE_URI: postgres://localhost:5432/ninguna
+          DATABASE_URL: postgres://localhost:5432/ninguna
           PAYLOAD_SECRET: ci
       - run: npm run test:int
 
