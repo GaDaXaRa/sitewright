@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
-import { dirname, join, relative, resolve } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { sectionOrder, validateBlueprint, validateWiring } from './schema.js'
 import { MODULE_SKIP, TEMPLATE_SKIP } from './generated.js'
@@ -26,6 +26,45 @@ const arg = (name) => {
 // Boolean flags carry no value, so `arg('force')` reads whatever comes next — or undefined
 // when the flag is last, which is exactly how `--force` did nothing at all.
 const flag = (name) => process.argv.includes(`--${name}`)
+
+/** El directorio a medio escribir, para no dejarlo ahí cuando algo falla. */
+let started = null
+
+/**
+ * Parar del todo.
+ *
+ * Media web generada es peor que ninguna: parece un sitio y no lo es, y quien la abra
+ * depurará un problema que no existe. Se borra lo escrito y se dice por qué.
+ */
+function abort(why) {
+  if (started) rmSync(started, { recursive: true, force: true })
+  console.error(`\nNo se ha generado nada: ${why}\n`)
+  process.exit(1)
+}
+
+/**
+ * Un reemplazo sobre la plantilla que **tiene** que ocurrir.
+ *
+ * `String.replace` devuelve el texto intacto cuando el patrón no casa, así que reindentar
+ * un fichero de la plantilla bastaba para que saliera un sitio aparentemente bien generado
+ * al que le faltaba media configuración. El caso peor no era la paleta: era el `hasEmbeds`
+ * del consentimiento, que se pone buscando tres líneas con su sangría exacta —sin él los
+ * reproductores dejan de pedir permiso y nadie se entera hasta que lo mira una autoridad—.
+ *
+ * Aquí se para y se dice cuál falló, que es la regla de la casa: un guion que termina bien
+ * tiene que haber hecho su trabajo.
+ */
+function replaceOrDie(text, pattern, replacement, what) {
+  const matches = typeof pattern === 'string' ? text.includes(pattern) : pattern.test(text)
+  if (!matches) {
+    abort(
+      `la plantilla ha cambiado y el generador ya no sabe escribir ${what}.\n` +
+        `  No encuentra:  ${pattern}\n\n` +
+        '  Arregla el patrón en generator/generate.js, o deshaz el cambio en template/.',
+    )
+  }
+  return text.replace(pattern, replacement)
+}
 
 const capitalise = (text) => text.charAt(0).toUpperCase() + text.slice(1)
 const fontImport = (font) => (typeof font === 'string' ? font : font.family).replaceAll(' ', '_')
@@ -116,8 +155,9 @@ function siteModules(bp, modules, wirings) {
     if (w.llmsName) campos.push(`llms: ${w.llmsName}`)
     if (w.options) campos.push(`options: ${JSON.stringify(w.options(m, bp))}`)
     if (w.pagePath) campos.push(`Page: () => import('${w.pagePath}')`)
+    if (w.detailPath) campos.push(`Detail: () => import('${w.detailPath}')`)
     if (w.indexPage) campos.push('indexPage: true')
-    if (w.detailPage) campos.push('documentPages: true')
+    if (w.detailPath) campos.push('documentPages: true')
 
     entradas.push(`  {\n    ${campos.join(',\n    ')},\n  },`)
 
@@ -388,22 +428,6 @@ await seed()
 
 // ── module pages ────────────────────────────────────────────────────────────────────────
 
-function writeModulePages(target, bp, modules, wirings, write) {
-  const written = []
-  for (const w of wirings) {
-    // Las páginas índice ya no se escriben: cada módulo trae la suya y una sola ruta las
-    // sirve. Quedan las fichas, que necesitan su propio `generateStaticParams`.
-    for (const build of [w.detailPage]) {
-      if (!build) continue
-      const page = build(modules[w.id], bp)
-      mkdirSync(join(target, dirname(page.path)), { recursive: true })
-      write(page.path, page.source)
-      written.push(page.path)
-    }
-  }
-  return written
-}
-
 // ── CLAUDE.md ───────────────────────────────────────────────────────────────────────────
 
 /**
@@ -545,7 +569,12 @@ sin pedir permiso. Si el cambio sirve para cualquier web, va al repositorio de S
 /** La hoja firma de quién es: en el repositorio de un cliente, «Sistema de diseño» a secas
  * no dice nada, y el nombre de otra web dice algo falso. */
 function nameStylesheet(css, name) {
-  return css.replace(/^\/\* =+\n   Sistema de diseño$/m, (head) => head.replace('Sistema de diseño', `${name} — sistema de diseño`))
+  return replaceOrDie(
+    css,
+    /^\/\* =+\n   Sistema de diseño$/m,
+    (head) => head.replace('Sistema de diseño', `${name} — sistema de diseño`),
+    'el nombre en la cabecera de la hoja de estilos',
+  )
 }
 
 function applyPalette(css, design) {
@@ -580,17 +609,28 @@ function applyPalette(css, design) {
   map['accent-hover'] = button.hover
 
   const claro = design.scheme === 'light'
-  let out = css
-    .replace(/color-scheme:\s*\w+;/, `color-scheme: ${claro ? 'light' : 'dark'};`)
-    // Un logo monocromo oscuro se ve solo sobre fondo claro y hay que invertirlo sobre uno
-    // oscuro; un recuadro blanco desaparece con `multiply` sobre claro y con `screen`
-    // sobre oscuro, una vez invertido.
-    .replace(/--logo-invert:\s*[^;]+;/, `--logo-invert: ${claro ? 0 : 1};`)
-    .replace(/--logo-box-blend:\s*[^;]+;/, `--logo-box-blend: ${claro ? 'multiply' : 'screen'};`)
+  let out = replaceOrDie(
+    css,
+    /color-scheme:\s*\w+;/,
+    `color-scheme: ${claro ? 'light' : 'dark'};`,
+    'el esquema de color',
+  )
+  // Un logo monocromo oscuro se ve solo sobre fondo claro y hay que invertirlo sobre uno
+  // oscuro; un recuadro blanco desaparece con `multiply` sobre claro y con `screen`
+  // sobre oscuro, una vez invertido.
+  out = replaceOrDie(out, /--logo-invert:\s*[^;]+;/, `--logo-invert: ${claro ? 0 : 1};`, 'el tratamiento del logo')
+  out = replaceOrDie(
+    out,
+    /--logo-box-blend:\s*[^;]+;/,
+    `--logo-box-blend: ${claro ? 'multiply' : 'screen'};`,
+    'la mezcla del recuadro del logo',
+  )
   for (const [token, value] of Object.entries(map)) {
     // The hover can be a `color-mix(...)` rather than a hex, so the old value is matched up
     // to its semicolon instead of assuming six hex digits.
-    out = out.replace(new RegExp(`(--${token}:\\s*)[^;]+;`), `$1${value};`)
+    // Un token que la hoja ya no declara es una paleta a medio escribir: la web saldría con
+    // el color de la plantilla en ese sitio, que es el de otra web.
+    out = replaceOrDie(out, new RegExp(`(--${token}:\\s*)[^;]+;`), `$1${value};`, `el color --${token}`)
   }
   return out
 }
@@ -632,12 +672,18 @@ const body = ${body}({
   display: 'swap',
 })`
 
-  return layout
-    .replace(/import \{[^}]+\} from 'next\/font\/google'/, block)
-    .replace(
-      /\/\/ The blueprint picks[\s\S]*?const display = body/,
-      declarations,
-    )
+  const imported = replaceOrDie(
+    layout,
+    /import \{[^}]+\} from 'next\/font\/google'/,
+    block,
+    'la importación de las tipografías',
+  )
+  return replaceOrDie(
+    imported,
+    /\/\/ The blueprint picks[\s\S]*?const display = body/,
+    declarations,
+    'la declaración de las tipografías',
+  )
 }
 
 // ── main ────────────────────────────────────────────────────────────────────────────────
@@ -663,6 +709,7 @@ if (existsSync(target) && !flag('force')) {
 }
 rmSync(target, { recursive: true, force: true })
 mkdirSync(target, { recursive: true })
+started = target
 
 // 1. The chassis, minus what belongs to the generator's own machinery.
 cpSync(join(ROOT, 'template'), target, {
@@ -712,7 +759,6 @@ write('src/app/(frontend)/page.tsx', homePage(bp, modules, wirings, order))
 write('scripts/seed.ts', seedScript(bp, modules, wirings))
 write('CLAUDE.md', siteGuide(bp, modules))
 write('README.md', siteReadme(bp, modules))
-const pages = writeModulePages(target, bp, modules, wirings, write)
 write(
   'src/app/(frontend)/styles.css',
   nameStylesheet(
@@ -722,9 +768,11 @@ write(
 )
 write(
   'src/app/(frontend)/layout.tsx',
-  applyFonts(read('src/app/(frontend)/layout.tsx'), bp.design).replace(
+  replaceOrDie(
+    applyFonts(read('src/app/(frontend)/layout.tsx'), bp.design),
     '<ConsentProvider\n        storageKey={site.id}\n        cookiesHref={site.routes.cookies}',
     `<ConsentProvider\n        storageKey={site.id}${modules.media ? '\n        hasEmbeds' : ''}\n        cookiesHref={site.routes.cookies}`,
+    'el consentimiento de los reproductores incrustados',
   ),
 )
 
@@ -744,12 +792,19 @@ write(
 // The domain lived in three places and the one nobody wrote was the one that won at
 // runtime: `NEXT_PUBLIC_SITE_URL`. It gets written here too, from the same answer.
 {
-  let env = read('.env.example').replace(
+  let env = replaceOrDie(
+    read('.env.example'),
     /^EMAIL_FROM_NAME=.*$/m,
     `EMAIL_FROM_NAME=${bp.identity.name}`,
+    'el nombre del remitente de los correos',
   )
   if (bp.identity.url) {
-    env = env.replace(/^NEXT_PUBLIC_SITE_URL=.*$/m, `NEXT_PUBLIC_SITE_URL=${bp.identity.url}`)
+    env = replaceOrDie(
+      env,
+      /^NEXT_PUBLIC_SITE_URL=.*$/m,
+      `NEXT_PUBLIC_SITE_URL=${bp.identity.url}`,
+      'la dirección pública del sitio',
+    )
   }
   write('.env.example', env)
 }
@@ -766,7 +821,12 @@ const pkg = JSON.parse(read('package.json'))
 pkg.name = bp.identity.id
 pkg.description = `Web de ${bp.identity.name}`
 if (bp.identity.url) {
-  pkg.scripts.audit = pkg.scripts.audit.replace('http://localhost:3000', bp.identity.url)
+  pkg.scripts.audit = replaceOrDie(
+    pkg.scripts.audit,
+    'http://localhost:3000',
+    bp.identity.url,
+    'la dirección que audita npm run audit',
+  )
 }
 // The published package by default: a `file:` path does not survive a deploy, because only
 // the site's own repository gets uploaded. `--core file:…` still works for developing the
@@ -779,7 +839,7 @@ console.log(`
 Sitio generado en ${target}
 
   ${Object.keys(modules).length} módulos: ${Object.keys(modules).join(', ')}
-  ${pages.length} páginas propias: ${pages.map((p) => p.replace('src/app/(frontend)', '')).join(', ')}
+  ${wirings.filter((w) => w.pagePath).length} secciones con página propia y ${wirings.filter((w) => w.detailPath).length} con ficha, servidas por [seccion] y [seccion]/[slug]
   Paleta y tipografías aplicadas · rutas y etiquetas escritas en src/site.config.ts
 
 Lo que falta, y no lo hace el generador:

@@ -29,93 +29,10 @@ export const wiring = {
 
   pagePath: '@/modules/catalog/Page',
   indexPage: true,
-  detailPage: (m) => ({
-    path: `src/app/(frontend)${m.route}/[slug]/page.tsx`,
-    source: `import React from 'react'
-import Image from 'next/image'
-import { notFound } from 'next/navigation'
-import type { Metadata } from 'next'
-
-import InnerPage from '../../components/InnerPage'
-import { loadSiteContent } from '@/lib/data'
-import { mediaAlt, mediaUrl } from 'sitewright-core'
-
-export const revalidate = 300
-
-async function find(slug: string) {
-  const { catalog } = await loadSiteContent()
-  return catalog.find((item) => item.slug === slug) ?? null
-}
-
-export async function generateStaticParams() {
-  const { catalog } = await loadSiteContent()
-  return catalog.filter((item) => item.slug).map((item) => ({ slug: item.slug! }))
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}): Promise<Metadata> {
-  const { slug } = await params
-  const item = await find(slug)
-  if (!item) return {}
-
-  return {
-    title: item.title,
-    ...(item.summary ? { description: item.summary } : {}),
-    alternates: { canonical: \`${m.route}/\${slug}\` },
-  }
-}
-
-export default async function CatalogDetailPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}) {
-  const { slug } = await params
-  const item = await find(slug)
-  if (!item) notFound()
-
-  const { settings } = await loadSiteContent()
-  const image = mediaUrl(item.image)
-
-  return (
-    <InnerPage settings={settings} kicker="${m.labels.singular}" title={item.title} intro={item.summary ?? undefined}>
-      <section className="section">
-        <div className="container container-narrow">
-          {image ? (
-            <Image
-              src={image}
-              alt={mediaAlt(item.image) || ''}
-              width={1200}
-              height={800}
-              sizes="(max-width: 900px) 100vw, 760px"
-              priority
-            />
-          ) : null}
-
-          {(item.body ?? []).map((block, i) => (
-            <div key={i}>
-              {block.heading ? <h2>{block.heading}</h2> : null}
-              <p>{block.text}</p>
-            </div>
-          ))}
-
-          {item.highlights?.length ? (
-            <ul>
-              {item.highlights.map((point, i) => (
-                <li key={i}>{point.text}</li>
-              ))}
-            </ul>
-          ) : null}
-        </div>
-      </section>
-    </InnerPage>
-  )
-}
-`,
-  }),
+  detailPath: '@/modules/catalog/Detail',
+  // De qué es ficha, en la palabra del cliente: «Servicio», «Proyecto», «Sesión». Sale del
+  // blueprint, así que viaja como opción y no escrito en el componente.
+  options: (m) => ({ singular: m.labels.singular }),
 
   // Example content: structure, not copy. It exists so the site can be looked at before
   // anybody has written a word, and so the client sees what a filled-in field looks like.

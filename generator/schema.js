@@ -191,7 +191,7 @@ export const WIRING_KEYS = [
   'navCta',
   'pagePath',
   'indexPage',
-  'detailPage',
+  'detailPath',
   'seed',
 ]
 

@@ -68,6 +68,14 @@ export type SiteModule = {
    * primera hoja de estilos que encuentre.
    */
   Page?: () => Promise<{ default: ComponentType<ModulePageProps> }>
+  /**
+   * La ficha de uno de sus documentos, por el mismo camino que `Page`.
+   *
+   * Era JSX dentro de una cadena de texto en el cableado, y el generador escribía un
+   * fichero por módulo bajo su ruta: sin resaltado, sin tipos y sin comprobar hasta que
+   * alguien generaba una web. Ahora la sirve una sola ruta, `[seccion]/[slug]`.
+   */
+  Detail?: () => Promise<ModuleDetail>
   /** Si escribe una página índice —y por tanto puede anunciarse y enlazarse—. */
   indexPage?: boolean
   /** Si cada documento tiene página propia, bajo qué ruta. */
@@ -90,6 +98,33 @@ export type ModulePageProps = {
   title: string
   route: string
   options?: Record<string, unknown>
+}
+
+/**
+ * Lo que recibe la ficha de un documento.
+ *
+ * `item` va tipado como `never` por lo mismo que `items` arriba: deja que un componente
+ * que declara `item: Person` encaje en el registro sin perder su propio tipado dentro.
+ */
+export type ModuleDetailProps = {
+  item: never
+  settings: SiteSetting
+  now: number
+  /** La ruta de la sección, p.ej. `/equipo`. La ficha vive en `<route>/<slug>`. */
+  route: string
+  options?: Record<string, unknown>
+}
+
+/**
+ * El módulo de una ficha: su componente y, si lo tiene, cómo se titula.
+ *
+ * Sin `documentMeta` la ficha se serviría con el título de la plantilla, que es el nombre
+ * del sitio repetido en cada una: lo mismo que no tener título para un buscador. Es una
+ * función pura y pequeña, y vive junto al componente que sabe qué campos hay.
+ */
+export type ModuleDetail = {
+  default: ComponentType<ModuleDetailProps>
+  documentMeta?: (item: never, route: string) => { title: string; description?: string }
 }
 
 /** Los que guardan algo, que son los que Payload tiene que conocer. */
