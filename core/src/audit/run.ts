@@ -15,6 +15,7 @@ import {
   checkPlaceholders,
   checkReachable,
   checkAdvertisedEmpty,
+  checkAdminPrivate,
   checkCoreVersion,
   checkHeroLegibility,
   checkWeight,
@@ -46,6 +47,8 @@ export type AuditOptions = {
   contrastPairs?: [string, string][]
   databaseUrl?: string
   migrationsDir?: string
+  /** Dónde vive la guía del panel. Se comprueba que sin sesión no se sirva. */
+  adminGuidePath?: string
 }
 
 async function get(url: string, redirect: RequestRedirect = 'follow'): Promise<Fetched> {
@@ -68,11 +71,14 @@ export async function runAudit(options: AuditOptions): Promise<Finding[]> {
   const siteUrl = (options.siteUrl ?? base).replace(/\/$/, '')
   const legal = options.legalPages ?? ['/aviso-legal', '/privacidad', '/cookies']
 
-  const [home, sitemap, robots, llms] = await Promise.all([
+  const guidePath = options.adminGuidePath ?? '/admin/guia'
+
+  const [home, sitemap, robots, llms, guide] = await Promise.all([
     get(`${base}/`),
     get(`${base}/sitemap.xml`),
     get(`${base}/robots.txt`),
     get(`${base}/llms.txt`),
+    get(`${base}${guidePath}`),
   ])
 
   const legalPages = await Promise.all(legal.map((path) => get(`${base}${path}`)))
@@ -124,6 +130,7 @@ export async function runAudit(options: AuditOptions): Promise<Finding[]> {
     ...checkWeight(allPages),
     ...checkReachable(sitemapUrls, reachable),
     ...checkAdvertisedEmpty(sitemapUrls, bodies),
+    ...checkAdminPrivate(guide),
     ...(options.core ? checkCoreVersion(options.core) : []),
   ]
 

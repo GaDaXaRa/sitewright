@@ -48,6 +48,31 @@ export function checkSecurityHeaders(page: Fetched): Finding[] {
   })
 }
 
+/**
+ * La guía del panel no se sirve a quien no ha entrado.
+ *
+ * Payload pinta una vista propia sin mirar la sesión —sólo redirige cuando la ruta no
+ * existe—, así que la barrera la pone la componente y esto comprueba que sigue puesta.
+ * No es un dato de nadie lo que se escapaba, pero sí el mapa del panel, y una vista que
+ * hoy es texto mañana puede enseñar algo que no debe.
+ */
+export function checkAdminPrivate(guide: Fetched): Finding[] {
+  // Lo que sólo aparece si la guía se ha llegado a pintar.
+  const leaked = /class="sw-guide"|Cómo se maneja/.test(guide.body)
+
+  if (leaked) {
+    return [
+      fail(
+        GATE_SEC,
+        'La guía del panel pide sesión',
+        `${guide.url} se sirve entera sin haber entrado. La vista tiene que redirigir al login.`,
+      ),
+    ]
+  }
+
+  return [ok(GATE_SEC, 'La guía del panel pide sesión', `sin sesión acaba en ${guide.finalUrl}`)]
+}
+
 // ── legal y consentimiento ──────────────────────────────────────────────────────────────
 
 const GATE_LEGAL = 'legal'

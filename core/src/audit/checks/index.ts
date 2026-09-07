@@ -10,6 +10,11 @@
  */
 export { canonicalOf, checkIdentity, checkCanonicalAnswers, checkSitemapAndRobots, internalLinks, checkReachable, checkAdvertisedEmpty, isEmptyPage } from './indexing.js'
 export { jsonLdOf, graphOf, checkStructuredData, checkLlmsTxt } from './machines.js'
-export { checkSecurityHeaders, checkLegalPages, checkConsentGating } from './compliance.js'
+export {
+  checkSecurityHeaders,
+  checkLegalPages,
+  checkConsentGating,
+  checkAdminPrivate,
+} from './compliance.js'
 export { checkImages, checkPlaceholders, cssTokens, checkContrast, checkWeight, checkHeroLegibility } from './presentation.js'
 export { checkCoreVersion } from './maintenance.js'

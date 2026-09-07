@@ -3,6 +3,14 @@
 Qué gana una web al actualizar. Escrito para quien tiene que decidir si le compensa, no
 para quien escribió el código.
 
+## 0.12.2 — 7 de septiembre de 2026
+
+- **La guía del panel ya no se sirve sin haber entrado.** Payload pinta una vista propia
+  sin mirar la sesión —sólo redirige cuando la ruta no existe—, así que cualquiera que
+  pidiera `/admin/guia` recibía la documentación entera. Ahora lleva al login y vuelve a
+  la guía al entrar. No se escapaba ningún dato, pero sí el mapa del panel. La auditoría
+  lo comprueba en cada despliegue, para que no dependa de que alguien se acuerde.
+
 ## 0.12.1 — 7 de septiembre de 2026
 
 - **La guía se lee mejor.** La plantilla del panel no pone relleno vertical a una vista

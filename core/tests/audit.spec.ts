@@ -20,6 +20,7 @@ import {
   checkImages,
   checkLegalPages,
   checkLlmsTxt,
+  checkAdminPrivate,
   cssTokens,
 } from '../src/audit/checks/index.js'
 import { contrastRatio } from '../src/lib/color.js'
@@ -508,5 +509,33 @@ describe('el título de la portada se lee sobre la foto', () => {
   it('una portada sin cabecera tampoco se juzga', () => {
     const [f] = checkHeroLegibility({ status: 200, body: '<main></main>', headers: {} } as never, css)
     expect(f!.status).toBe('skip')
+  })
+})
+
+describe('la guía del panel sin haber entrado', () => {
+  it('si llega pintada, es un fallo', () => {
+    const [found] = checkAdminPrivate(
+      page({ url: `${SITE}/admin/guia`, body: '<div class="sw-guide"><h1>Cómo se maneja Ejemplo</h1>' }),
+    )
+    expect(found!.status).toBe('fail')
+    expect(found!.detail).toContain('/admin/guia')
+  })
+
+  it('el título solo también delata, aunque cambie el maquetado', () => {
+    const [found] = checkAdminPrivate(page({ body: '<h1>Cómo se maneja Ejemplo</h1>' }))
+    expect(found!.status).toBe('fail')
+  })
+
+  it('la pantalla de entrada es la respuesta correcta', () => {
+    const [found] = checkAdminPrivate(
+      page({ body: '<form action="/admin/login">', finalUrl: `${SITE}/admin/login?redirect=/admin/guia` }),
+    )
+    expect(found!.status).toBe('ok')
+    expect(found!.detail).toContain('/admin/login')
+  })
+
+  it('devuelve una sola comprobación, dé lo que dé', () => {
+    expect(checkAdminPrivate(page({ body: '' }))).toHaveLength(1)
+    expect(checkAdminPrivate(page({ body: 'class="sw-guide"' }))).toHaveLength(1)
   })
 })
