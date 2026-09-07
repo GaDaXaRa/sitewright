@@ -233,3 +233,32 @@ test('lo que el generador escribe por web está declarado como tal', async () =>
     )
   }
 })
+
+test('cada campo del blueprint lo lee alguien', async () => {
+  // `design.altExample` estuvo en el blueprint de una web real sin que nadie lo leyera: el
+  // panel seguía enseñando el ejemplo de la plantilla. Un campo que se rellena y no hace
+  // nada es peor que no tenerlo, porque quien lo rellena cree que ha configurado algo.
+  const source = (
+    await Promise.all(
+      ['./generate.js', './schema.js'].map((f) => readFile(new URL(f, import.meta.url), 'utf8')),
+    )
+  )
+    .join('\n')
+    // `bp.design?.sections` lee `design.sections`: el encadenamiento opcional no cambia
+    // quién lee qué, sólo qué pasa si falta.
+    .replaceAll('?.', '.')
+
+  for (const file of ['ejemplo-asociacion', 'ejemplo-portafolio']) {
+    const bp = JSON.parse(
+      await readFile(new URL(`./blueprints/${file}.json`, import.meta.url), 'utf8'),
+    )
+    for (const group of ['identity', 'design', 'legal']) {
+      for (const key of Object.keys(bp[group] ?? {})) {
+        assert.ok(
+          source.includes(`${group}.${key}`),
+          `${file}: nadie lee ${group}.${key}, así que rellenarlo no hace nada.`,
+        )
+      }
+    }
+  }
+})

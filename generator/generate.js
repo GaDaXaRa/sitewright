@@ -76,6 +76,9 @@ ${nav.join('\n')}
 
   support: ${bp.support ? JSON.stringify(bp.support) : 'null'} as { name?: string; email?: string } | null,
 
+  /** El ejemplo de texto alternativo que lee quien sube una foto, en sus propias palabras. */
+  altExample: '${bp.design.altExample ?? 'Una foto del equipo trabajando'}',
+
   cta: ${cta ? `{ href: '${cta.href}', label: '${cta.label}' }` : 'null'} as { href: string; label: string } | null,
 } as const
 

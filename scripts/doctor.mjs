@@ -7,7 +7,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { dirname, isAbsolute, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { changelogSections, diagnose, versionsAfter } from '../core/dist/index.js'
-import { driftSummary, siteDrift } from './lib/drift.mjs'
+import { driftSummary, siteDrift, writtenDrift } from './lib/drift.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -62,7 +62,24 @@ console.log(
 if (behind) {
   for (const { rel } of drift.differ) console.log(`      distinto  ${rel}`)
   for (const { rel } of drift.missing) console.log(`      falta     ${rel}`)
-  console.log(`\n  Para llevárselos:  npm run sync-site -- ${target} --apply`)
+  console.log(`      Para llevárselos:  npm run sync-site -- ${target} --apply`)
+}
+
+// Y los que el generador escribe para esta web: se regenera desde su blueprint y se mira
+// en qué difieren. Aquí no hay nada que copiar automáticamente, porque un fichero distinto
+// puede ser una corrección que falta o una decisión que alguien tomó a mano.
+const written = writtenDrift(root, site)
+if (!written.available) {
+  console.log(`  ${SYMBOL.warn} ${'Ficheros de esta web'.padEnd(30)} no se pueden comparar: ${written.why}`)
+} else {
+  const summary = written.differ.length
+    ? `${written.differ.length} de ${written.checked} no son lo que el generador escribiría hoy`
+    : `${written.checked} ficheros, iguales a lo que se generaría hoy`
+  console.log(`  ${written.differ.length ? SYMBOL.warn : SYMBOL.ok} ${'Ficheros de esta web'.padEnd(30)} ${summary}`)
+  for (const { rel } of written.differ) console.log(`      distinto  ${rel}`)
+  if (written.differ.length) {
+    console.log('      Míralos antes de tocar nada: puede ser una mejora que falta o algo hecho a mano.')
+  }
 }
 
 const pending = published ? versionsAfter(installed ?? (declared ?? '').replace(/^[^\d]*/, ''), published) : []

@@ -32,8 +32,10 @@ const IN_TESTS =
 const Users = usersCollection()
 const Media = mediaCollection({
   // The example is written in the client's own words by the generator: an abstract one
-  // ("una imagen del sitio") teaches nobody what a good alt text looks like.
-  altExample: 'Una foto del equipo trabajando',
+  // ("una imagen del sitio") teaches nobody what a good alt text looks like. It lives in
+  // site.config because this file is shared: a value written here would be the same in
+  // every site, which is how the blueprint's own `altExample` ended up read by nobody.
+  altExample: site.altExample,
   revalidation: mediaRevalidation,
 })
 

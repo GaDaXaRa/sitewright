@@ -33,6 +33,9 @@ export const site = {
   /** A quién escribe la clienta si algo no cuadra. Sale del blueprint; puede no haberlo. */
   support: null as { name?: string; email?: string } | null,
 
+  /** El ejemplo de texto alternativo que lee quien sube una foto, en sus propias palabras. */
+  altExample: 'Una foto del equipo trabajando',
+
   cta: null as { href: string; label: string } | null,
 } as const
 

@@ -9,9 +9,11 @@
  * Sólo mira ficheros que viajan iguales a todas las webs. Lo que el generador escribe a
  * partir del blueprint es de cada cliente y no se compara: ver `generator/generated.js`.
  */
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
+import { execFileSync } from 'node:child_process'
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join, relative } from 'node:path'
-import { MODULE_SKIP, TEMPLATE_SKIP, isShared } from '../../generator/generated.js'
+import { MODULE_SKIP, TEMPLATE_SKIP, WRITTEN, isShared } from '../../generator/generated.js'
 
 /** Los ficheros de un directorio, en rutas relativas y sin lo que no viaja. */
 function filesIn(dir, skip, prefix = '') {
@@ -70,6 +72,58 @@ export function siteDrift(root, site) {
 
   return { checked: pairs.length, modules: installed, differ, missing }
 }
+
+/**
+ * Lo que el generador escribiría hoy para esta web, comparado con lo que tiene.
+ *
+ * Es la otra mitad de la deriva: `site.config.ts`, la portada, los ajustes del panel, la
+ * hoja de estilos. No se copian de la plantilla —llevan el nombre, las rutas y los textos
+ * de cada cliente—, así que la única forma de compararlos es regenerar la web desde su
+ * propio blueprint y mirar en qué se diferencia. Por eso el blueprint vive dentro del
+ * sitio: sin él esto no se puede ni preguntar.
+ *
+ * No se aplica solo, y no debería: aquí un fichero distinto puede ser una corrección que
+ * falta o una decisión que alguien tomó a mano, y eso lo dice una persona mirando el diff.
+ */
+export function writtenDrift(root, site) {
+  const blueprint = join(site, 'sitewright.json')
+  if (!existsSync(blueprint)) {
+    return { available: false, why: 'esta web no lleva su blueprint (sitewright.json)', differ: [] }
+  }
+
+  const out = mkdtempSync(join(tmpdir(), 'sitewright-drift-'))
+  try {
+    execFileSync(
+      'node',
+      [join(root, 'generator/generate.js'), '--blueprint', blueprint, '--out', out, '--force'],
+      { cwd: root, stdio: 'pipe' },
+    )
+  } catch (err) {
+    rmSync(out, { recursive: true, force: true })
+    return { available: false, why: `no se pudo regenerar: ${err.stderr ?? err}`, differ: [] }
+  }
+
+  const differ = []
+  for (const rel of WRITTEN) {
+    if (SKIP_WRITTEN.includes(rel)) continue
+    const fresh = join(out, rel)
+    if (!existsSync(fresh) || !existsSync(join(site, rel))) continue
+    if (!same(fresh, join(site, rel))) differ.push({ rel })
+  }
+
+  rmSync(out, { recursive: true, force: true })
+  return { available: true, checked: WRITTEN.length - SKIP_WRITTEN.length, differ }
+}
+
+/**
+ * Lo que se regenera pero no se compara.
+ *
+ * `package.json` lo mueve npm en cada instalación y de la versión del núcleo ya lleva
+ * cuenta `sync-core`. `public/icon.svg` es un marcador de posición con las iniciales: la
+ * web de Sandunguera tiene uno dibujado a mano y saldría eternamente «distinto». Y el
+ * blueprint es el propio origen de la comparación.
+ */
+const SKIP_WRITTEN = ['package.json', 'public/icon.svg', 'sitewright.json']
 
 /** Un resumen de una línea, que es lo que cabe en un diagnóstico. */
 export function driftSummary({ checked, differ, missing }) {

@@ -16,9 +16,10 @@ el comando que las comprueba: si no hay comando, no hay regla, hay buena intenci
    exige árbol limpio, comprueba contra el registro que la versión esté libre y pasa las
    puertas antes de subir nada.
 2. **Antes de tocar una web ya hecha, `npm run doctor -- ../<sitio>`**: dice qué núcleo
-   tiene, cuántas versiones se está perdiendo, qué hay en medio y **qué ficheros de la
-   fábrica no son los suyos**. Ninguna se actualiza sola y hasta ahora nadie llevaba esa
-   cuenta.
+   tiene, cuántas versiones se está perdiendo, qué hay en medio, **qué ficheros de la
+   fábrica no son los suyos** y **en qué se diferencia de lo que el generador escribiría
+   hoy** —esto último regenerándola desde el `sitewright.json` que lleva dentro—. Ninguna
+   se actualiza sola y hasta ahora nadie llevaba esa cuenta.
 3. **Poner una web al día son dos comandos, y hacen cosas distintas.**
    `npm run sync-core -- ../<sitio>` trae el núcleo, que va por npm: el guion borra la
    dependencia —npm no refresca una `file:` que conserva su versión— y compara el hash de
