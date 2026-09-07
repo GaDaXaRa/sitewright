@@ -1,0 +1,30 @@
+name: Tipos y esquema
+
+# Lo que se puede comprobar sin desplegar ni tocar la base de datos.
+#
+# `audit.yml` mira la web ya publicada, que es tarde para dos cosas: un error de tipos
+# —que `next build` con caché ha dado por bueno alguna vez— y un campo que el código
+# declara y ninguna migración tiene. Lo segundo no rompe el despliegue: no hay nada
+# pendiente que aplicar, así que pasa, y el panel falla el día que alguien toque ese campo.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  comprobar:
+    name: Tipos y esquema
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Tipos
+        run: npm run typecheck
+      # Sin DATABASE_URL a propósito: Payload compara el esquema del código con el último
+      # snapshot de las migraciones, y para eso no hace falta conectarse a ninguna base.
+      - name: Esquema
+        run: npm run schema:check

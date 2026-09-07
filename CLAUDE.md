@@ -40,7 +40,14 @@ el comando que las comprueba: si no hay comando, no hay regla, hay buena intenci
    que el repo de GitHub no estaba creado; estaba. `git remote -v`, `gh repo view`, `ls`.
 9. **No afirmar un hecho de infraestructura sin el comando delante** — ver la tabla de
    abajo. Media docena de herramientas devuelven respuestas engañosas por diseño.
-10. **Migrar en producción después de haber usado el modo desarrollo** requiere arreglar
+10. **El esquema se comprueba en dos escalones, y sólo uno necesita base de datos.**
+   `npm run schema:check` en el sitio compara lo que declara el código con el último
+   snapshot de las migraciones —Payload lo hace sin conectarse a nada, igual que su
+   `migrate:create`—: caza el campo añadido sin `migrate:create`, que no rompe el
+   despliegue y revienta el panel más tarde. Lo corre la CI de cada web en cada push.
+   El otro escalón, la base contra las migraciones, lo mira la auditoría, y **hoy se
+   salta por no tener `DATABASE_URL`**: es el «1 sin comprobar» de todas las auditorías.
+   Y migrar en producción después de haber usado el modo desarrollo requiere arreglar
    antes la marca `batch = -1` que deja el empuje automático de esquema; si no,
    `payload migrate` se planta.
 11. **Al terminar cualquier cambio en el núcleo**: pruebas y mutación. El listón está en

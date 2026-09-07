@@ -66,6 +66,13 @@ jobs:
           DATABASE_URI: postgres://localhost:5432/ninguna
           PAYLOAD_SECRET: ci
       - run: npm run typecheck
+      # La plantilla no tiene migraciones, así que aquí el guion se salta la comparación:
+      # lo que comprueba esta línea es que arranca y no se ha quedado colgado de una tripa
+      # de Payload que cambió de sitio.
+      - run: npm run schema:check
+        env:
+          DATABASE_URI: postgres://localhost:5432/ninguna
+          PAYLOAD_SECRET: ci
       - run: npm run test:int
 
   site:

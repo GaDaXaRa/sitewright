@@ -13,6 +13,7 @@
     "icons": "node scripts/icons.mjs",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
     "typecheck": "cross-env NODE_OPTIONS=--no-deprecation tsc --noEmit",
+    "schema:check": "cross-env NODE_OPTIONS=--no-deprecation payload run ./scripts/schema-check.ts",
     "migrate": "cross-env NODE_OPTIONS=--no-deprecation payload migrate",
     "migrate:create": "cross-env NODE_OPTIONS=--no-deprecation payload migrate:create",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
