@@ -1,5 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
 import { sectionOrder, validateBlueprint, validateWiring } from './schema.js'
 
 /**
@@ -203,5 +204,32 @@ test('un campo del panel que nadie pinta es una promesa que la web no cumple', a
         `modules/${id}: el panel pide "${campo}" y ningún componente lo usa`,
       )
     }
+  }
+})
+
+test('lo que el generador escribe por web está declarado como tal', async () => {
+  // `sync-site` copia sobre una web viva todo lo que NO esté en esta lista. Si el
+  // generador escribe un fichero más y nadie lo declara, la próxima puesta al día
+  // sobrescribe el contenido de un cliente con el de la plantilla.
+  const { WRITTEN } = await import('./generated.js')
+  const source = await readFile(new URL('./generate.js', import.meta.url), 'utf8')
+
+  // Sólo las rutas escritas a pelo: las de las páginas de cada módulo salen de una
+  // variable y no existen en la plantilla, así que nunca se comparan.
+  const written = [...source.matchAll(/\bwrite\(\s*'([^']+)'/g)].map((m) => m[1])
+  assert.ok(written.length >= WRITTEN.length, 'no se han leído todas las escrituras')
+
+  for (const path of written) {
+    assert.ok(
+      WRITTEN.includes(path),
+      `generate.js escribe "${path}" y generated.js no lo declara: sync-site lo pisaría.`,
+    )
+  }
+
+  for (const path of WRITTEN) {
+    assert.ok(
+      source.includes(`'${path}'`),
+      `generated.js declara "${path}" y generate.js ya no lo escribe: sobra en la lista.`,
+    )
   }
 })

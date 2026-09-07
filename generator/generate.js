@@ -3,6 +3,7 @@ import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } fr
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { sectionOrder, validateBlueprint, validateWiring } from './schema.js'
+import { MODULE_SKIP, TEMPLATE_SKIP } from './generated.js'
 import { buttonColors, defaultIconSvg } from '../core/dist/index.js'
 
 /**
@@ -666,8 +667,7 @@ cpSync(join(ROOT, 'template'), target, {
   // The lockfile goes too: it pins `sitewright-core` to the **template's** own path, and a
   // generated site inheriting it sends npm looking for the core next to itself, with an
   // ENOENT that names a directory nobody wrote. The first `npm install` writes a fresh one.
-  filter: (src) =>
-    !/node_modules|\.next|payload-types\.ts|tsconfig\.tsbuildinfo|package-lock\.json/.test(src),
+  filter: (src) => !TEMPLATE_SKIP.test(src),
 })
 
 const modules = bp.modules
@@ -693,7 +693,7 @@ for (const id of Object.keys(modules)) {
   wirings.push(wiring)
   cpSync(join(ROOT, 'modules', id), join(target, 'src/modules', id), {
     recursive: true,
-    filter: (src) => !/module\.json|wiring\.js|package\.json|section\.css/.test(src),
+    filter: (src) => !MODULE_SKIP.test(src),
   })
   // Titles default to the plural label: the client's own word for the thing.
   modules[id].title = modules[id].title ?? modules[id].labels?.plural ?? id

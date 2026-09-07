@@ -16,11 +16,17 @@ el comando que las comprueba: si no hay comando, no hay regla, hay buena intenci
    exige árbol limpio, comprueba contra el registro que la versión esté libre y pasa las
    puertas antes de subir nada.
 2. **Antes de tocar una web ya hecha, `npm run doctor -- ../<sitio>`**: dice qué núcleo
-   tiene, cuántas versiones se está perdiendo y qué hay en medio. Ninguna se actualiza
-   sola y hasta ahora nadie llevaba esa cuenta.
-3. **Instalar el núcleo en un sitio es `npm run sync-core -- ../<sitio>`.** npm no refresca
-   una dependencia `file:` que conserva su versión, así que el guion la borra y compara el
-   hash de lo instalado con lo que acaba de construir.
+   tiene, cuántas versiones se está perdiendo, qué hay en medio y **qué ficheros de la
+   fábrica no son los suyos**. Ninguna se actualiza sola y hasta ahora nadie llevaba esa
+   cuenta.
+3. **Poner una web al día son dos comandos, y hacen cosas distintas.**
+   `npm run sync-core -- ../<sitio>` trae el núcleo, que va por npm: el guion borra la
+   dependencia —npm no refresca una `file:` que conserva su versión— y compara el hash de
+   todo `dist` con lo que acaba de construir. `npm run sync-site -- ../<sitio> --apply`
+   trae lo que se copió el día que la web nació —el chasis y los módulos—, que no tiene
+   número de versión y por eso se quedaba atrás sin que nadie lo supiera. Sin `--apply` no
+   escribe: enseña qué cambiaría. Lo que el generador escribe por web no lo toca nunca
+   (`generator/generated.js`, y una prueba lo vigila contra `generate.js`).
 4. **Los tipos se comprueban aparte: `npm run typecheck`.** `next build` con caché
    ha dado por bueno un error de tipos que luego tumbó el despliegue.
 5. **Desplegar es `git push`.** Los proyectos están conectados a GitHub; lanzar `vercel

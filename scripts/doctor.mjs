@@ -7,6 +7,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { dirname, isAbsolute, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { changelogSections, diagnose, versionsAfter } from '../core/dist/index.js'
+import { driftSummary, siteDrift } from './lib/drift.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -49,6 +50,19 @@ const SYMBOL = { ok: '·', warn: '!', fail: '✗' }
 console.log(`\n  ${pkg.name ?? '(sin nombre)'}  ${site}\n`)
 for (const d of diagnose({ declared, installed, published })) {
   console.log(`  ${SYMBOL[d.level]} ${d.title.padEnd(30)} ${d.detail}`)
+}
+
+// El núcleo no es lo único que se queda atrás: el chasis y los módulos se copiaron el día
+// que nació la web, y una corrección posterior no llega sola.
+const drift = siteDrift(root, site)
+const behind = drift.differ.length + drift.missing.length
+console.log(
+  `  ${behind ? SYMBOL.warn : SYMBOL.ok} ${'Ficheros de la fábrica'.padEnd(30)} ${driftSummary(drift)}`,
+)
+if (behind) {
+  for (const { rel } of drift.differ) console.log(`      distinto  ${rel}`)
+  for (const { rel } of drift.missing) console.log(`      falta     ${rel}`)
+  console.log(`\n  Para llevárselos:  npm run sync-site -- ${target} --apply`)
 }
 
 const pending = published ? versionsAfter(installed ?? (declared ?? '').replace(/^[^\d]*/, ''), published) : []
