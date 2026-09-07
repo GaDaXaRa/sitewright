@@ -41,7 +41,10 @@ jobs:
       - run: node --test generator/*.test.js
       # `provision.js` sólo imprime, y por eso nadie lo ejecutaba: se rompió con una
       # comilla invertida dentro de una plantilla literal y se subió roto.
-      - run: node generator/provision.js generator/blueprints/ejemplo-asociacion.json > /dev/null
+      - run: |
+          for bp in generator/blueprints/*.json; do
+            node generator/provision.js "$bp" > /dev/null
+          done
 
   template:
     name: Plantilla
@@ -76,8 +79,18 @@ jobs:
       - run: npm run test:int
 
   site:
-    name: Un sitio generado
+    name: Un sitio generado (${{ matrix.blueprint }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # `ejemplo-completo` enciende los once módulos, y está por eso: con sólo la
+        # asociación, cuatro de ellos —about, media, partners, reviews— no los compilaba
+        # nadie, y una errata en cualquiera la habría descubierto un cliente. Los otros dos
+        # son combinaciones reales, que es lo que cambia el cableado: un catálogo con
+        # precios enlaza su JSON-LD y sin ellos no, y sólo `media` pone el consentimiento
+        # de los reproductores en el layout.
+        blueprint: [ejemplo-completo, ejemplo-asociacion, ejemplo-portafolio]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -86,7 +99,7 @@ jobs:
       # Los módulos no se compilan en ningún sitio: sólo existen dentro de una web
       # generada. Sin este trabajo, una errata en un módulo la descubre el cliente.
       - run: npm ci --prefix core && npm run build --prefix core
-      - run: node generator/generate.js --blueprint generator/blueprints/ejemplo-asociacion.json --out /tmp/sitio
+      - run: node generator/generate.js --blueprint generator/blueprints/${{ matrix.blueprint }}.json --out /tmp/sitio
       - run: npm install --no-audit --no-fund
         working-directory: /tmp/sitio
       - run: npm run generate:types

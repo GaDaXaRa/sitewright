@@ -1,0 +1,143 @@
+{
+  "identity": {
+    "id": "once",
+    "name": "Once",
+    "url": "https://once.example",
+    "schemaType": "MusicGroup",
+    "email": "hola@once.example",
+    "city": "Bilbao",
+    "tagline": "Colectivo ficticio con los once módulos encendidos"
+  },
+  "modules": {
+    "about": {
+      "title": "Quiénes somos"
+    },
+    "catalog": {
+      "labels": {
+        "singular": "Sesión",
+        "plural": "Sesiones"
+      },
+      "route": "/sesiones",
+      "title": "Lo que hacemos"
+    },
+    "schedule": {
+      "labels": {
+        "singular": "Fecha",
+        "plural": "Agenda"
+      },
+      "route": "/agenda",
+      "title": "Próximas fechas",
+      "emptyText": "No hay nada anunciado ahora mismo."
+    },
+    "media": {
+      "labels": {
+        "singular": "Pieza",
+        "plural": "Sonido"
+      },
+      "route": "/sonido",
+      "title": "Escucha"
+    },
+    "pricing": {
+      "labels": {
+        "singular": "Tarifa",
+        "plural": "Tarifas"
+      },
+      "route": "/tarifas",
+      "title": "Contratación"
+    },
+    "team": {
+      "labels": {
+        "singular": "Miembro",
+        "plural": "Equipo"
+      },
+      "route": "/equipo",
+      "title": "Quién lo forma"
+    },
+    "partners": {
+      "labels": {
+        "singular": "Colaboradora",
+        "plural": "Colaboran"
+      },
+      "title": "Colaboran"
+    },
+    "reviews": {
+      "labels": {
+        "singular": "Opinión",
+        "plural": "Prensa"
+      },
+      "title": "Lo que dicen"
+    },
+    "faq": {
+      "labels": {
+        "singular": "Pregunta frecuente",
+        "plural": "Preguntas frecuentes"
+      },
+      "route": "/preguntas",
+      "title": "Preguntas frecuentes"
+    },
+    "notices": {
+      "labels": {
+        "singular": "Aviso",
+        "plural": "Avisos"
+      },
+      "buttonUrl": "/agenda"
+    },
+    "contact": {
+      "labels": {
+        "singular": "Solicitud",
+        "plural": "Contacto"
+      },
+      "title": "Escríbenos",
+      "askDate": true,
+      "kinds": {
+        "booking": "Contratación",
+        "press": "Prensa",
+        "other": "Otra cosa"
+      }
+    }
+  },
+  "design": {
+    "scheme": "dark",
+    "altExample": "El colectivo pinchando en una sala llena",
+    "palette": {
+      "ground": "#0b0b0d",
+      "ground2": "#101014",
+      "surface": "#16161b",
+      "surface2": "#1d1d23",
+      "ink": "#f2efe9",
+      "inkSoft": "#c6c2b9",
+      "inkFaint": "#94908a",
+      "line": "#2a2a31",
+      "accent": "#ff6b4a",
+      "accentSoft": "#ff8f74"
+    },
+    "fonts": {
+      "display": {
+        "family": "Space Grotesk",
+        "weights": ["600", "700"]
+      },
+      "body": {
+        "family": "Public Sans",
+        "weights": ["400", "500", "600"]
+      }
+    },
+    "sections": [
+      "about",
+      "catalog",
+      "schedule",
+      "media",
+      "pricing",
+      "team",
+      "reviews",
+      "partners",
+      "faq",
+      "contact"
+    ]
+  },
+  "legal": {
+    "holder": "Once Colectivo S. Coop.",
+    "id": "F00000000",
+    "address": "Calle de ejemplo 11, 48001 Bilbao"
+  },
+  "contentStatus": "borrador"
+}
