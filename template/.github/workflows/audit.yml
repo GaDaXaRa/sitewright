@@ -24,6 +24,12 @@ jobs:
           # El dominio propio cuando lo hay; si aún no se ha comprado, la dirección que
           # Vercel acaba de publicar. Se define con `gh variable set AUDIT_URL`.
           URL: ${{ vars.AUDIT_URL || github.event.deployment_status.environment_url }}
+          # Un rol de Postgres que sólo puede leer `payload_migrations`: ni los ajustes del
+          # sitio, ni borrar, ni crear nada. Con él, la puerta del esquema mira la base de
+          # producción de verdad; sin secreto, se salta como hasta ahora. Se crea con SQL
+          # corriente, porque un rol hecho con `neonctl roles create` nace dentro de
+          # `neon_superuser` y el dueño de la base no puede sacarlo de ahí.
+          AUDIT_DATABASE_URL: ${{ secrets.AUDIT_DATABASE_URL }}
         run: |
           VERSION=$(node -p "require('./package.json').dependencies['sitewright-core'].replace(/[^0-9.]/g, '')")
           npx --yes "sitewright-core@$VERSION" sitewright-audit \

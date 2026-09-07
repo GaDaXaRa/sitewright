@@ -46,6 +46,14 @@ export type AuditOptions = {
   /** Token pairs to measure, when the palette names them differently. */
   contrastPairs?: [string, string][]
   databaseUrl?: string
+  /**
+   * Una conexión sólo para mirar las migraciones, cuando no es la que usa la web.
+   *
+   * Existe para no mentir: `checkPooled` juzga **la cadena que le den**, así que si aquí se
+   * pasara un rol de auditoría creado para leer una tabla, esa puerta se pondría verde
+   * hablando de una cadena que producción no usa. Separadas, cada una dice lo que sabe.
+   */
+  migrationsUrl?: string
   migrationsDir?: string
   /** Dónde vive la guía del panel. Se comprueba que sin sesión no se sirva. */
   adminGuidePath?: string
@@ -149,7 +157,7 @@ export async function runAudit(options: AuditOptions): Promise<Finding[]> {
   findings.push(...checkPooled(options.databaseUrl))
   findings.push(
     ...(await checkMigrations({
-      databaseUrl: options.databaseUrl,
+      databaseUrl: options.migrationsUrl ?? options.databaseUrl,
       migrationsDir: options.migrationsDir,
     })),
   )

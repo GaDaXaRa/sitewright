@@ -3,6 +3,15 @@
 Qué gana una web al actualizar. Escrito para quien tiene que decidir si le compensa, no
 para quien escribió el código.
 
+## 0.12.4 — 7 de septiembre de 2026
+
+- **La puerta del esquema puede mirar producción sin que la de la conexión mienta.** Antes
+  las dos leían la misma cadena, así que darle a la auditoría un rol de sólo lectura habría
+  puesto en verde una puerta que habla de la conexión que usa la web —y esa seguiría sin
+  comprobarse—. Ahora `--migrations-db` (o `AUDIT_DATABASE_URL`) es una entrada aparte: con
+  ella el «1 sin comprobar» de todas las auditorías pasa a comprobar de verdad si la base
+  tiene marcas de modo desarrollo y si están aplicadas todas las migraciones.
+
 ## 0.12.3 — 7 de septiembre de 2026
 
 - La puerta que estrena 0.12.2 buscaba el título de la vista, que Payload manda en la

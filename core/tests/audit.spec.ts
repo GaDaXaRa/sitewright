@@ -23,6 +23,7 @@ import {
   checkAdminPrivate,
   cssTokens,
 } from '../src/audit/checks/index.js'
+import { checkPooled } from '../src/audit/migrations.js'
 import { contrastRatio } from '../src/lib/color.js'
 import { exitCode, renderReport } from '../src/audit/report.js'
 
@@ -541,5 +542,20 @@ describe('la guía del panel sin haber entrado', () => {
   it('devuelve una sola comprobación, dé lo que dé', () => {
     expect(checkAdminPrivate(page({ body: '' }))).toHaveLength(1)
     expect(checkAdminPrivate(page({ body: 'sw-guide' }))).toHaveLength(1)
+  })
+})
+
+describe('la conexión con la que se miran las migraciones', () => {
+  it('la puerta de la conexión agrupada sólo juzga la de la web', () => {
+    // Un rol de auditoría, creado para leer una tabla, no dice nada de la cadena que usa
+    // producción. Si las dos entradas fueran la misma, esta puerta se pondría verde
+    // hablando de algo que la web no usa, que es peor que no comprobarlo.
+    expect(checkPooled(undefined)).toEqual([])
+
+    const [directa] = checkPooled('postgres://u:p@ep-uno.eu-central-1.aws.neon.tech/neondb')
+    expect(directa!.status).toBe('fail')
+
+    const [agrupada] = checkPooled('postgres://u:p@ep-uno-pooler.eu-central-1.aws.neon.tech/neondb')
+    expect(agrupada!.status).toBe('ok')
   })
 })

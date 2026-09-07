@@ -73,6 +73,7 @@ const findings = await runAudit({
     ?.split(',')
     .map((pair) => pair.split(':') as [string, string]),
   databaseUrl: arg('db') ?? process.env.DATABASE_URL,
+  migrationsUrl: arg('migrations-db') ?? process.env.AUDIT_DATABASE_URL,
   migrationsDir: arg('migrations'),
 })
 
