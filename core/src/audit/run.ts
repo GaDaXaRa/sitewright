@@ -45,15 +45,15 @@ export type AuditOptions = {
   cssPath?: string
   /** Token pairs to measure, when the palette names them differently. */
   contrastPairs?: [string, string][]
-  databaseUrl?: string
   /**
-   * Una conexión sólo para mirar las migraciones, cuando no es la que usa la web.
+   * La base que se mira, cuando se mira alguna.
    *
-   * Existe para no mentir: `checkPooled` juzga **la cadena que le den**, así que si aquí se
-   * pasara un rol de auditoría creado para leer una tabla, esa puerta se pondría verde
-   * hablando de una cadena que producción no usa. Separadas, cada una dice lo que sabe.
+   * Es **la cadena que le den**, y las dos puertas que la usan juzgan eso y nada más: la
+   * que exige la conexión agrupada y la que lee las migraciones. Lo que un despliegue usa
+   * de verdad no se puede leer desde fuera (`vercel env pull` lo censura), así que sin
+   * cadena las dos se saltan y lo dicen, que es lo honesto.
    */
-  migrationsUrl?: string
+  databaseUrl?: string
   migrationsDir?: string
   /** Dónde vive la guía del panel. Se comprueba que sin sesión no se sirva. */
   adminGuidePath?: string
@@ -157,7 +157,7 @@ export async function runAudit(options: AuditOptions): Promise<Finding[]> {
   findings.push(...checkPooled(options.databaseUrl))
   findings.push(
     ...(await checkMigrations({
-      databaseUrl: options.migrationsUrl ?? options.databaseUrl,
+      databaseUrl: options.databaseUrl,
       migrationsDir: options.migrationsDir,
     })),
   )

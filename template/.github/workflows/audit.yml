@@ -24,19 +24,12 @@ jobs:
           # El dominio propio cuando lo hay; si aún no se ha comprado, la dirección que
           # Vercel acaba de publicar. Se define con `gh variable set AUDIT_URL`.
           URL: ${{ vars.AUDIT_URL || github.event.deployment_status.environment_url }}
-          # Un rol de Postgres que sólo puede leer `payload_migrations`: ni los ajustes del
-          # sitio, ni borrar, ni crear nada. Con él, la puerta del esquema mira la base de
-          # producción de verdad; sin secreto, se salta como hasta ahora. Se crea con SQL
-          # corriente, porque un rol hecho con `neonctl roles create` nace dentro de
-          # `neon_superuser` y el dueño de la base no puede sacarlo de ahí.
-          AUDIT_DATABASE_URL: ${{ secrets.AUDIT_DATABASE_URL }}
         run: |
           VERSION=$(node -p "require('./package.json').dependencies['sitewright-core'].replace(/[^0-9.]/g, '')")
-          # `-p pg` no es un capricho: la auditoría corre sobre el repositorio pelado, sin
-          # `npm ci`, así que el cliente de Postgres no está por ninguna parte y la puerta
-          # del esquema se saltaba diciendo «no está instalado pg». npx los pone a los dos
-          # en la misma carpeta y el núcleo lo encuentra.
-          npx --yes -p "sitewright-core@$VERSION" -p pg sitewright-audit \
+          # Sin base de datos: esto audita la web publicada, que es lo que ve una persona.
+          # Lo del esquema —un campo declarado que ninguna migración tiene— lo caza
+          # `esquema.yml` en cada push, sin conectarse a nada y antes de desplegar, que es
+          # cuando todavía sirve de algo.
+          npx --yes -p "sitewright-core@$VERSION" sitewright-audit \
             --url "$URL" \
-            --css "src/app/(frontend)/styles.css" \
-            --migrations src/migrations
+            --css "src/app/(frontend)/styles.css"

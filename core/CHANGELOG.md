@@ -3,6 +3,16 @@
 Qué gana una web al actualizar. Escrito para quien tiene que decidir si le compensa, no
 para quien escribió el código.
 
+## Sin publicar
+
+- **Una entrada menos en la auditoría: se va `--migrations-db` (y `AUDIT_DATABASE_URL`).**
+  Servía para mirar la base de producción con un rol de sólo lectura después de cada
+  despliegue, y no compensaba lo que costaba —un rol de Postgres a medida, su contraseña y
+  su rotación—: el fallo caro que buscaba, un campo declarado que ninguna migración tiene,
+  lo caza `schema:check` en cada push, sin conectarse a nada y **antes** de desplegar; y
+  las migraciones sin aplicar no pueden existir después de un despliegue con éxito, porque
+  las aplica el propio build. `--db` sigue estando, para mirar una base desde el portátil.
+
 ## 0.12.5 — 7 de septiembre de 2026
 
 - Cuando la base no contesta, la auditoría dice por qué. Antes escribía «No se pudo
