@@ -32,7 +32,11 @@ jobs:
           AUDIT_DATABASE_URL: ${{ secrets.AUDIT_DATABASE_URL }}
         run: |
           VERSION=$(node -p "require('./package.json').dependencies['sitewright-core'].replace(/[^0-9.]/g, '')")
-          npx --yes "sitewright-core@$VERSION" sitewright-audit \
+          # `-p pg` no es un capricho: la auditoría corre sobre el repositorio pelado, sin
+          # `npm ci`, así que el cliente de Postgres no está por ninguna parte y la puerta
+          # del esquema se saltaba diciendo «no está instalado pg». npx los pone a los dos
+          # en la misma carpeta y el núcleo lo encuentra.
+          npx --yes -p "sitewright-core@$VERSION" -p pg sitewright-audit \
             --url "$URL" \
             --css "src/app/(frontend)/styles.css" \
             --migrations src/migrations
