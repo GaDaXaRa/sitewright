@@ -57,8 +57,9 @@ export function checkSecurityHeaders(page: Fetched): Finding[] {
  * hoy es texto mañana puede enseñar algo que no debe.
  */
 export function checkAdminPrivate(guide: Fetched): Finding[] {
-  // Lo que sólo aparece si la guía se ha llegado a pintar.
-  const leaked = /class="sw-guide"|Cómo se maneja/.test(guide.body)
+  // La clase de la guía y nada más. El título de la vista —«Cómo se maneja esto»— viaja
+  // en la pestaña aunque sólo se sirva el login, así que buscarlo daba falsos positivos.
+  const leaked = /sw-guide/.test(guide.body)
 
   if (leaked) {
     return [

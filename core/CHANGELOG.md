@@ -3,6 +3,12 @@
 Qué gana una web al actualizar. Escrito para quien tiene que decidir si le compensa, no
 para quien escribió el código.
 
+## 0.12.3 — 7 de septiembre de 2026
+
+- La puerta que estrena 0.12.2 buscaba el título de la vista, que Payload manda en la
+  pestaña aunque sólo sirva el login: se habría puesto roja en webs que están bien.
+  Ahora mira el maquetado de la guía y nada más.
+
 ## 0.12.2 — 7 de septiembre de 2026
 
 - **La guía del panel ya no se sirve sin haber entrado.** Payload pinta una vista propia

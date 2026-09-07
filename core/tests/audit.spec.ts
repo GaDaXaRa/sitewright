@@ -521,9 +521,13 @@ describe('la guía del panel sin haber entrado', () => {
     expect(found!.detail).toContain('/admin/guia')
   })
 
-  it('el título solo también delata, aunque cambie el maquetado', () => {
-    const [found] = checkAdminPrivate(page({ body: '<h1>Cómo se maneja Ejemplo</h1>' }))
-    expect(found!.status).toBe('fail')
+  it('el título de la pestaña no es la guía', () => {
+    // Payload manda el título de la vista aunque sirva el login: buscarlo daba un fallo
+    // donde no lo había. Lo comprobé en el servidor local antes de creerme la puerta.
+    const [found] = checkAdminPrivate(
+      page({ body: '<title>Cómo se maneja esto — Ejemplo</title><form action="/admin/login">' }),
+    )
+    expect(found!.status).toBe('ok')
   })
 
   it('la pantalla de entrada es la respuesta correcta', () => {
@@ -536,6 +540,6 @@ describe('la guía del panel sin haber entrado', () => {
 
   it('devuelve una sola comprobación, dé lo que dé', () => {
     expect(checkAdminPrivate(page({ body: '' }))).toHaveLength(1)
-    expect(checkAdminPrivate(page({ body: 'class="sw-guide"' }))).toHaveLength(1)
+    expect(checkAdminPrivate(page({ body: 'sw-guide' }))).toHaveLength(1)
   })
 })
