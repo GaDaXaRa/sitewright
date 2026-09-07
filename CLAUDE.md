@@ -95,3 +95,6 @@ fallo que da ahí no es un fallo de la web.
   histórico, no la chuleta: si algo de ahí hay que recordarlo en caliente, su sitio es
   este fichero o, mejor, un guion.
 - **`docs/plan-v1.md`** — el plan y lo aplazado a versiones siguientes.
+- **La documentación navegable** — https://claude.ai/code/artifact/9a5f1f1d-6e5b-4b03-93f1-7548ba17f3af
+  Qué es cada pieza y por qué está donde está. Si cambias la arquitectura, actualízala:
+  las cifras que lleva salen de ejecutar las pruebas y la auditoría, no de recordarlas.

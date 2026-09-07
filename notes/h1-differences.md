@@ -988,3 +988,31 @@ entrevista tiene que preguntarlo, porque decide qué versión indexa Google y hu
      datos legales, con un «no toques esto». Documentarlos es mejor: un dato legal
      equivocado **no da error** —la web sigue funcionando y las páginas legales siguen ahí
      diciendo algo que no es cierto—, así que lo único que protege es entender qué son.
+
+137. **Un rol de Neon creado con `neonctl roles create` nace `neon_superuser`,** y el dueño
+     de la base no puede sacarlo de ahí: «permission denied to revoke role». Llamarlo «de
+     sólo lectura» habría sido una etiqueta falsa sobre un rol que podía borrarlo todo. Con
+     `CREATE ROLE` a secas no hereda nada — y lo que decide si es verdad no es el método,
+     es intentar con él lo que no debería poder hacer.
+
+138. **Payload no mira la sesión en una vista propia.** `views/Root` pinta el componente y
+     sólo redirige cuando la ruta no existe, así que la guía del panel se servía entera a
+     quien pidiera la dirección. La barrera la pone la componente, donde Payload deja el
+     usuario, y una puerta de la auditoría comprueba que sigue puesta.
+
+139. **Un guion de verificación que mira el fichero equivocado es peor que no tenerlo.**
+     `sync-core` comparaba el hash de `dist/index.js`, y tres versiones seguidas lo dejaron
+     idéntico —los cambios estaban en `dist/ui` y `dist/audit`—: decía «verificado» sin
+     haber mirado nada de lo que había cambiado. Comprueba el efecto, y que lo comprobado
+     sea lo que cambió.
+
+140. **Un campo del blueprint que nadie lee es una promesa que la web no cumple.**
+     `design.altExample` llevaba versiones ahí, y el panel seguía enseñando el ejemplo de la
+     plantilla. Estaba escrito en un fichero compartido por todas las webs, así que ningún
+     valor por sitio cabía. Ahora lo vigila una prueba: cada campo de los blueprints de
+     ejemplo tiene que leerlo alguien.
+
+141. **Que funcione en tu máquina no dice nada de la CI.** El `.env` del sitio tapó que
+     Payload no arranca sin `PAYLOAD_SECRET`, y las dependencias de desarrollo del núcleo
+     taparon que `pg` no existe en un repositorio pelado. Dos rojos seguidos por lo mismo.
+     Reproducir la CI cuesta un minuto: sin `.env` y sin `node_modules`.

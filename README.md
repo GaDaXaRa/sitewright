@@ -8,8 +8,9 @@ Pensado para colectivos, portafolios personales, asociaciones y pequeños negoci
 personales. La referencia de calidad es [organicyoga.es](https://www.organicyoga.es).
 
 - **Reglas de trabajo** → [CLAUDE.md](CLAUDE.md) — léelo antes de tocar nada
+- **Cómo funciona por dentro** → [documentación navegable](https://claude.ai/code/artifact/9a5f1f1d-6e5b-4b03-93f1-7548ba17f3af) — cada pieza, y qué se rompió para que exista cada regla
 - **Plan de la v1** → [docs/plan-v1.md](docs/plan-v1.md)
-- **Estado**: v1.1. Dos webs en producción, una de ellas de cliente.
+- **Estado**: v1.4. Dos webs en producción sobre esta arquitectura, una de ellas de cliente.
 
 ## Operaciones
 
