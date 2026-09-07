@@ -30,8 +30,13 @@ fichero. El blueprint de una web real vive **en el repositorio de esa web**, que
 lleva el nombre legal de quien la encarga, sus textos y su contacto, y este repositorio es
 público.
 
+Lo escribe el propio generador en `sitewright.json`, en la raíz del sitio, para que la
+receta viaje con la web. Guardarlo aparte ya salió caro: de las dos webs en producción,
+una no tenía el suyo en ninguna parte, y hubo que reconstruirlo leyendo hacia atrás sus
+ficheros generados.
+
 ```bash
-node generate.js --blueprint ../../mi-sitio/blueprints/mi-sitio.json --out ../../mi-sitio
+node generate.js --blueprint ../../mi-sitio/sitewright.json --out ../../mi-sitio
 ```
 
 ## El blueprint

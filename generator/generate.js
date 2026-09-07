@@ -751,6 +751,14 @@ write(
   write('.env.example', env)
 }
 
+// El blueprint, dentro de la web que ha producido.
+//
+// Vivía sólo en `generator/blueprints/`, y de las dos webs en producción una no tenía el
+// suyo en ninguna parte: sin él no se puede regenerar nada para comparar, así que lo único
+// que quedaba era leer los ficheros generados hacia atrás. Guardado aquí, la receta viaja
+// con la web y no se puede perder por separado.
+write('sitewright.json', JSON.stringify(bp, null, 2) + '\n')
+
 const pkg = JSON.parse(read('package.json'))
 pkg.name = bp.identity.id
 pkg.description = `Web de ${bp.identity.name}`

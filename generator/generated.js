@@ -36,6 +36,7 @@ export const WRITTEN = [
   'src/globals/SiteSettings.ts',
   'src/site.config.ts',
   'src/site.modules.ts',
+  'sitewright.json',
 ]
 
 /**
