@@ -46,6 +46,9 @@ export const WRITTEN = [
  * `next-env.d.ts` lo reescribe Next en cada arranque.
  */
 export const PER_SITE = [
+  // El sello de `sync-site`: qué le entregó la fábrica a esta web. Es de aquí y de ahora,
+  // así que ni se compara con la plantilla ni se copia de una web a otra.
+  '.sitewright-sync.json',
   'next-env.d.ts',
   'public/apple-icon.png',
   'public/favicon.ico',

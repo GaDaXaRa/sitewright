@@ -55,15 +55,19 @@ for (const d of diagnose({ declared, installed, published })) {
 // El núcleo no es lo único que se queda atrás: el chasis y los módulos se copiaron el día
 // que nació la web, y una corrección posterior no llega sola.
 const drift = siteDrift(root, site)
-const behind = drift.differ.length + drift.missing.length
+const atrasados = drift.behind.length + drift.missing.length
+const propios = drift.customised.length + drift.unknown.length
 console.log(
-  `  ${behind ? SYMBOL.warn : SYMBOL.ok} ${'Ficheros de la fábrica'.padEnd(30)} ${driftSummary(drift)}`,
+  `  ${atrasados || propios ? SYMBOL.warn : SYMBOL.ok} ${'Ficheros de la fábrica'.padEnd(30)} ${driftSummary(drift)}`,
 )
-if (behind) {
-  for (const { rel } of drift.differ) console.log(`      distinto  ${rel}`)
-  for (const { rel } of drift.missing) console.log(`      falta     ${rel}`)
-  console.log(`      Para llevárselos:  npm run sync-site -- ${target} --apply`)
-}
+for (const { rel } of drift.behind) console.log(`      se ha quedado atrás  ${rel}`)
+for (const { rel } of drift.missing) console.log(`      falta                ${rel}`)
+// Personalizado y atrasado piden cosas contrarias, así que no se cuentan juntos: uno se
+// trae con un comando y el otro es una decisión que alguien tomó aquí.
+for (const { rel } of drift.customised) console.log(`      personalizado aquí   ${rel}`)
+for (const { rel } of drift.unknown) console.log(`      sin sello            ${rel}`)
+if (atrasados) console.log(`      Para traerlos:  npm run sync-site -- ${target} --apply`)
+if (propios) console.log(`      Los personalizados no los toca sync-site: mira su git diff antes de nada.`)
 
 // Y los que el generador escribe para esta web: se regenera desde su blueprint y se mira
 // en qué difieren. Aquí no hay nada que copiar automáticamente, porque un fichero distinto

@@ -27,7 +27,14 @@ el comando que las comprueba: si no hay comando, no hay regla, hay buena intenci
    trae lo que se copió el día que la web nació —el chasis y los módulos—, que no tiene
    número de versión y por eso se quedaba atrás sin que nadie lo supiera. Sin `--apply` no
    escribe: enseña qué cambiaría. Lo que el generador escribe por web no lo toca nunca
-   (`generator/generated.js`, y una prueba lo vigila contra `generate.js`).
+   (`generator/generated.js`, y una prueba lo vigila contra `generate.js`), y **tampoco
+   pisa lo que se personalizó en esa web**: cada sitio lleva un sello
+   (`.sitewright-sync.json`) con el hash de lo que la fábrica le entregó, así que «este
+   fichero no es el de la fábrica» se parte en dos —se ha quedado atrás, o alguien lo tocó
+   aquí— y sólo lo primero se aplica solo. Lo segundo pide `--force`, escrito a propósito.
+   Sin sello no se pisa nada: no saber si alguien lo tocó no es permiso para pisarlo. Y la
+   libertad de editar no es teórica —`schedule/Row.tsx` y `faq/Section.tsx` se han tocado
+   en webs vivas—, que es la razón por la que los módulos se copian y no se empaquetan.
 4. **Los tipos se comprueban aparte: `npm run typecheck`.** `next build` con caché
    ha dado por bueno un error de tipos que luego tumbó el despliegue.
 5. **Desplegar es `git push`.** Los proyectos están conectados a GitHub; lanzar `vercel

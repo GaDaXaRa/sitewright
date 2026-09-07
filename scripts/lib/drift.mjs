@@ -10,10 +10,46 @@
  * partir del blueprint es de cada cliente y no se compara: ver `generator/generated.js`.
  */
 import { execFileSync } from 'node:child_process'
-import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, relative } from 'node:path'
 import { MODULE_SKIP, TEMPLATE_SKIP, WRITTEN, isShared } from '../../generator/generated.js'
+
+/**
+ * El sello: qué le entregó la fábrica a esta web la última vez, fichero por fichero.
+ *
+ * Sin él, «este fichero no es el de la fábrica» tiene dos causas que no se distinguen y
+ * que piden lo contrario: o la fábrica avanzó —y hay que traerlo— o esta web lo
+ * personalizó —y copiar encima destruye trabajo—. Guardando el hash de lo entregado, la
+ * pregunta se responde sola: si el fichero sigue siendo el entregado, la web no lo ha
+ * tocado.
+ *
+ * Guarda **lo entregado**, nunca lo que hay ahora: sellar una personalización la
+ * convertiría en pisable en la siguiente vuelta.
+ */
+export const SEAL = '.sitewright-sync.json'
+
+export const hashOf = (path) => createHash('sha256').update(readFileSync(path)).digest('hex')
+
+export function readSeal(site) {
+  try {
+    return JSON.parse(readFileSync(join(site, SEAL), 'utf8')).files ?? {}
+  } catch {
+    return {}
+  }
+}
+
+/**
+ * Por qué difiere un fichero, que es lo único que hace falta saber para decidir.
+ *
+ * `unknown` es el caso de las webs anteriores al sello, y se trata como personalizado: no
+ * saber si alguien lo tocó no es permiso para pisarlo.
+ */
+export function classify(current, sealed) {
+  if (sealed === undefined) return 'unknown'
+  return current === sealed ? 'behind' : 'customised'
+}
 
 /** Los ficheros de un directorio, en rutas relativas y sin lo que no viaja. */
 function filesIn(dir, skip, prefix = '') {
@@ -35,8 +71,10 @@ const same = (a, b) => existsSync(b) && readFileSync(a).equals(readFileSync(b))
 /**
  * Compara lo que la fábrica tiene ahora con lo que la web se llevó.
  *
- * Devuelve las diferencias en un solo saco, cada una con de dónde sale y adónde va, para
- * que quien la aplique no tenga que volver a razonar la correspondencia.
+ * Cada diferencia lleva de dónde sale y adónde va, para que quien la aplique no tenga que
+ * volver a razonar la correspondencia, y **por qué difiere**, que es lo que decide si se
+ * puede copiar encima: `behind` es la fábrica avanzando y `customised` es esta web
+ * habiendo tocado el fichero.
  */
 export function siteDrift(root, site) {
   const pairs = []
@@ -63,14 +101,59 @@ export function siteDrift(root, site) {
     }
   }
 
-  const differ = []
+  const seal = readSeal(site)
+  const behind = []
+  const customised = []
+  const unknown = []
   const missing = []
+
   for (const pair of pairs) {
-    if (!existsSync(pair.to)) missing.push(pair)
-    else if (!same(pair.from, pair.to)) differ.push(pair)
+    if (!existsSync(pair.to)) {
+      // Lo que no está no se puede pisar: traerlo nunca destruye nada.
+      missing.push(pair)
+      continue
+    }
+    if (same(pair.from, pair.to)) continue
+
+    const why = classify(hashOf(pair.to), seal[pair.rel])
+    if (why === 'behind') behind.push(pair)
+    else if (why === 'customised') customised.push(pair)
+    else unknown.push(pair)
   }
 
-  return { checked: pairs.length, modules: installed, differ, missing }
+  // `differ` sigue siendo todo lo que difiere, para quien sólo quiera contarlo.
+  const differ = [...behind, ...customised, ...unknown]
+  return { checked: pairs.length, modules: installed, pairs, differ, behind, customised, unknown, missing }
+}
+
+/**
+ * Deja constancia de lo que la fábrica acaba de entregar.
+ *
+ * Sella un fichero **sólo cuando su contenido es el de la fábrica**: o porque se acaba de
+ * copiar, o porque ya lo era. Un fichero personalizado conserva el sello de su última
+ * entrega —que es lo que lo mantiene reconocible como personalizado— y uno que nunca se
+ * entregó no se sella, porque no habría nada que afirmar.
+ */
+export function writeSeal(site, pairs) {
+  const seal = readSeal(site)
+
+  for (const pair of pairs) {
+    if (existsSync(pair.to) && same(pair.from, pair.to)) seal[pair.rel] = hashOf(pair.to)
+  }
+
+  const ordered = Object.fromEntries(Object.entries(seal).sort(([a], [b]) => (a < b ? -1 : 1)))
+  writeFileSync(
+    join(site, SEAL),
+    JSON.stringify(
+      {
+        _: 'Qué le entregó la fábrica a esta web, para distinguir lo que se ha quedado atrás de lo que alguien personalizó aquí. Lo escribe npm run sync-site; no se edita a mano.',
+        files: ordered,
+      },
+      null,
+      2,
+    ) + '\n',
+  )
+  return Object.keys(ordered).length
 }
 
 /**
@@ -125,12 +208,24 @@ export function writtenDrift(root, site) {
  */
 const SKIP_WRITTEN = ['package.json', 'public/icon.svg', 'sitewright.json']
 
-/** Un resumen de una línea, que es lo que cabe en un diagnóstico. */
-export function driftSummary({ checked, differ, missing }) {
-  const behind = differ.length + missing.length
-  return behind
-    ? `${behind} de ${checked} ficheros compartidos no son los de la fábrica`
-    : `${checked} ficheros compartidos, todos al día`
+/**
+ * Un resumen de una línea, que es lo que cabe en un diagnóstico.
+ *
+ * Separa lo que se puede traer solo de lo que no, porque son dos noticias distintas: una
+ * es trabajo pendiente y la otra es una decisión que alguien tomó en esta web.
+ */
+const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`
+
+export function driftSummary({ checked, behind, customised, unknown, missing }) {
+  const atrasados = behind.length + missing.length
+  const propios = customised.length + unknown.length
+
+  if (!atrasados && !propios) return `${checked} ficheros compartidos, todos al día`
+
+  const partes = []
+  if (atrasados) partes.push(`${atrasados} por traer`)
+  if (propios) partes.push(plural(propios, 'personalizado aquí', 'personalizados aquí'))
+  return `${partes.join(' · ')}, de ${checked} ficheros compartidos`
 }
 
 export { relative }

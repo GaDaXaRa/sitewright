@@ -4,6 +4,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { sectionOrder, validateBlueprint, validateWiring } from './schema.js'
 import { MODULE_SKIP, TEMPLATE_SKIP } from './generated.js'
+import { siteDrift, writeSeal } from '../scripts/lib/drift.mjs'
 import { buttonColors, defaultIconSvg } from '../core/dist/index.js'
 
 /**
@@ -808,6 +809,11 @@ write(
   }
   write('.env.example', env)
 }
+
+// El sello de lo que acaba de entregar: sin él, la primera puesta al día no sabría
+// distinguir un fichero que se ha quedado atrás de uno que alguien personalizó aquí, y
+// `sync-site` los trataría igual —copiando encima de los dos—.
+writeSeal(target, siteDrift(ROOT, target).pairs)
 
 // El blueprint, dentro de la web que ha producido.
 //
