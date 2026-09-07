@@ -53,7 +53,7 @@ No es descuido: estas devuelven algo que parece una respuesta y no lo es.
 | `~/.zshrc` con la variable repetida | Vale la primera | Vale **la última**. `zsh -lc 'echo $NPM_TOKEN' \| head -c 8`. |
 | `next build` | Compila de cero | Reutiliza caché y puede ocultar errores de tipos. `npm run typecheck`. |
 | Stryker | Marca supervivientes | Los mutantes estáticos salen como supervivientes sin serlo (`ignoreStatic`). |
-| Un guion que termina con éxito | Ha hecho su trabajo | `core:sync` borraba `node_modules/@sitewright`, nombre muerto desde el renombrado: terminaba bien sin hacer nada. Comprueba el efecto, no el código de salida. |
+| Un guion que termina con éxito | Ha hecho su trabajo | `core:sync` borraba `node_modules/@sitewright`, nombre muerto desde el renombrado: terminaba bien sin hacer nada. Y `sync-core` decía «verificado» comparando sólo `dist/index.js`, que tres versiones seguidas dejaron idéntico. Comprueba el efecto, y que lo comprobado sea lo que cambió. |
 
 ## La CI
 

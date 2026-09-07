@@ -5,7 +5,7 @@
 // trusting the install: it compares the bytes on disk with the bytes it meant to install.
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, readFileSync, rmSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, rmSync } from 'node:fs'
 import { dirname, isAbsolute, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -18,7 +18,34 @@ const stop = (why) => {
   process.exit(1)
 }
 const step = (what) => console.log(`\n── ${what} ──`)
-const hash = (file) => createHash('sha256').update(readFileSync(file)).digest('hex').slice(0, 12)
+/**
+ * El hash de un directorio entero: cada ruta y su contenido.
+ *
+ * Antes se miraba sólo `dist/index.js`, y tres versiones seguidas lo dejaron idéntico
+ * —los cambios estaban en `dist/ui` y en `dist/audit`—, así que el guion decía
+ * «verificado» sin haber mirado nada de lo que había cambiado. Justo lo que este guion
+ * existe para no hacer.
+ */
+const treeHash = (dir) => {
+  const files = []
+  const walk = (current, prefix) => {
+    for (const entry of readdirSync(current, { withFileTypes: true })) {
+      const path = join(current, entry.name)
+      const rel = prefix ? `${prefix}/${entry.name}` : entry.name
+      if (entry.isDirectory()) walk(path, rel)
+      else files.push([rel, path])
+    }
+  }
+  walk(dir, '')
+
+  // El orden del sistema de ficheros no está garantizado y cambiaría el hash sin que
+  // hubiera cambiado nada.
+  const sha = createHash('sha256')
+  for (const [rel, path] of files.sort(([a], [b]) => (a < b ? -1 : 1))) {
+    sha.update(rel).update('\0').update(readFileSync(path))
+  }
+  return sha.digest('hex').slice(0, 12)
+}
 
 const [target, askedVersion] = process.argv.slice(2)
 if (!target) stop('Uso: npm run sync-core -- <ruta-del-sitio> [versión]')
@@ -49,14 +76,29 @@ if (local) {
 
 // The check that would have caught all three failures: is the code in the site the code
 // we just built or downloaded? A version number matching proves nothing on a file: dep.
-const entry = join(installed, 'dist', 'index.js')
-if (!existsSync(entry)) stop('el núcleo no ha quedado instalado.')
+const distThere = join(installed, 'dist')
+if (!existsSync(join(distThere, 'index.js'))) stop('el núcleo no ha quedado instalado.')
 
-const there = hash(entry)
-const here = local ? hash(join(core, 'dist', 'index.js')) : null
-if (here && here !== there) {
-  stop(`el núcleo instalado no es el que se acaba de construir (${there} ≠ ${here}).`)
+const distHere = join(core, 'dist')
+const there = treeHash(distThere)
+const version = JSON.parse(readFileSync(join(installed, 'package.json'), 'utf8')).version
+const built = JSON.parse(readFileSync(join(core, 'package.json'), 'utf8')).version
+
+if (local) {
+  const here = treeHash(distHere)
+  if (here !== there) {
+    stop(`el núcleo instalado no es el que se acaba de construir (${there} ≠ ${here}).`)
+  }
+} else if (version === built && existsSync(distHere)) {
+  // Lo que sirve el registro tiene que ser lo que hay aquí construido: si no coincide, o
+  // el núcleo ha cambiado desde que se publicó esa versión, o npm ha servido otra cosa.
+  const here = treeHash(distHere)
+  if (here !== there) {
+    console.warn(
+      `\n  Aviso: la ${version} instalada no coincide con lo construido aquí (${there} ≠ ${here}).` +
+        `\n  Pasa si el núcleo ha cambiado después de publicarla. Comprueba antes de seguir.`,
+    )
+  }
 }
 
-const version = JSON.parse(readFileSync(join(installed, 'package.json'), 'utf8')).version
 console.log(`\n  sitewright-core ${version} instalado y verificado (${there}).\n`)
