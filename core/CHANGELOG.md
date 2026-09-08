@@ -3,6 +3,27 @@
 Qué gana una web al actualizar. Escrito para quien tiene que decidir si le compensa, no
 para quien escribió el código.
 
+## 0.16.0 — 8 de septiembre de 2026
+
+- **El grafo de datos estructurados y `/llms.txt` pasan al paquete.** Viajaban copiados
+  dentro de cada web, idénticos: 152 líneas que una errata rompía en todas a la vez y que
+  había que corregir a mano repositorio por repositorio. Ahora la lógica es de aquí —probada
+  con 30 casos y **al 100% de mutación**— y en la web quedan 41 líneas que sólo dicen a qué
+  dirección pertenece: `siteGraph(SITE_URL)` y `llmsTxt(SITE_URL)`.
+
+  Se atan a la dirección porque es lo único que cambia entre sitios, y porque es lo que más
+  duele equivocar: un `@id` apuntando al subdominio desechable de la plataforma le dice a un
+  buscador que la versión buena de la web es esa. Le pasó a la primera web durante semanas.
+
+  **Los módulos no cambian**: siguen importando `ORG_ID` y `buildHomeJsonLd` de
+  `@/lib/jsonLd` como siempre. Y `LlmsContext` se queda en la web a propósito, porque lleva
+  los ajustes de ese sitio: un módulo lee la presentación, que es un campo que el generador
+  añade por web y que un tipo del paquete no conocería.
+
+  Para recibirlo, una web ya hecha regenera sus dos ficheros; `sync-site` no los toca porque
+  son de los que escribe el generador.
+- El listón de mutación sube de 95,56% a **96,29%** con los dos módulos nuevos dentro.
+
 ## 0.15.0 — 8 de septiembre de 2026
 
 - **La auditoría mide sola el texto sobre cualquier color de la paleta.** Hasta ahora

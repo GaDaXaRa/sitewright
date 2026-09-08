@@ -21,6 +21,12 @@ no se copia —imágenes, revalidación, consentimiento, frenos del formulario�
 | `jsonld.ts` | Los nodos que añade al grafo, si añade alguno |
 | `llms.ts` | Su sección de `/llms.txt`, si aporta alguna |
 | `section.css` | Sus estilos, si necesita alguno. El generador los pega en la hoja del sitio |
+| `*.spec.ts` | Sus pruebas, que viajan con él y las corre el `test:int` de cada web |
+
+Las pruebas viajan **a propósito**. Un módulo es del sitio y se puede editar sin pedir
+permiso —`schedule/Row.tsx` y `faq/Section.tsx` ya se han tocado en webs vivas—, así que
+quien lo toque se entera ahí mismo de lo que ha roto, sin volver a la fábrica. Y de paso son
+el banco donde se prueban aquí: la CI genera tres webs y las corre.
 
 `wiring.js` es lo único que **no** viaja a la web: es del generador, y por eso el contenido
 de ejemplo vive ahí dentro (`seed:`) y no en un fichero aparte.

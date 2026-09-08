@@ -7,6 +7,9 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
-    include: ['tests/int/**/*.int.spec.ts'],
+    // Las de la web, y las que viajan dentro de cada módulo. Un módulo se copia al sitio y
+    // es suyo para editarlo, así que sus pruebas se copian con él: quien toque
+    // `schedule/Row.tsx` en su web se entera aquí de lo que ha roto, sin volver a la fábrica.
+    include: ['tests/int/**/*.int.spec.ts', 'src/modules/**/*.spec.ts'],
   },
 })

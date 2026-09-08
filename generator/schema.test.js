@@ -231,7 +231,9 @@ test('un campo del panel que nadie pinta es una promesa que la web no cumple', a
     // Se busca **en su propio módulo**: mirar en todos deja que el uso de uno tape el
     // huérfano de otro, y `featured` existe en dos módulos distintos.
     const suyo = readdirSync(new URL(`${id}/`, raiz))
-      .filter((f) => /\.(ts|tsx|js)$/.test(f) && f !== 'collection.ts')
+      // Las pruebas no cuentan como pintar: un campo que sólo nombra su `.spec.ts` sigue
+      // siendo una promesa que la web no cumple, y contarlas taparía justo eso.
+      .filter((f) => /\.(ts|tsx|js)$/.test(f) && f !== 'collection.ts' && !f.endsWith('.spec.ts'))
       .map((f) => readFileSync(new URL(`${id}/${f}`, raiz), 'utf8'))
       .join(' ')
 

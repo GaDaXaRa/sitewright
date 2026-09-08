@@ -34,6 +34,11 @@ export {
 // Laying out a page
 export { alternateTones, type Tone } from './lib/sectionTones.js'
 
+// Lo que leen las máquinas: el grafo de datos estructurados y el resumen de /llms.txt.
+// Los dos se atan a la dirección del sitio, que es lo único que cambia entre webs.
+export { siteGraph, type JsonLdSettings, type SiteGraph } from './lib/jsonLd.js'
+export { llmsTxt, type LlmsSection, type LlmsSettings } from './lib/llmsTxt.js'
+
 // Dated content
 export {
   isUpcoming,
