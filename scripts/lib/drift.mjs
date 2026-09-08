@@ -135,7 +135,21 @@ export function siteDrift(root, site) {
  * entregó no se sella, porque no habría nada que afirmar.
  */
 export function writeSeal(site, pairs) {
-  const seal = readSeal(site)
+  const previo = readSeal(site)
+
+  // Sin pares no hay nada que sellar, y reescribir aquí vaciaría el sello entero por un
+  // error de invocación —una raíz equivocada, un sitio a medio copiar—. El sello es lo que
+  // protege el trabajo de alguien: se deja como está.
+  if (!pairs.length) return Object.keys(previo).length
+
+  // Lo que la fábrica ya no entrega deja de estar sellado: si un fichero desapareció de la
+  // plantilla, su hash no afirma nada sobre nada, y guardarlo para siempre convierte el
+  // sello en el mismo archivo de restos que este trabajo existe para evitar.
+  const vigentes = new Set(pairs.map((pair) => pair.rel))
+  const seal = {}
+  for (const [rel, hash] of Object.entries(previo)) {
+    if (vigentes.has(rel)) seal[rel] = hash
+  }
 
   for (const pair of pairs) {
     if (existsSync(pair.to) && same(pair.from, pair.to)) seal[pair.rel] = hashOf(pair.to)

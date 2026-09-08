@@ -118,6 +118,42 @@ test('lo que falta se trae siempre: no hay nada que destruir', () => {
   }
 })
 
+test('el sello olvida lo que la fábrica ha dejado de entregar', () => {
+  const { raiz, sitio, escribe, limpia } = escenario()
+  try {
+    escribe(raiz, 'template/src/temporal.ts', 'esto no durará\n')
+    escribe(sitio, 'src/temporal.ts', 'esto no durará\n')
+    writeSeal(sitio, siteDrift(raiz, sitio).pairs)
+    assert.ok('src/temporal.ts' in readSeal(sitio))
+
+    // La fábrica lo retira. En la web puede quedarse —`sync-site` copia, nunca borra— pero
+    // su hash ya no afirma nada, y guardarlo convertiría el sello en un archivo de restos.
+    rmSync(join(raiz, 'template/src/temporal.ts'))
+    writeSeal(sitio, siteDrift(raiz, sitio).pairs)
+
+    assert.ok(!('src/temporal.ts' in readSeal(sitio)))
+    assert.ok('src/comun.ts' in readSeal(sitio))
+  } finally {
+    limpia()
+  }
+})
+
+test('sin pares no se reescribe: un error de invocación no vacía el sello', () => {
+  const { raiz, sitio, limpia } = escenario()
+  try {
+    writeSeal(sitio, siteDrift(raiz, sitio).pairs)
+    const antes = readSeal(sitio)
+
+    // Lo que pasaría con una raíz equivocada. Podar aquí borraría de un plumazo lo único
+    // que distingue una personalización de un fichero atrasado.
+    writeSeal(sitio, [])
+
+    assert.deepEqual(readSeal(sitio), antes)
+  } finally {
+    limpia()
+  }
+})
+
 test('el sello se escribe legible y ordenado, que es como se revisa un diff', () => {
   const { raiz, sitio, limpia } = escenario()
   try {
