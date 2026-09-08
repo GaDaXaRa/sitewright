@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import test from 'node:test'
 
 import { sectionOrder } from './schema.js'
-import { TemplateChanged, replaceOrDie } from './lib/text.js'
+import { PlaceholderMismatch, TemplateChanged, fill, replaceOrDie } from './lib/text.js'
 import { homePage, siteConfig, siteModules } from './lib/site.js'
 import { seedScript, siteSettings } from './lib/panel.js'
 import { siteGuide, siteReadme } from './lib/docs.js'
@@ -38,6 +38,7 @@ async function preparar(nombre) {
 }
 
 const plantilla = (rel) => readFileSync(join(ROOT, 'template', rel), 'utf8')
+const prosa = (rel) => readFileSync(join(ROOT, 'generator/templates', rel), 'utf8')
 
 // ── el reemplazo que tiene que ocurrir ──────────────────────────────────────────────────
 
@@ -142,11 +143,51 @@ test('el seed escribe los ejemplos de cada módulo activo', async () => {
 
 test('el README y la guía hablan de esta web, no de la plantilla', async () => {
   const { bp, modules } = await preparar('ejemplo-completo')
+  const readme = siteReadme(prosa('site-README.md'), bp, modules)
 
-  assert.match(siteReadme(bp, modules), /^# Once/m)
-  assert.match(siteGuide(bp, modules), /Once/)
+  assert.match(readme, /^# Once/m)
+  assert.match(siteGuide(prosa('site-CLAUDE.md'), bp, modules), /Once/)
   // Apuntaba a `../core`, un directorio que no existe al lado de un sitio generado.
-  assert.doesNotMatch(siteReadme(bp, modules), /\.\.\/core/)
+  assert.doesNotMatch(readme, /\.\.\/core/)
+})
+
+test('sin eslogan, el README no empieza con una línea en blanco de más', async () => {
+  const { bp, modules } = await preparar('ejemplo-completo')
+  const sinEslogan = { ...bp, identity: { ...bp.identity, tagline: undefined } }
+
+  assert.match(siteReadme(prosa('site-README.md'), sinEslogan, modules), /^# Once\n\nWeb y gestor/)
+})
+
+test('la prosa no lleva ni un hueco sin rellenar', async () => {
+  // Un `{{name}}` que sobreviva llega literal al repositorio de una clienta.
+  const { bp, modules } = await preparar('ejemplo-completo')
+
+  for (const texto of [
+    siteReadme(prosa('site-README.md'), bp, modules),
+    siteGuide(prosa('site-CLAUDE.md'), bp, modules),
+  ]) {
+    assert.doesNotMatch(texto, /\{\{/)
+  }
+})
+
+// ── rellenar una plantilla de texto ─────────────────────────────────────────────────────
+
+test('un hueco sin valor se avisa: llegaría literal al repositorio de una clienta', () => {
+  assert.throws(
+    () => fill('# {{name}}', {}, 'el README'),
+    (err) => err instanceof PlaceholderMismatch && /\{\{name\}\}/.test(err.message),
+  )
+})
+
+test('y un valor sin hueco también, que es alguien renombrando el hueco en el .md', () => {
+  assert.throws(
+    () => fill('# hola', { name: 'Once' }, 'el README'),
+    (err) => err instanceof PlaceholderMismatch && /name/.test(err.message),
+  )
+})
+
+test('rellena todas las apariciones del mismo hueco', () => {
+  assert.equal(fill('{{a}} y {{a}}', { a: 'x' }, 'algo'), 'x y x')
 })
 
 // ── el diseño ───────────────────────────────────────────────────────────────────────────

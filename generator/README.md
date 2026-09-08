@@ -19,7 +19,7 @@ reciben el blueprint y devuelven texto — sin leer el disco ni escribir nada.
 |---|---|
 | `lib/site.js` | `site.config.ts`, `site.modules.ts` y la portada |
 | `lib/panel.js` | `SiteSettings.ts` y `scripts/seed.ts` |
-| `lib/docs.js` | El README y el CLAUDE.md de la web |
+| `lib/docs.js` | El README y el CLAUDE.md de la web, desde `templates/` |
 | `lib/design.js` | La paleta, los colores propios y las tipografías |
 | `lib/text.js` | `replaceOrDie` y los ayudantes que usan todos |
 
@@ -28,6 +28,13 @@ de eso se podía llamar desde una prueba**, y lo único que lo vigilaba era comp
 enteras en la CI, minutos por vuelta y sólo después de subir. Ahora lo prueba
 [`writers.test.js`](writers.test.js) en milisegundos, y la matriz de la CI sigue donde
 estaba para lo que una prueba no ve: que el sitio compile.
+
+La prosa que lee una clienta —el README y la guía de su web— **no está en el código**: vive
+en [`templates/`](templates), en markdown de verdad. Estuvo dentro de plantillas literales
+de JavaScript con cada comilla invertida escapada a mano, y eso ya se subió roto una vez en
+`provision.js`. Se rellena con `fill`, que comprueba las dos direcciones: un `{{hueco}}` sin
+valor llegaría literal al repositorio de una clienta, y un valor sin hueco es alguien que
+renombró el hueco en el `.md` y dejó de llegar el dato sin que nada lo dijera.
 
 Un escritor **no puede parar el proceso**. Cuando no reconoce la plantilla lanza
 `TemplateChanged` y `generate.js` decide: borrar lo escrito a medias y decir cuál falló. Que

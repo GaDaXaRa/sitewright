@@ -6,7 +6,7 @@ import { sectionOrder, validateBlueprint, validateWiring } from './schema.js'
 import { MODULE_SKIP, TEMPLATE_SKIP } from './generated.js'
 import { siteDrift, writeSeal } from '../scripts/lib/drift.mjs'
 import { defaultIconSvg } from '../core/dist/index.js'
-import { TemplateChanged, replaceOrDie } from './lib/text.js'
+import { GeneratorStopped, replaceOrDie } from './lib/text.js'
 import { homePage, siteConfig, siteModules } from './lib/site.js'
 import { seedScript, siteSettings } from './lib/panel.js'
 import { siteGuide, siteReadme } from './lib/docs.js'
@@ -66,7 +66,7 @@ function writing(work) {
   try {
     return work()
   } catch (err) {
-    if (err instanceof TemplateChanged) abort(err.message)
+    if (err instanceof GeneratorStopped) abort(err.message)
     throw err
   }
 }
@@ -143,8 +143,11 @@ writing(() => {
   write('src/globals/SiteSettings.ts', siteSettings(read('src/globals/SiteSettings.ts'), bp, modules, wirings))
   write('src/app/(frontend)/page.tsx', homePage(bp, modules, wirings, order))
   write('scripts/seed.ts', seedScript(bp, modules, wirings))
-  write('CLAUDE.md', siteGuide(bp, modules))
-  write('README.md', siteReadme(bp, modules))
+  // La prosa de los dos vive en `generator/templates/`, en markdown de verdad: dentro de una
+  // plantilla literal había que escapar cada comilla invertida, y eso ya se ha subido roto.
+  const prosa = (nombre) => readFileSync(join(ROOT, 'generator/templates', nombre), 'utf8')
+  write('CLAUDE.md', siteGuide(prosa('site-CLAUDE.md'), bp, modules))
+  write('README.md', siteReadme(prosa('site-README.md'), bp, modules))
   write(
     'src/app/(frontend)/styles.css',
     nameStylesheet(
