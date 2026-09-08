@@ -68,6 +68,13 @@ jobs:
           cache: npm
           cache-dependency-path: template/package-lock.json
       - run: npm ci
+      # Contra el núcleo de **este commit**, no contra el publicado. Es la misma corrección
+      # que ya llevaban los sitios generados, y aquí faltaba: la plantilla instalaba del
+      # registro, así que un cambio en el núcleo y su uso en la plantilla no podían entrar
+      # en el mismo commit — el trabajo se caía hasta que alguien publicara. Probaba una
+      # mezcla que no es ningún commit.
+      - run: npm ci --prefix ../core && npm run build --prefix ../core
+      - run: npm install --no-audit --no-fund --no-save "file:$GITHUB_WORKSPACE/core"
       # Los tipos de Payload no están versionados —los genera cada sitio— así que aquí
       # hay que escribirlos antes de comprobarlos. No hace falta base de datos: sólo se
       # lee la configuración. La copia local de cada quien se queda atrás cuando alguien
