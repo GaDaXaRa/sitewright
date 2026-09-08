@@ -13,7 +13,7 @@ export const TEMPLATE_SKIP =
   /node_modules|\.next|payload-types\.ts|tsconfig\.tsbuildinfo|package-lock\.json/
 
 /** De un módulo no viaja lo que es del generador, no del sitio. */
-export const MODULE_SKIP = /module\.json|wiring\.js|package\.json|section\.css/
+export const MODULE_SKIP = /wiring\.js|package\.json|section\.css/
 
 /**
  * Lo que el generador escribe a partir del blueprint: es de cada web, y compararlo con la

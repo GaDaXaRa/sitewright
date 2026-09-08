@@ -16,4 +16,12 @@ export {
   checkConsentGating,
   checkAdminPrivate,
 } from './compliance.js'
-export { checkImages, checkPlaceholders, cssTokens, checkContrast, checkWeight, checkHeroLegibility } from './presentation.js'
+export {
+  checkImages,
+  checkPlaceholders,
+  cssTokens,
+  discoverOnPairs,
+  checkContrast,
+  checkWeight,
+  checkHeroLegibility,
+} from './presentation.js'

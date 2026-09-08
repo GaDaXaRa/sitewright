@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { sectionOrder, validateBlueprint, validateWiring } from './schema.js'
 import { MODULE_SKIP, TEMPLATE_SKIP } from './generated.js'
 import { siteDrift, writeSeal } from '../scripts/lib/drift.mjs'
-import { buttonColors, defaultIconSvg } from '../core/dist/index.js'
+import { bestTextOn, buttonColors, defaultIconSvg } from '../core/dist/index.js'
 
 /**
  * From a blueprint to a site on disk.
@@ -633,7 +633,38 @@ function applyPalette(css, design) {
     // el color de la plantilla en ese sitio, que es el de otra web.
     out = replaceOrDie(out, new RegExp(`(--${token}:\\s*)[^;]+;`), `$1${value};`, `el color --${token}`)
   }
-  return out
+  return extraColours(out, palette.extras ?? {}, palette)
+}
+
+/**
+ * Los colores que sólo tiene este diseño.
+ *
+ * Los diez de la paleta tienen papel fijo —fondo, tinta, línea, acento— y con eso se pinta
+ * la estructura, que es igual en todas las webs. Pero un diseño de verdad usa más: Organic
+ * Yoga pinta sus bandas con un índigo y sus detalles con un ocre, y esos dos colores
+ * aparecen en cuarenta y cuatro sitios de su hoja. Sin un hueco donde declararlos, la única
+ * salida era escribir el hexadecimal a mano en cada regla, que es como se pierde una paleta.
+ *
+ * Cada uno viene con su **tinta medida**, no elegida: `--on-<color>` es el texto que se lee
+ * encima, calculado igual que el del botón. Sirve para dos cosas, y la segunda es la que
+ * importa: la auditoría busca esas parejas sola, así que un color nuevo entra ya medido y
+ * no puede quedarse un texto ilegible sobre una banda de color sin que nadie lo diga.
+ */
+function extraColours(css, extras, palette) {
+  const names = Object.keys(extras)
+  if (!names.length) return css
+
+  const lines = names.flatMap((name) => [
+    `  --${name}: ${extras[name]};`,
+    `  --on-${name}: ${bestTextOn(extras[name], [palette.ink, palette.ground])};`,
+  ])
+
+  return replaceOrDie(
+    css,
+    /\n\n  --radius:/,
+    `\n\n  /* Los colores propios de este diseño, con la tinta que se lee sobre cada uno. */\n${lines.join('\n')}\n\n  --radius:`,
+    'los colores propios del diseño',
+  )
 }
 
 /**

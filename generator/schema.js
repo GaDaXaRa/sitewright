@@ -35,6 +35,40 @@ const WITHOUT_COLLECTION = ['about']
 const HEX = /^#[0-9a-fA-F]{6}$/
 const ID = /^[a-z][a-z0-9-]*$/
 const ROUTE = /^\/[a-z0-9-/]*$/
+const TOKEN = /^[a-z][a-z0-9-]*$/
+
+/**
+ * Los tokens que la plantilla ya declara.
+ *
+ * Un color propio que se llame como uno de estos no se añade: lo tapa. Y como el generador
+ * escribe los suyos después de la paleta, ganaría el del blueprint, dejando la web con el
+ * fondo donde iba el acento y ninguna puerta diciendo nada.
+ */
+const RESERVED_TOKENS = [
+  'ground',
+  'ground-2',
+  'surface',
+  'surface-2',
+  'ink',
+  'ink-soft',
+  'ink-faint',
+  'line',
+  'accent',
+  'accent-soft',
+  'accent-hover',
+  'on-accent',
+  'on-photo',
+  'on-photo-alt',
+  'logo-invert',
+  'logo-box-blend',
+  'radius',
+  'radius-lg',
+  'maxw',
+  'narrow',
+  'gutter',
+  'font-display',
+  'font-body',
+]
 
 function required(value, path, errors, what = 'falta') {
   if (value === undefined || value === null || value === '') errors.push(`${path}: ${what}`)
@@ -120,6 +154,30 @@ export function validateBlueprint(blueprint) {
       errors.push(`design.palette.${key}: un color en formato #rrggbb`)
     }
   }
+  // Los colores propios de un diseño: una banda índigo, un detalle dorado. Van aparte de
+  // los diez de siempre porque no tienen papel fijo —la hoja de estilos de esa web decide
+  // qué hace con ellos—, y por eso lo único que se puede comprobar aquí es que se puedan
+  // escribir como token y que no tapen a uno del sistema.
+  const extras = palette.extras ?? {}
+  if (palette.extras !== undefined && (typeof extras !== 'object' || Array.isArray(extras))) {
+    errors.push('design.palette.extras: un objeto de nombre a color')
+  } else {
+    for (const [name, value] of Object.entries(extras)) {
+      if (!TOKEN.test(name)) {
+        errors.push(`design.palette.extras.${name}: solo minúsculas, números y guiones`)
+      } else if (RESERVED_TOKENS.includes(name)) {
+        errors.push(`design.palette.extras.${name}: ese nombre ya es del sistema de diseño`)
+      } else if (name.startsWith('on-')) {
+        // El generador escribe `--on-<color>` con la tinta medida para cada uno: un color
+        // llamado `on-algo` produciría `--on-on-algo` y taparía al de verdad.
+        errors.push(`design.palette.extras.${name}: "on-" lo reserva la tinta de cada color`)
+      }
+      if (typeof value !== 'string' || !HEX.test(value)) {
+        errors.push(`design.palette.extras.${name}: un color en formato #rrggbb`)
+      }
+    }
+  }
+
   const fonts = design.fonts ?? {}
   required(fonts.display, 'design.fonts.display', errors)
   required(fonts.body, 'design.fonts.body', errors)

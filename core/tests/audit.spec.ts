@@ -22,6 +22,7 @@ import {
   checkLlmsTxt,
   checkAdminPrivate,
   cssTokens,
+  discoverOnPairs,
 } from '../src/audit/checks/index.js'
 import { checkPooled, describeDbError } from '../src/audit/migrations.js'
 import { contrastRatio } from '../src/lib/color.js'
@@ -315,6 +316,48 @@ describe('contraste', () => {
     const css = ':root { --washi: #f4efe4; --sumi: #262019; }'
 
     expect(failures(checkContrast(css, [['sumi', 'washi']]))).toEqual([])
+  })
+
+  it('mide el texto del error del formulario, que va sobre la tarjeta', () => {
+    // Sandunguera lo tenía en su oro de marca, a 3,88:1 sobre la tarjeta, y nadie lo medía:
+    // es texto que alguien lee justo cuando algo acaba de fallar.
+    const malo = ':root { --ground: #F3F2E1; --ink: #1E2A1A; --surface: #FFFDF2; --accent: #A67800; }'
+    const bueno = ':root { --ground: #F3F2E1; --ink: #1E2A1A; --surface: #FFFDF2; --accent: #99423B; }'
+
+    expect(failures(checkContrast(malo))).toContain('--accent sobre --surface')
+    expect(failures(checkContrast(bueno))).toEqual([])
+  })
+
+  /**
+   * Ampliar la paleta no puede abrir un agujero justo aquí. Un color propio —una banda
+   * índigo, un detalle dorado— declara su tinta como `--on-<color>`, y esa pareja se mide
+   * sin que nadie se acuerde de pasarla.
+   */
+  it('descubre la tinta de un color propio y la mide', () => {
+    const css = ':root { --indigo: #274257; --on-indigo: #3a4048; }'
+
+    expect(discoverOnPairs(cssTokens(css), [])).toEqual([['on-indigo', 'indigo']])
+    expect(failures(checkContrast(css))).toContain('--on-indigo sobre --indigo')
+  })
+
+  it('y la deja pasar cuando el color propio sí se lee', () => {
+    const css = ':root { --indigo: #274257; --on-indigo: #f4efe4; }'
+
+    expect(failures(checkContrast(css))).toEqual([])
+  })
+
+  it('no repite la pareja que ya estaba en la lista fija', () => {
+    const tokens = { accent: '#99423b', 'on-accent': '#f3f2e1' }
+
+    expect(discoverOnPairs(tokens, [['on-accent', 'accent']])).toEqual([])
+  })
+
+  it('no inventa un fondo para --on-photo, que no tiene --photo', () => {
+    // La foto la sube alguien después; de eso se ocupa la puerta del hero, que sabe que
+    // hay un velo por medio.
+    const tokens = { ground: '#f3f2e1', 'on-photo': '#f3f2e1' }
+
+    expect(discoverOnPairs(tokens, [])).toEqual([])
   })
 })
 

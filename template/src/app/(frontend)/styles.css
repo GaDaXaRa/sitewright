@@ -1103,8 +1103,13 @@ img {
   margin: 0;
 }
 
+/* En el acento, no en `--accent-soft`. Dos razones, y la segunda es la que lo decidió:
+   un mensaje de error no es el segundo color de marca —en Sandunguera el suyo es un oro, y
+   "no se ha podido enviar" salía en dorado—, y `--accent-soft` es el único token que la
+   hoja leía como texto sin que ninguna puerta lo midiera: ahí daba 3,88:1, por debajo del
+   AA. El acento sí se mide, contra el fondo y contra su propia tinta. */
 .form-error {
-  color: var(--accent-soft);
+  color: var(--accent);
   font-size: 15px;
   margin: 0;
 }

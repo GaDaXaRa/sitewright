@@ -19,7 +19,7 @@
  * 1. **A mutant that breaks the module's import counts as a survivor**, because the vitest
  *    runner only looks at failing tests, not at files that never load. Before believing a
  *    row, apply the change by hand and run the tests.
- * 2. **The twenty-nine survivors that remain cannot be killed**, gone through one by one
+ * 2. **The twenty-eight survivors that remain cannot be killed**, gone through one by one
  *    on 7 September 2026 by applying each one and running the battery. They fall into four
  *    families, and knowing which is which is what stops the next person re-deriving them:
  *
@@ -37,26 +37,33 @@
  *      array (NaN, which never counts as backdrop) and write past a typed array, a no-op.
  *    - **A threshold no pair of colours can hit** (2): `>= 4.5` and `> 4.5` differ only at
  *      a contrast of exactly 4.5:1, a real number no hex pair produces.
- *    - **Guards that cannot fail where they stand** (13): `holderLines` already returned
+ *    - **Guards that cannot fail where they stand** (12): `holderLines` already returned
  *      `[]` when there is no holder, so `settings` is never null below it; `split()` always
  *      yields index 0; `if (!end) return false` where the fallthrough returns false too;
- *      `String(null)` matches no id; a separator over one item; a default that only has to
- *      be neither 'never' nor 'always'; `new URL()` throwing into the same `null`; `URL`
- *      trimming what `.trim()` trimmed; `.toString()` on a string; the `g` flag already
- *      stripping both ends; and a hostname whose only slash is the trailing one.
+ *      a separator over one item; a default that only has to be neither 'never' nor
+ *      'always'; `new URL()` throwing into the same `null`; `URL` trimming what `.trim()`
+ *      trimmed; `.toString()` on a string; the `g` flag already stripping both ends; and a
+ *      hostname whose only slash is the trailing one.
  *
  *    Three that used to sit here **were real gaps**, and now have tests: `#abc` expanding
  *    to `#aabbcc` and not `#abcabc` (the old case used `#fff`, where both readings agree),
  *    `contrastRatio` returning null when the **second** colour is invalid, and a
  *    `/EmbeddedPlayer` path on a host that is not Bandcamp.
  *
- * Score when last measured: **95.46%** (29 survivors of 639), on 8 September 2026.
+ * Score when last measured: **95.56%** (28 survivors of 631), on 8 September 2026.
  *
- * It dropped from 96.08% and **that is not a regression**: `versions.ts` moved out to
- * `scripts/lib/`, where it belongs — it is the factory's own tooling and no site imports
- * it — and it took 100 mutants with a perfect score with it. The same 29 survivors remain
- * over a smaller total. Worth knowing because the margin over the 95 threshold is now
- * 0.46: the next module added without tests breaks the build, which is the point.
+ * It **rose** from 95.46% and that is not an improvement either: `relationPointsTo` was
+ * deleted — nothing called it, not a site, not the template, not the core itself — and it
+ * took 8 mutants with it, 7 killed and **one survivor**, the `String(null)` guard that used
+ * to sit in the list above. A survivor leaving raises the score without a single test being
+ * written, which is worth knowing before anyone reads a rise as progress.
+ *
+ * Before that it had dropped from 96.08%, and that was not a regression: `versions.ts`
+ * moved out to `scripts/lib/`, where it belongs — it is the factory's own tooling and no
+ * site imports it — taking 100 mutants with a perfect score with it.
+ *
+ * The margin over the 95 threshold is 0.56: the next module added without tests breaks the
+ * build, which is the point.
  */
 /** @type {import('@stryker-mutator/api/core').PartialStrykerOptions} */
 const configuration = {

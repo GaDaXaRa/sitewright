@@ -118,6 +118,31 @@ export function cssTokens(css: string): Record<string, string> {
  * **Pass text pairs only.** A border or a divider is not read, and WCAG asks 3:1 of it, not
  * 4.5:1: measuring `--line` here reports a failure that is not one.
  */
+/**
+ * Las parejas que no están en la lista fija porque dependen de la paleta de cada web.
+ *
+ * La convención es la que ya usaba `--on-accent`: **`--on-X` es la tinta que se lee sobre
+ * `--X`**. Una web puede declarar los colores que su diseño necesite —una banda índigo, un
+ * detalle dorado— y cada uno trae el suyo; encontrándolos aquí, el texto sobre una banda de
+ * color se mide igual que el del botón, sin que nadie tenga que acordarse de pasar
+ * `--contrast-pairs`.
+ *
+ * Sin esto, ampliar la paleta abría un agujero justo en la puerta que existe para que no
+ * haya texto ilegible: un color nuevo entraba sin que nadie midiera lo que va encima.
+ */
+export function discoverOnPairs(
+  tokens: Record<string, string>,
+  known: [string, string][],
+): [string, string][] {
+  const already = new Set(known.map(([fg, bg]) => `${fg}/${bg}`))
+  return Object.keys(tokens)
+    .filter((name) => name.startsWith('on-'))
+    .map((name) => [name, name.slice(3)] as [string, string])
+    // `--on-photo` no tiene `--photo`: la foto la sube alguien después, y de eso se ocupa
+    // `checkPhotoContrast`, que sabe que hay un velo por medio.
+    .filter(([fg, bg]) => bg in tokens && !already.has(`${fg}/${bg}`))
+}
+
 export function checkContrast(
   css: string,
   pairs: [string, string][] = [
@@ -129,11 +154,14 @@ export function checkContrast(
     ['on-accent', 'accent'],
     ['ink-soft', 'surface'],
     ['ink-faint', 'surface'],
+    // El mensaje de error del formulario, que va en el acento sobre la tarjeta. Es texto
+    // que alguien lee justo cuando algo ha fallado, y no lo medía nadie.
+    ['accent', 'surface'],
   ],
 ): Finding[] {
   const tokens = cssTokens(css)
 
-  const findings = pairs
+  const findings = [...pairs, ...discoverOnPairs(tokens, pairs)]
     .map(([fg, bg]) => {
       const [a, b] = [tokens[fg], tokens[bg]]
       if (!a || !b) return null

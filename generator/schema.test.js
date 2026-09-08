@@ -81,6 +81,49 @@ test('rechaza un color que no es un color', () => {
   assert.match(validateBlueprint(bp).join(' '), /#rrggbb/)
 })
 
+/**
+ * Los colores propios del diseño. La plantilla trae diez con papel fijo y una web real usa
+ * más —Organic Yoga pinta sus bandas con un índigo y sus detalles con un ocre—, así que lo
+ * que se valida aquí es lo único comprobable sin ver la hoja: que se puedan escribir como
+ * token y que no tapen a uno del sistema.
+ */
+test('acepta los colores propios de un diseño', () => {
+  const bp = valid()
+  bp.design.palette.extras = { indigo: '#274257', ocre: '#c19a4b' }
+
+  assert.deepEqual(validateBlueprint(bp), [])
+})
+
+test('rechaza un color propio que no es un color', () => {
+  const bp = valid()
+  bp.design.palette.extras = { indigo: 'índigo' }
+
+  assert.match(validateBlueprint(bp).join(' '), /extras\.indigo.*#rrggbb/)
+})
+
+test('rechaza un color propio que se llama como uno del sistema', () => {
+  // Se escriben después de la paleta, así que ganaría éste: la web saldría con el fondo
+  // donde iba el acento y ninguna puerta lo diría.
+  const bp = valid()
+  bp.design.palette.extras = { accent: '#274257' }
+
+  assert.match(validateBlueprint(bp).join(' '), /ya es del sistema/)
+})
+
+test('rechaza un color propio llamado "on-algo", que taparía a la tinta medida', () => {
+  const bp = valid()
+  bp.design.palette.extras = { 'on-indigo': '#274257' }
+
+  assert.match(validateBlueprint(bp).join(' '), /"on-" lo reserva/)
+})
+
+test('rechaza un nombre de color que no se puede escribir como token', () => {
+  const bp = valid()
+  bp.design.palette.extras = { 'Índigo Profundo': '#274257' }
+
+  assert.match(validateBlueprint(bp).join(' '), /minúsculas/)
+})
+
 test('el orden de las secciones respeta el declarado y añade el resto detrás', () => {
   const bp = valid()
   bp.design.sections = ['contact']

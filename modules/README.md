@@ -13,14 +13,17 @@ no se copia —imágenes, revalidación, consentimiento, frenos del formulario�
 
 | Fichero | Para qué |
 |---|---|
-| `module.json` | El manifiesto: etiquetas por defecto, rutas, sección y qué aporta |
+| `wiring.js` | Cómo se enchufa: importaciones, consulta, render, menú y contenido de ejemplo |
 | `collection.ts` | Fábrica de la colección de Payload, parametrizada por etiquetas |
 | `Section.tsx` | La sección de la portada (y de su página, si la tiene) |
 | `Page.tsx` | Su página índice, si la tiene. La sirve `[seccion]` |
 | `Detail.tsx` | La ficha de uno de sus documentos, si las tiene. La sirve `[seccion]/[slug]` |
 | `jsonld.ts` | Los nodos que añade al grafo, si añade alguno |
 | `llms.ts` | Su sección de `/llms.txt`, si aporta alguna |
-| `seed.ts` | Contenido de ejemplo, para que la web se vea antes de tener textos |
+| `section.css` | Sus estilos, si necesita alguno. El generador los pega en la hoja del sitio |
+
+`wiring.js` es lo único que **no** viaja a la web: es del generador, y por eso el contenido
+de ejemplo vive ahí dentro (`seed:`) y no en un fichero aparte.
 
 Las páginas son **ficheros de verdad**, no cadenas de texto dentro de `wiring.js`: se
 comprueban con el resto, se leen con resaltado y las sirve una sola ruta de la plantilla,

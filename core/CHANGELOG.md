@@ -3,6 +3,55 @@
 Qué gana una web al actualizar. Escrito para quien tiene que decidir si le compensa, no
 para quien escribió el código.
 
+## 0.15.0 — 8 de septiembre de 2026
+
+- **La auditoría mide sola el texto sobre cualquier color de la paleta.** Hasta ahora
+  comparaba una lista fija de parejas, y las webs que declaran colores propios —una banda
+  índigo, un detalle dorado— se quedaban con ese texto sin medir. Ahora, además de la lista,
+  busca en la hoja toda pareja `--on-<color>` / `--<color>` y la mide igual: la convención
+  que ya usaba el botón, aplicada a lo que venga. Una web sin colores propios no nota nada.
+- **El mensaje de error del formulario deja de ir en el segundo color de marca.** Ahora va en
+  el acento. Eran dos problemas en la misma línea: «no se ha podido enviar» salía en el oro
+  de Sandunguera —un error no es un color de marca—, y `--accent-soft` era el único token que
+  la hoja leía como texto sin que ninguna puerta lo midiera. Ahí daba **3,88:1**, por debajo
+  del AA, en la frase que alguien lee justo cuando algo acaba de fallar. En el acento da
+  6,44. La puerta de contraste mide ahora esa pareja, así que no puede volver a pasar.
+
+  Las webs ya hechas lo reciben regenerando su hoja: es un fichero que el generador escribe
+  por sitio, y `sync-site` no lo toca.
+- **El blueprint acepta los colores propios de un diseño**, con nombre libre, en
+  `design.palette.extras`. Los diez de siempre tienen papel fijo y una web real usa más:
+  Organic Yoga pinta sus bandas con un índigo y sus detalles con un ocre, en cuarenta y
+  cuatro sitios de su hoja, y sin un hueco donde declararlos la única salida era escribir el
+  hexadecimal a mano en cada regla. Cada uno sale con su tinta **medida**, no elegida.
+
+  Y medirla dejó ver algo: en Organic Yoga, la tinta del propio sitio da **4,32:1** sobre su
+  verde matcha, por debajo del 4,5 que pide el AA. Medirlo devuelve un negro que da 5,06.
+  Elegido a ojo, ese texto habría salido a producción.
+
+- **Segunda pasada al índice, esta vez con la lista de consumidores delante.** La de 0.14.0
+  se hizo a ojo; ésta se hizo mirando las tres webs en producción, la plantilla y los
+  módulos, y sale de ahí una regla que se puede repetir: **sale del paquete lo que alguien
+  nombra**. Dejan de exportarse las piezas que el propio núcleo cablea por dentro:
+  - de `sitewright-core/payload`, los ganchos `saveOriginalCopy` y `versionUrls` y los
+    endpoints `restoreOriginalEndpoint` e `imageOpsEndpoint` —con `invertImage`,
+    `clearImageBackdrop` y `OPS_ERROR`—, que **monta `mediaCollection`**;
+  - de `sitewright-core`, las decisiones de la copia original (`decideOriginalCopy`,
+    `rejectionReason`, `fileToRestore`, `RESTORE_ERROR` y sus tipos), `contrastRatio` —la
+    usa `buttonColors` y la auditoría—, `joinWithAnd`, `PROVIDER_NAMES`,
+    `initials`, `CMS_ICON_ROUTE` y los topes del freno del formulario (`MAX_PER_IP`,
+    `MAX_GLOBAL`, `GLOBAL_WINDOW_MS`), que aplican `countSince` y `exceedsGlobalCeiling`.
+
+  **Ninguna función cambia**: la copia original se sigue guardando, el panel sigue quitando
+  fondos y volviendo al original, y el freno del formulario sigue frenando igual. Lo que se
+  deja de prometer es la forma de montarlo a mano, que ninguna web usaba.
+
+  Sí sigue saliendo `IP_WINDOW_MS`, porque el módulo de contacto purga con él su propio mapa
+  de IPs; y `relationId`, porque subsuelo lo usa en cuatro ficheros. Comprobarlo antes fue
+  la diferencia entre una limpieza y romper una web.
+- **Se va `relationPointsTo`**, que no la llamaba nadie: ni una web, ni la plantilla, ni el
+  propio núcleo. Sólo la llamaba su prueba.
+
 ## 0.14.0 — 8 de septiembre de 2026
 
 - **El paquete deja de exportar lo que ninguna web usaba.** Se van del índice `compareVersions`,

@@ -7,9 +7,3 @@ export function relationId(value: unknown): number | string | null {
   if (typeof value === 'object') return (value as { id?: number | string }).id ?? null
   return value as number | string
 }
-
-/** Whether a relationship points at a given document, in either shape. */
-export function relationPointsTo(value: unknown, id: number | string): boolean {
-  const own = relationId(value)
-  return own != null && String(own) === String(id)
-}
