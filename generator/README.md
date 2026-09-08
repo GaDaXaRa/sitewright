@@ -9,6 +9,30 @@ node provision.js blueprints/ejemplo-asociacion.json   # imprime los comandos de
 node --test                                            # pruebas del validador
 ```
 
+## Cómo está partido
+
+`generate.js` **dirige**: lee los argumentos, valida, copia el chasis, le pide a cada
+escritor su fichero y lo guarda. Quien redacta vive en [`lib/`](lib), en funciones puras que
+reciben el blueprint y devuelven texto — sin leer el disco ni escribir nada.
+
+| Fichero | Qué redacta |
+|---|---|
+| `lib/site.js` | `site.config.ts`, `site.modules.ts` y la portada |
+| `lib/panel.js` | `SiteSettings.ts` y `scripts/seed.ts` |
+| `lib/docs.js` | El README y el CLAUDE.md de la web |
+| `lib/design.js` | La paleta, los colores propios y las tipografías |
+| `lib/text.js` | `replaceOrDie` y los ayudantes que usan todos |
+
+Estaban las novecientas líneas dentro de `generate.js`, que se ejecuta al importarlo: **nada
+de eso se podía llamar desde una prueba**, y lo único que lo vigilaba era compilar tres webs
+enteras en la CI, minutos por vuelta y sólo después de subir. Ahora lo prueba
+[`writers.test.js`](writers.test.js) en milisegundos, y la matriz de la CI sigue donde
+estaba para lo que una prueba no ve: que el sitio compile.
+
+Un escritor **no puede parar el proceso**. Cuando no reconoce la plantilla lanza
+`TemplateChanged` y `generate.js` decide: borrar lo escrito a medias y decir cuál falló. Que
+pudiera llamar a `process.exit` era justo lo que hacía imposible probarlo.
+
 ## Qué escribe
 
 `site.config.ts` (identidad, rutas) · `payload.config.ts` (colecciones de los módulos con sus

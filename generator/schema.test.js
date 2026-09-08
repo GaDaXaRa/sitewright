@@ -293,9 +293,16 @@ test('cada campo del blueprint lo lee alguien', async () => {
   // `design.altExample` estuvo en el blueprint de una web real sin que nadie lo leyera: el
   // panel seguía enseñando el ejemplo de la plantilla. Un campo que se rellena y no hace
   // nada es peor que no tenerlo, porque quien lo rellena cree que ha configurado algo.
+  // Todo el generador, no sólo su guion: quien lee un campo del blueprint vive en `lib/`
+  // desde que se partió, y buscar sólo en `generate.js` daba por huérfano lo que sí se lee.
+  // Se listan por glob para que un escritor nuevo entre sin tocar esta prueba.
+  const { readdirSync } = await import('node:fs')
+  const enLib = readdirSync(new URL('./lib/', import.meta.url)).map((f) => `./lib/${f}`)
   const source = (
     await Promise.all(
-      ['./generate.js', './schema.js'].map((f) => readFile(new URL(f, import.meta.url), 'utf8')),
+      ['./generate.js', './schema.js', ...enLib].map((f) =>
+        readFile(new URL(f, import.meta.url), 'utf8'),
+      ),
     )
   )
     .join('\n')
