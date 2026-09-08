@@ -102,7 +102,11 @@ jobs:
       # Los módulos no se compilan en ningún sitio: sólo existen dentro de una web
       # generada. Sin este trabajo, una errata en un módulo la descubre el cliente.
       - run: npm ci --prefix core && npm run build --prefix core
-      - run: node generator/generate.js --blueprint generator/blueprints/${{ matrix.blueprint }}.json --out /tmp/sitio
+      # `--core file:` apunta al núcleo que se acaba de construir, no al publicado. Sin
+      # esto el trabajo compilaba el núcleo local para nada y luego se instalaba el del
+      # registro: probaba una mezcla que no es ningún commit, y se caía entero en cuanto
+      # se subía la versión antes de publicarla.
+      - run: node generator/generate.js --blueprint generator/blueprints/${{ matrix.blueprint }}.json --out /tmp/sitio --core file:$GITHUB_WORKSPACE/core
       - run: npm install --no-audit --no-fund
         working-directory: /tmp/sitio
       - run: npm run generate:types
