@@ -235,7 +235,19 @@ test('un campo del panel que nadie pinta es una promesa que la web no cumple', a
       .map((f) => readFileSync(new URL(`${id}/${f}`, raiz), 'utf8'))
       .join(' ')
 
-    const campos = [...readFileSync(coleccion, 'utf8').matchAll(/name: '([a-zA-Z][a-zA-Z0-9]*)'/g)]
+    // Y los que **no se publican a propósito**, que se reconocen solos: un campo con su
+    // propio `access.read` es privado por decisión —el enlace de una clase de pago, por
+    // ejemplo—, y pintarlo sería el fallo, no dejarlo sin pintar. Se mira el cuerpo de cada
+    // campo, de su `name` al siguiente, en vez de apuntarlo en una lista que hay que
+    // acordarse de mantener.
+    const fuente = readFileSync(coleccion, 'utf8')
+    const declaraciones = [...fuente.matchAll(/name: '([a-zA-Z][a-zA-Z0-9]*)'/g)]
+
+    const campos = declaraciones
+      .filter(({ index }, i) => {
+        const cuerpo = fuente.slice(index, declaraciones[i + 1]?.index ?? fuente.length)
+        return !/access:\s*\{\s*read:/.test(cuerpo)
+      })
       .map((m) => m[1])
       .filter((campo) => !ESTRUCTURALES.has(campo) && !LOS_LEE_OTRO.has(`${id}.${campo}`))
 

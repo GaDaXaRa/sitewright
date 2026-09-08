@@ -37,12 +37,13 @@ estudio, "Proyectos" en un portafolio, "Sesiones" en un colectivo y "Actividades
 asociación. Por eso ninguna etiqueta está escrita en el código: entran por la fábrica, y el
 blueprint decide cuál toca.
 
-## Los diez
+## Los once
 
 | Módulo | Qué es | Página propia |
 |---|---|---|
 | `catalog` | Lo que el negocio ofrece o ha hecho | Sí, con ficha por elemento |
 | `schedule` | Contenido con fecha: próximo y archivo | Sí |
+| `timetable` | El cuadrante semanal: lo que se repite cada semana | Sí |
 | `pricing` | Precios, bonos y "a convenir" | Sí |
 | `team` | Las personas | Ficha por persona |
 | `media` | Audio y vídeo embebidos, tras consentimiento | Sí |
@@ -51,3 +52,19 @@ blueprint decide cuál toca.
 | `notices` | Aviso emergente programable | No |
 | `contact` | Formulario, con consentimiento y avisos por correo | No |
 | `about` | La presentación del negocio. Sin colección: vive en Ajustes | No |
+
+## `schedule` o `timetable`
+
+Se confunden, y la diferencia decide el modelo de datos entero:
+
+- **`schedule`** son **fechas**. Llegan, pasan y se archivan solas —el bolo del 14, la
+  jornada de puertas abiertas—. Cada una ocurre una vez y tiene su sitio y su hora.
+- **`timetable`** es un **cuadrante**. «Martes y jueves, 20:00» se repite hasta que alguien
+  lo cambia, así que no caduca ni hay nada que archivar: lo que deja de darse se desmarca.
+
+Un gimnasio, una academia, una escuela de baile o un centro de terapias quieren el segundo,
+y a veces los dos: el cuadrante de siempre, más las fechas sueltas de un taller.
+
+En los datos estructurados también son cosas distintas —`Event` frente a `Course` con su
+`Schedule`—, y ahí está la mitad del valor: con `byDay`, un buscador puede contestar «los
+martes a las 20:00» sin que nadie haya escrito esa frase en ninguna parte.

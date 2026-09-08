@@ -1,0 +1,88 @@
+/* Horario: el cuadrante semanal. Se añade a la hoja del sitio al generar. */
+.classes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.class {
+  border-bottom: 1px solid var(--line);
+}
+
+.class-link,
+.class > .class-when {
+  text-decoration: none;
+}
+
+/* La rejilla va sobre el enlace cuando lo hay y sobre la fila cuando no, para que una clase
+   sin tarifa quede alineada con las demás en vez de recolocarse sola. */
+.class-link,
+.class:not(:has(.class-link)) {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 18px 26px;
+  align-items: start;
+  padding: 20px 0;
+}
+
+.class-when {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.class-when span {
+  color: var(--ink-soft);
+}
+
+.class-body {
+  min-width: 0;
+}
+
+.class-body h3 {
+  font-size: clamp(18px, 2.2vw, 23px);
+  margin: 0 0 4px;
+}
+
+.class-body p {
+  margin: 0;
+  color: var(--ink-soft);
+  max-width: 62ch;
+}
+
+.class-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 8px !important;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.class-level {
+  color: var(--accent);
+}
+
+.class-teacher {
+  color: var(--ink-faint);
+}
+
+.class-link:hover .class-body h3 {
+  color: var(--accent);
+}
+
+@media (max-width: 760px) {
+  .class-link,
+  .class:not(:has(.class-link)) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+}

@@ -14,6 +14,7 @@ export const MODULE_IDS = [
   'about',
   'catalog',
   'schedule',
+  'timetable',
   'pricing',
   'team',
   'media',

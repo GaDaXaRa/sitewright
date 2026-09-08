@@ -29,6 +29,14 @@
       "title": "Próximas fechas",
       "emptyText": "No hay nada anunciado ahora mismo."
     },
+    "timetable": {
+      "labels": {
+        "singular": "Clase",
+        "plural": "Horario"
+      },
+      "route": "/horario",
+      "title": "Horario semanal"
+    },
     "media": {
       "labels": {
         "singular": "Pieza",
@@ -114,17 +122,25 @@
     "fonts": {
       "display": {
         "family": "Space Grotesk",
-        "weights": ["600", "700"]
+        "weights": [
+          "600",
+          "700"
+        ]
       },
       "body": {
         "family": "Public Sans",
-        "weights": ["400", "500", "600"]
+        "weights": [
+          "400",
+          "500",
+          "600"
+        ]
       }
     },
     "sections": [
       "about",
       "catalog",
       "schedule",
+      "timetable",
       "media",
       "pricing",
       "team",
