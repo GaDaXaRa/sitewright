@@ -37,6 +37,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+      # El generador mide colores con el núcleo —la tinta de un botón y la de cada color
+      # propio salen de ahí—, así que sus escritores no se pueden ni importar sin `dist`.
+      # Este trabajo no lo construía, y no se notaba porque sus pruebas no llegaban a
+      # tocarlo: al partir `generate.js` y empezar a probar los escritores, sí.
+      - run: npm ci --prefix core && npm run build --prefix core
       # Con el directorio a secas, Node intenta cargarlo como módulo.
       - run: node --test generator/*.test.js
       # `drift.mjs` decide si `sync-site` copia encima de una web viva: es el fichero que
