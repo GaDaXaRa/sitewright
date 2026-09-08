@@ -47,12 +47,7 @@ next-env.d.ts
 .db-shm
 .db-wal
 
-# Playwright
 node_modules/
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
 
 # Herramientas locales de asistentes de IA (no forman parte del proyecto)
 .agents/

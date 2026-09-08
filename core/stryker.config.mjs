@@ -50,7 +50,13 @@
  *    `contrastRatio` returning null when the **second** colour is invalid, and a
  *    `/EmbeddedPlayer` path on a host that is not Bandcamp.
  *
- * Score when last measured: **96.08%** (29 survivors of 740), on 7 September 2026.
+ * Score when last measured: **95.46%** (29 survivors of 639), on 8 September 2026.
+ *
+ * It dropped from 96.08% and **that is not a regression**: `versions.ts` moved out to
+ * `scripts/lib/`, where it belongs — it is the factory's own tooling and no site imports
+ * it — and it took 100 mutants with a perfect score with it. The same 29 survivors remain
+ * over a smaller total. Worth knowing because the margin over the 95 threshold is now
+ * 0.46: the next module added without tests breaks the build, which is the point.
  */
 /** @type {import('@stryker-mutator/api/core').PartialStrykerOptions} */
 const configuration = {

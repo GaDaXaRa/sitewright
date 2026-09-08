@@ -87,24 +87,7 @@ export {
   type LegalSection,
 } from './lib/legalTexts.js'
 
-// Cuánto se ha quedado atrás una web
-export {
-  compareVersions,
-  normaliseVersion,
-  versionsAfter,
-  changelogSections,
-  diagnose,
-  type Diagnosis,
-} from './lib/versions.js'
-
-// Qué es fondo en una imagen que lo tiene plano
-export {
-  colourDistance,
-  isBackdrop,
-  flatBackdrop,
-  backdropShare,
-  clearBackdrop,
-  NO_BACKDROP,
-  TOO_MUCH_BACKDROP,
-  type Rgb,
-} from './lib/backdrop.js'
+// Lo que **no** sale por aquí, y por qué: quitar el fondo de una imagen sólo lo usa el
+// endpoint del panel (`sitewright-core/payload`), y contar versiones sólo lo usa el
+// `doctor` de la fábrica. Un símbolo exportado es una promesa de compatibilidad con quien
+// instale el paquete, y estas dos no se le prometían a nadie.

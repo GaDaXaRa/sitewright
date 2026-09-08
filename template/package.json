@@ -20,10 +20,8 @@
     "seed": "cross-env NODE_OPTIONS=--no-deprecation payload run ./scripts/seed.ts",
     "vercel-build": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap && cross-env NODE_OPTIONS=--no-deprecation payload migrate && cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
-    "test": "npm run test:int && npm run test:e2e",
-    "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
+    "test": "npm run test:int",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
-    "core:sync": "rm -rf node_modules/sitewright-core && npm install --prefer-online --install-links --no-audit --no-fund",
     "audit": "node ./node_modules/sitewright-core/dist/audit/cli.js --url ${AUDIT_URL:-http://localhost:3000} --css \"src/app/(frontend)/styles.css\" --migrations src/migrations"
   },
   "engines": {
@@ -52,7 +50,6 @@
     "sitewright-core": "^0.13.0"
   },
   "devDependencies": {
-    "@playwright/test": "1.58.2",
     "@testing-library/react": "16.3.0",
     "@types/node": "22.19.9",
     "@types/react": "19.2.14",

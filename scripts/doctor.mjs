@@ -6,7 +6,7 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, isAbsolute, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { changelogSections, diagnose, versionsAfter } from '../core/dist/index.js'
+import { changelogSections, diagnose, versionsAfter } from './lib/versions.mjs'
 import { driftSummary, siteDrift, writtenDrift } from './lib/drift.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')

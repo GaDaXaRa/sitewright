@@ -3,6 +3,25 @@
 Qué gana una web al actualizar. Escrito para quien tiene que decidir si le compensa, no
 para quien escribió el código.
 
+## 0.14.0 — 8 de septiembre de 2026
+
+- **El paquete deja de exportar lo que ninguna web usaba.** Se van del índice `compareVersions`,
+  `normaliseVersion`, `versionsAfter`, `changelogSections` y `diagnose` —herramienta del
+  `doctor` de la fábrica, que ahora vive con él— y las funciones de recorte de fondo
+  (`colourDistance`, `isBackdrop`, `flatBackdrop`, `backdropShare`, `clearBackdrop`,
+  `NO_BACKDROP`, `TOO_MUCH_BACKDROP`), que sólo las usa por dentro el endpoint de imágenes
+  de `sitewright-core/payload`. **La función del panel no cambia**: quitar el fondo de un
+  logo sigue estando donde estaba. Lo que cambia es que cada símbolo exportado era una
+  promesa de compatibilidad, y estas no se le prometían a nadie.
+- **La auditoría deja de preguntarle al registro npm.** Se va la puerta «Al día con el
+  núcleo» y la opción `core` de `runAudit`: metía red y no determinismo en la puerta que
+  juzga un despliegue, para decir lo mismo que ya dice `doctor`. Una web atrasada funciona;
+  eso es mantenimiento, no un fallo de despliegue.
+- **Dos textos de relleno menos que marcaban webs sanas.** «Aquí va» y «de ejemplo» estaban
+  sueltos en la lista de placeholders y son español corriente: una web que explicara algo
+  con un ejemplo salía avisada por escribir bien. Ahora se buscan las frases enteras del
+  seed.
+
 ## 0.13.0 — 7 de septiembre de 2026
 
 - **Una entrada menos en la auditoría: se va `--migrations-db` (y `AUDIT_DATABASE_URL`).**

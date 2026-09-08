@@ -63,10 +63,16 @@ export const PLACEHOLDERS = [
   'Dos o tres líneas contando',
   'Nombre Apellido',
   'Su papel aquí',
-  'Aquí va',
   'Lugar por decidir',
-  'de ejemplo',
   'cámbialo',
+  // Frases enteras del seed, no trozos. `'Aquí va'` y `'de ejemplo'` estaban aquí sueltas
+  // y son español corriente: una web que explique con un ejemplo cómo se apunta alguien a
+  // un taller salía marcada por escribir bien.
+  'Aquí va la explicación larga',
+  'Aquí va la respuesta',
+  'Pieza de ejemplo',
+  'Aviso de ejemplo',
+  'Cámbiala por la tuya',
 ]
 
 export function checkPlaceholders(pages: Fetched[]): Finding[] {

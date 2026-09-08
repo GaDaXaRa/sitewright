@@ -16,7 +16,6 @@ import {
   checkReachable,
   checkAdvertisedEmpty,
   checkAdminPrivate,
-  checkCoreVersion,
   checkHeroLegibility,
   checkWeight,
   internalLinks,
@@ -26,15 +25,6 @@ import { checkMigrations, checkPooled } from './migrations.js'
 export type AuditOptions = {
   /** Where the site is answering right now: a dev server or the real thing. */
   baseUrl: string
-  /**
-   * Qué versión del núcleo usa la web y cuáles hay publicadas. Quien llama decide si
-   * pregunta al registro: la auditoría no debería quedarse colgada porque npm no conteste.
-   */
-  core?: {
-    declared: string | null
-    installed: string | null
-    published: string[] | null
-  }
   /** What the site says it is. Defaults to `baseUrl`. */
   siteUrl?: string
   siteName?: string
@@ -139,7 +129,6 @@ export async function runAudit(options: AuditOptions): Promise<Finding[]> {
     ...checkReachable(sitemapUrls, reachable),
     ...checkAdvertisedEmpty(sitemapUrls, bodies),
     ...checkAdminPrivate(guide),
-    ...(options.core ? checkCoreVersion(options.core) : []),
   ]
 
   if (options.cssPath) {

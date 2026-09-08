@@ -1,16 +1,15 @@
 /**
  * La deriva entre lo que una web tiene instalado y lo que hay publicado.
  *
- * Hace falta porque las webs no se actualizan solas y nadie lleva la cuenta: una lleva
- * meses cinco versiones por detrás, con arreglos que le harían falta, y no hay nada que
- * lo diga. Todo esto son funciones puras; quién pregunta al registro es otro asunto.
+ * Hace falta porque las webs no se actualizan solas y nadie lleva la cuenta: una llegó a
+ * estar once versiones por detrás sin que nada lo dijera. Todo esto son funciones puras;
+ * quién pregunta al registro es otro asunto.
+ *
+ * Vive aquí y no en el núcleo porque es **herramienta de la fábrica, no código de una
+ * web**: lo usa `doctor`, y ninguna web en producción lo importa. Estaba exportado desde
+ * el índice del paquete, y cada símbolo que sale por ahí es una promesa de compatibilidad
+ * con quien lo instale.
  */
-
-export type Diagnosis = {
-  level: 'ok' | 'warn' | 'fail'
-  title: string
-  detail: string
-}
 
 /**
  * Los números de una versión, en orden, ignorando lo que la acompañe.
@@ -19,18 +18,18 @@ export type Diagnosis = {
  * inventa cómo quitarle el acento circunflejo, dos partes del programa acaban comparando
  * cosas distintas. Se lee en un único lugar.
  */
-function numbers(version: string): number[] {
+function numbers(version) {
   return (version.match(/\d+/g) ?? []).map(Number)
 }
 
 /** `^0.7.0` y `0.7.0` son la misma versión escrita de dos maneras. */
-export function normaliseVersion(version: string): string {
+export function normaliseVersion(version) {
   const [major = 0, minor = 0, patch = 0] = numbers(version)
   return `${major}.${minor}.${patch}`
 }
 
 /** Compara dos versiones. Sólo cuentan los tres primeros números. */
-export function compareVersions(a: string, b: string): number {
+export function compareVersions(a, b) {
   const [x, y] = [numbers(a), numbers(b)]
   for (let i = 0; i < 3; i += 1) {
     const left = x[i] ?? 0
@@ -42,7 +41,7 @@ export function compareVersions(a: string, b: string): number {
 }
 
 /** Las versiones publicadas después de la que se tiene, de la más antigua a la más nueva. */
-export function versionsAfter(current: string, all: string[]): string[] {
+export function versionsAfter(current, all) {
   return all.filter((v) => compareVersions(v, current) > 0).sort(compareVersions)
 }
 
@@ -52,13 +51,13 @@ export function versionsAfter(current: string, all: string[]): string[] {
  * Se lee el markdown tal cual: cada `## <versión>` abre una sección y lo que va debajo es
  * lo que esa versión trajo. Una cabecera sin número —«Sin publicar»— no es una versión.
  */
-export function changelogSections(markdown: string): Map<string, string> {
-  const sections = new Map<string, string>()
+export function changelogSections(markdown) {
+  const sections = new Map()
   const parts = markdown.split(/^## +/m)
 
   for (const part of parts) {
     const [heading, ...rest] = part.split('\n')
-    const version = heading!.match(/^\d+\.\d+\.\d+/)?.[0]
+    const version = heading.match(/^\d+\.\d+\.\d+/)?.[0]
     if (version) sections.set(version, rest.join('\n').trim())
   }
 
@@ -73,19 +72,13 @@ export function changelogSections(markdown: string): Map<string, string> {
  * que más ha dolido: npm no refresca una dependencia local que conserva su versión, y una
  * web puede estar ejecutando un núcleo distinto del que declara sin que nada proteste.
  */
-export function diagnose({
-  declared,
-  installed,
-  published,
-}: {
-  /** Lo que pide el `package.json` de la web, con su `^` si lo lleva. */
-  declared: string | null
-  /** Lo que hay de verdad en `node_modules`, si está instalado. */
-  installed: string | null
-  /** Todas las versiones que existen en el registro, si se pudo preguntar. */
-  published: string[] | null
-}): Diagnosis[] {
-  const out: Diagnosis[] = []
+/**
+ * @param declared  Lo que pide el `package.json` de la web, con su `^` si lo lleva.
+ * @param installed Lo que hay de verdad en `node_modules`, si está instalado.
+ * @param published Todas las versiones que existen en el registro, si se pudo preguntar.
+ */
+export function diagnose({ declared, installed, published }) {
+  const out = []
 
   if (!declared) {
     return [{ level: 'fail', title: 'La web usa el núcleo', detail: 'No depende de sitewright-core.' }]

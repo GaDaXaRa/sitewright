@@ -83,7 +83,7 @@ while (!live && Date.now() < deadline) {
   } catch {
     live = false
   }
-  if (!live) execFileSync('sleep', ['20'])
+  if (!live) await new Promise((listo) => setTimeout(listo, 20_000))
 }
 if (!live) {
   stop(`publicada, pero el registro todavía no la sirve. Reintenta el resto cuando aparezca:
