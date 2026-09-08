@@ -47,7 +47,7 @@
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "sharp": "0.35.3",
-    "sitewright-core": "^0.14.0"
+    "sitewright-core": "^0.15.0"
   },
   "devDependencies": {
     "@testing-library/react": "16.3.0",
