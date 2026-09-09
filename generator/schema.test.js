@@ -209,6 +209,26 @@ test('cada clase que define un módulo la usa su componente', async () => {
   }
 })
 
+test('toda página índice pasa por el armazón, o se queda sin datos estructurados', async () => {
+  // Escritas a mano eran siete copias del mismo fichero decidiendo cada una qué emitir, y se
+  // notó: tres no emitían nada y ninguna emitía migas, aunque `InnerPage` lleva pintándolas
+  // para una persona desde el primer día. Con el armazón se decide una vez; esta prueba es
+  // lo que impide que el próximo módulo vuelva a decidirlo por su cuenta.
+  const { readdirSync, readFileSync, existsSync } = await import('node:fs')
+  const raiz = new URL('../modules/', import.meta.url)
+
+  for (const { name: id } of readdirSync(raiz, { withFileTypes: true }).filter((d) => d.isDirectory())) {
+    const page = new URL(`${id}/Page.tsx`, raiz)
+    if (!existsSync(page)) continue
+
+    assert.match(
+      readFileSync(page, 'utf8'),
+      /<ModuleIndexPage/,
+      `modules/${id}: su Page.tsx no usa ModuleIndexPage, así que se queda sin migas ni grafo`,
+    )
+  }
+})
+
 test('un campo del panel que nadie pinta es una promesa que la web no cumple', async () => {
   // Ha pasado tres veces: el cartel de un evento, su dirección y «Destacado en la portada».
   // Ninguna falla nada — el campo existe, se guarda, y la web sigue sin usarlo — así que

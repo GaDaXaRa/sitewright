@@ -16,7 +16,7 @@ no se copia —imágenes, revalidación, consentimiento, frenos del formulario�
 | `wiring.js` | Cómo se enchufa: importaciones, consulta, render, menú y contenido de ejemplo |
 | `collection.ts` | Fábrica de la colección de Payload, parametrizada por etiquetas |
 | `Section.tsx` | La sección de la portada (y de su página, si la tiene) |
-| `Page.tsx` | Su página índice, si la tiene. La sirve `[seccion]` |
+| `Page.tsx` | Su página índice, si la tiene. La sirve `[seccion]`, sobre `ModuleIndexPage` |
 | `Detail.tsx` | La ficha de uno de sus documentos, si las tiene. La sirve `[seccion]/[slug]` |
 | `jsonld.ts` | Los nodos que añade al grafo, si añade alguno |
 | `llms.ts` | Su sección de `/llms.txt`, si aporta alguna |
@@ -30,6 +30,12 @@ el banco donde se prueban aquí: la CI genera tres webs y las corre.
 
 `wiring.js` es lo único que **no** viaja a la web: es del generador, y por eso el contenido
 de ejemplo vive ahí dentro (`seed:`) y no en un fichero aparte.
+
+La página índice pone **su cuerpo y qué añade al grafo**; el resto —las migas, el marco y
+el bloque de «todavía no hay nada»— lo decide una vez `ModuleIndexPage`, en la plantilla.
+Escritas a mano eran siete copias del mismo fichero, y se notó: tres no emitían ningún dato
+estructurado y ninguna emitía migas, aunque la página lleva pintándoselas a una persona
+desde el primer día. Una prueba comprueba que ninguna se salte el armazón.
 
 Las páginas son **ficheros de verdad**, no cadenas de texto dentro de `wiring.js`: se
 comprueban con el resto, se leen con resaltado y las sirve una sola ruta de la plantilla,
