@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import test from 'node:test'
 
-import { classify, hashOf, readSeal, siteDrift, writeSeal } from './lib/drift.mjs'
+import { classify, hashOf, readSeal, siteDrift, whatToCopy, writeSeal } from './lib/drift.mjs'
 
 /**
  * Lo que decide si se pisa el trabajo de alguien.
@@ -164,4 +164,68 @@ test('el sello se escribe legible y ordenado, que es como se revisa un diff', ()
   } finally {
     limpia()
   }
+})
+
+/**
+ * La puerta: qué se copia encima de una web viva.
+ *
+ * Es la línea que separa poner al día de borrar la tarde de alguien, y estaba suelta dentro
+ * del guion —un `filter` en medio de doscientas líneas de texto por pantalla— sin nada que
+ * la probara.
+ */
+const escenarioPuerta = {
+  behind: [{ rel: 'atrasado' }],
+  missing: [{ rel: 'falta' }],
+  customised: [{ rel: 'personalizado' }],
+  unknown: [{ rel: 'sin-sello' }],
+}
+const copiados = (opciones) => whatToCopy(escenarioPuerta, opciones).copy.map((p) => p.rel)
+
+test('sin --apply no se escribe nada: el comando enseña, no aplica', () => {
+  const decision = whatToCopy(escenarioPuerta, {})
+
+  assert.deepEqual(decision.copy, [])
+  assert.equal(decision.seals, false)
+})
+
+test('--force sin --apply tampoco escribe: es el que más duele si se rompe', () => {
+  // Alguien escribe --force pensando en la vuelta siguiente. Si esto se cae, pisa cuatro
+  // ficheros de una web viva sin haber pedido aplicar nada.
+  const decision = whatToCopy(escenarioPuerta, { force: true })
+
+  assert.deepEqual(decision.copy, [])
+  assert.equal(decision.seals, false)
+})
+
+test('con --apply se trae lo atrasado y lo que falta, y nada más', () => {
+  assert.deepEqual(copiados({ apply: true }), ['atrasado', 'falta'])
+})
+
+test('y lo de esta web se respeta: copiar encima borraría lo que alguien escribió', () => {
+  const decision = whatToCopy(escenarioPuerta, { apply: true })
+
+  assert.deepEqual(
+    decision.respected.map((p) => p.rel),
+    ['personalizado', 'sin-sello'],
+  )
+})
+
+test('sólo --apply --force pisa lo personalizado, que es una decisión escrita', () => {
+  assert.deepEqual(copiados({ apply: true, force: true }), [
+    'atrasado',
+    'falta',
+    'personalizado',
+    'sin-sello',
+  ])
+  assert.deepEqual(whatToCopy(escenarioPuerta, { apply: true, force: true }).respected, [])
+})
+
+test('un fichero sin sello se trata como personalizado, no como atrasado', () => {
+  // No saber si alguien lo tocó no es permiso para pisarlo: las webs anteriores al sello
+  // caen aquí enteras.
+  assert.ok(!copiados({ apply: true }).includes('sin-sello'))
+})
+
+test('sin nada que traer no se inventa trabajo', () => {
+  assert.deepEqual(whatToCopy({}, { apply: true }), { copy: [], respected: [], seals: true })
 })

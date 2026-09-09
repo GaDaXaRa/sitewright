@@ -127,6 +127,36 @@ export function siteDrift(root, site) {
 }
 
 /**
+ * Qué se copia encima de una web viva, y qué no.
+ *
+ * Es **la línea que separa poner al día de borrar la tarde de alguien**, y vivía suelta
+ * dentro del guion, sin nada que la probara: un `filter` en medio de doscientas líneas de
+ * texto por pantalla. Aquí es una función con sus casos, incluido el que más duele si se
+ * rompe —`--force` sin `--apply` no puede escribir nada—.
+ *
+ * `seals` va con ellos a propósito: el sello también es escribir, y sin `--apply` no se
+ * escribe **nada**, ni siquiera eso. Un sello adelantado convertiría en «entregado» un
+ * fichero que nadie copió, y la siguiente vuelta lo pisaría creyendo que se quedó atrás.
+ */
+export function whatToCopy(
+  { behind = [], missing = [], customised = [], unknown = [] },
+  { apply = false, force = false } = {},
+) {
+  // Traerlos no destruye nada: uno se quedó atrás y el otro no está.
+  const atrasados = [...behind, ...missing]
+  // De esta web: o alguien los tocó, o no se puede saber. No saberlo no es permiso.
+  const suyos = [...customised, ...unknown]
+
+  if (!apply) return { copy: [], respected: suyos, seals: false }
+
+  return {
+    copy: force ? [...atrasados, ...suyos] : atrasados,
+    respected: force ? [] : suyos,
+    seals: true,
+  }
+}
+
+/**
  * Deja constancia de lo que la fábrica acaba de entregar.
  *
  * Sella un fichero **sólo cuando su contenido es el de la fábrica**: o porque se acaba de

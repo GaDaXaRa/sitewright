@@ -7,7 +7,7 @@
 import { copyFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs'
 import { dirname, isAbsolute, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { SEAL, siteDrift, writeSeal } from './lib/drift.mjs'
+import { SEAL, siteDrift, whatToCopy, writeSeal } from './lib/drift.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -35,12 +35,20 @@ const { checked, modules, pairs, behind, customised, unknown, missing } = siteDr
 console.log(`\n  ${name}  ${site}`)
 console.log(`  ${checked} ficheros compartidos · ${modules.length} módulos: ${modules.join(', ')}\n`)
 
+// La decisión de qué se pisa vive en `lib/drift.mjs`, con sus pruebas: aquí sólo se cuenta.
+const { copy: aCopiar, respected, seals } = whatToCopy(
+  { behind, customised, unknown, missing },
+  { apply, force },
+)
 const traibles = [...behind, ...missing]
+// Lo que es de esta web se enseña **siempre**, también con `--force`: es justo cuando hay
+// que ver qué se está a punto de pisar. `respected` es otra cosa —lo que al final no se
+// tocó— y sólo sirve para contarlo al terminar.
 const propios = [...customised, ...unknown]
 
-if (!traibles.length && !propios.length) {
+if (!traibles.length && !customised.length && !unknown.length) {
   console.log('  Todo lo que viaja igual a todas las webs está al día.')
-  if (apply) {
+  if (seals) {
     const sellados = writeSeal(site, pairs)
     console.log(`  Sello al día: ${sellados} ficheros en ${SEAL}.`)
   }
@@ -71,7 +79,6 @@ if (!apply) {
   process.exit(0)
 }
 
-const aCopiar = force ? [...traibles, ...propios] : traibles
 for (const { from, to } of aCopiar) {
   mkdirSync(dirname(to), { recursive: true })
   copyFileSync(from, to)
@@ -80,7 +87,7 @@ for (const { from, to } of aCopiar) {
 const sellados = writeSeal(site, pairs)
 
 console.log(`\n  ${plural(aCopiar.length, 'fichero copiado', 'ficheros copiados')}${
-  !force && propios.length ? `, y ${plural(propios.length, 'respetado', 'respetados')}` : ''
+  respected.length ? `, y ${plural(respected.length, 'respetado', 'respetados')}` : ''
 }. Sello al día: ${sellados} ficheros.
 
   Queda por hacer, y conviene hacerlo antes de subir nada:
