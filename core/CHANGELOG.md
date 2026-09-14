@@ -3,6 +3,28 @@
 Qué gana una web al actualizar. Escrito para quien tiene que decidir si le compensa, no
 para quien escribió el código.
 
+## 0.17.0 — 14 de septiembre de 2026
+
+- **La auditoría mira la accesibilidad de verdad, con axe.** El plan de la v1 prometía
+  «axe sin violaciones serias» y lo que había era la mitad del contraste, leído de la hoja
+  de estilos. Una web podía salir con imágenes sin texto alternativo, botones sin nombre o
+  un salto de encabezado y pasar la auditoría entera.
+
+  Mide sobre el HTML **que ya estaba descargado** —incluidas las páginas que el recorrido
+  encuentra pinchando, que es donde apareció el primer fallo real— así que no cuesta ni una
+  petición más. Lo que impide usar la página falla; lo que la afea avisa, porque una puerta
+  que grita se acaba apagando. Y dice siempre lo que **no** ha podido mirar: `color-contrast`
+  necesita la página pintada, y de eso sigue ocupándose la puerta «contraste» sobre los
+  tokens, que es donde se decide.
+
+- **Arreglado el salto de encabezado que encontró nada más existir.** En su propia página la
+  sección se queda sin `<h2>` a propósito —el título es el `<h1>` de la página— pero sus
+  fichas seguían en `<h3>`: de `h1` a `h3`, saltando un nivel, en `catalog`, `team`,
+  `timetable` y `media`. Y `pricing` pintaba además un `<h2>` vacío. Estaba en producción,
+  en una web de cliente, desde que existen las páginas de sección.
+
+  **Los módulos cambian**, así que esto llega con `npm run sync-site`.
+
 ## 0.16.0 — 8 de septiembre de 2026
 
 - **El grafo de datos estructurados y `/llms.txt` pasan al paquete.** Viajaban copiados

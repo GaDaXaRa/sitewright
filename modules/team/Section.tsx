@@ -27,6 +27,11 @@ export default function TeamSection({
 }) {
   if (!items.length) return null
 
+  // Sin encabezado de sección, estas fichas cuelgan directamente del <h1> de la página, y
+  // dejarlas en <h3> salta un nivel: es lo que axe llama `heading-order`, y lo encontró en
+  // una web de cliente en cuanto la puerta existió.
+  const Card = title ? 'h3' : 'h2'
+
   return (
     <section className={`section ${tone ? `tone-${tone}` : ''}`} id="equipo">
       <div className="container">
@@ -57,7 +62,7 @@ export default function TeamSection({
                       <div className="member-photo-empty" aria-hidden="true" />
                     )}
                   </div>
-                  <h3>{member.name}</h3>
+                  <Card>{member.name}</Card>
                   {member.role ? <p className="member-role">{member.role}</p> : null}
                   {first ? <p className="member-bio">{first}</p> : null}
                 </Link>

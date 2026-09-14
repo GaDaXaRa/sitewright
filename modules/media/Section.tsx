@@ -66,7 +66,17 @@ export default function MediaSection({
   )
 }
 
-export function MediaCard({ item, withPlayer = false }: { item: MediaItem; withPlayer?: boolean }) {
+export function MediaCard({
+  item,
+  withPlayer = false,
+  // Bajo el <h2> de la sección, una ficha es <h3>; en su propia página cuelga del <h1> y
+  // tiene que ser <h2>, o se salta un nivel. Quien la coloca es quien sabe dónde está.
+  heading: Heading = 'h3',
+}: {
+  item: MediaItem
+  withPlayer?: boolean
+  heading?: 'h2' | 'h3'
+}) {
   const cover = mediaUrl(item.cover)
   const embed = parseEmbed(item.url)
 
@@ -87,7 +97,7 @@ export function MediaCard({ item, withPlayer = false }: { item: MediaItem; withP
       </div>
 
       <div className="session-body">
-        <h3>{item.title}</h3>
+        <Heading>{item.title}</Heading>
         {item.author ? <p className="session-artist">{item.author}</p> : null}
         {item.description ? <p className="session-text">{item.description}</p> : null}
 

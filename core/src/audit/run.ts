@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import type { Fetched, Finding } from './types.js'
 import { skip } from './types.js'
 import {
+  checkAccessibility,
   checkCanonicalAnswers,
   checkIdentity,
   checkSecurityHeaders,
@@ -130,6 +131,16 @@ export async function runAudit(options: AuditOptions): Promise<Finding[]> {
     ...checkAdvertisedEmpty(sitemapUrls, bodies),
     ...checkAdminPrivate(guide),
   ]
+
+  // Sobre todo lo que se ha descargado, que incluye lo que el recorrido encontró pinchando:
+  // es donde viven las páginas de sección, y es justo donde apareció el primer salto de
+  // encabezado real. Medir sólo la portada habría dicho que todo estaba bien.
+  findings.push(
+    ...(await checkAccessibility([
+      ...[...bodies].map(([path, body]) => ({ url: `${base}${path}`, body })),
+      ...legalPages.filter((page) => page.status === 200),
+    ])),
+  )
 
   if (options.cssPath) {
     try {

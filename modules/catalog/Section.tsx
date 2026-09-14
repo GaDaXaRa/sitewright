@@ -44,6 +44,11 @@ export default function CatalogSection({
   const ordered = limit ? [...items].sort((a, b) => Number(b.featured) - Number(a.featured)) : items
   const shown = limit ? ordered.slice(0, limit) : ordered
 
+  // Sin encabezado de sección, estas fichas cuelgan directamente del <h1> de la página, y
+  // dejarlas en <h3> salta un nivel: es lo que axe llama `heading-order`, y lo encontró en
+  // una web de cliente en cuanto la puerta existió.
+  const Card = title ? 'h3' : 'h2'
+
   return (
     <section className={`section ${tone ? `tone-${tone}` : ''}`} id="catalogo">
       <div className="container">
@@ -79,7 +84,7 @@ export default function CatalogSection({
                     <div className="card-image-empty" aria-hidden="true" />
                   )}
                 </div>
-                <h3>{item.title}</h3>
+                <Card>{item.title}</Card>
                 {item.summary ? <p>{item.summary}</p> : null}
                 {item.tags?.length ? (
                   <ul className="tags">

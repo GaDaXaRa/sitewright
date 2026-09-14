@@ -34,12 +34,21 @@ export default function PricingSection({
 }) {
   if (!items.length) return null
 
+  // Sin encabezado de sección, estas fichas cuelgan directamente del <h1> de la página, y
+  // dejarlas en <h3> salta un nivel: es lo que axe llama `heading-order`, y lo encontró en
+  // una web de cliente en cuanto la puerta existió.
+  const Card = title ? 'h3' : 'h2'
+
   return (
     <section className={`section ${tone ? `tone-${tone}` : ''}`} id="tarifas">
       <div className="container">
-        <div className="section-head">
-          <h2>{title}</h2>
-        </div>
+        {/* En su propia página el título es el <h1>, y esto pintaba un <h2> vacío:
+            un encabezado sin texto es peor que ninguno. */}
+        {title ? (
+          <div className="section-head">
+            <h2>{title}</h2>
+          </div>
+        ) : null}
 
         <div className="prices">
           {items.map((price) => (
@@ -47,7 +56,7 @@ export default function PricingSection({
               key={price.id}
               className={`price ${price.highlighted ? 'price-highlighted' : ''}`}
             >
-              <h3>{price.name}</h3>
+              <Card>{price.name}</Card>
               <p className="price-amount">{priceLabel(price)}</p>
               {price.description ? <p className="price-text">{price.description}</p> : null}
               {price.includes?.length ? (

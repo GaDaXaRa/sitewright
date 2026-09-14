@@ -16,6 +16,8 @@ export {
   checkConsentGating,
   checkAdminPrivate,
 } from './compliance.js'
+export { checkAccessibility } from './a11y.js'
+export type { Measurable } from './a11y.js'
 export {
   checkImages,
   checkPlaceholders,

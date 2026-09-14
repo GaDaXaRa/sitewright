@@ -1,6 +1,6 @@
 {
   "name": "sitewright-core",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "description": "Shared runtime for Next.js + Payload CMS sites: image backup and versioning, public-form abuse brakes, real cookie consent, generated legal pages, SEO/GEO helpers, and an audit CLI that gates deploys.",
   "license": "MIT",
   "type": "module",
@@ -41,6 +41,7 @@
     "@payloadcms/ui": "^3.88.0",
     "@stryker-mutator/core": "^10.0.0",
     "@stryker-mutator/vitest-runner": "^10.0.0",
+    "@types/jsdom": "^30.0.0",
     "@types/node": "^22.19.9",
     "@types/pg": "^8.23.1",
     "@types/react": "^19.2.14",
@@ -101,5 +102,9 @@
   "homepage": "https://github.com/GaDaXaRa/sitewright#readme",
   "bugs": {
     "url": "https://github.com/GaDaXaRa/sitewright/issues"
+  },
+  "dependencies": {
+    "axe-core": "^4.13.0",
+    "jsdom": "^30.0.1"
   }
 }

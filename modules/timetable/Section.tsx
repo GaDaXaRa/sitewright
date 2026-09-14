@@ -54,6 +54,10 @@ export default function TimetableSection({
   if (!items.length) return null
   const ordered = sortByWhen(items)
 
+  // Sin encabezado de sección, estas fichas cuelgan directamente del <h1> de la página, y
+  // dejarlas en <h3> salta un nivel: es lo que axe llama `heading-order`.
+  const Card = context === 'home' ? 'h3' : 'h2'
+
   return (
     <section className={`section ${tone ? `tone-${tone}` : ''}`} id="horario">
       <div className="container">
@@ -73,7 +77,7 @@ export default function TimetableSection({
                   <span>{formatTime(item)}</span>
                 </div>
                 <div className="class-body">
-                  <h3>{className(item)}</h3>
+                  <Card>{className(item)}</Card>
                   {item.description ? <p>{item.description}</p> : null}
                   <p className="class-meta">
                     {item.level ? <span className="class-level">{LEVELS[item.level] ?? item.level}</span> : null}

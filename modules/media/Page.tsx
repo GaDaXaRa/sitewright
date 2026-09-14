@@ -20,7 +20,7 @@ export default function MediaPage({ items, settings, title, route }: ModulePageP
         <div className="container">
           <div className="session-grid">
             {list.map((item) => (
-              <MediaCard key={item.id} item={item} />
+              <MediaCard key={item.id} item={item} heading="h2" />
             ))}
           </div>
         </div>
