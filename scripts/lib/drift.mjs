@@ -51,8 +51,11 @@ export function classify(current, sealed) {
   return current === sealed ? 'behind' : 'customised'
 }
 
+/** Un filtro que no descarta nada: lo regenerado ya viene filtrado por el generador. */
+const NADA = /(?!)/
+
 /** Los ficheros de un directorio, en rutas relativas y sin lo que no viaja. */
-function filesIn(dir, skip, prefix = '') {
+function filesIn(dir, skip = NADA, prefix = '') {
   if (!existsSync(dir)) return []
 
   const out = []
@@ -163,8 +166,14 @@ export function whatToCopy(
  * copiar, o porque ya lo era. Un fichero personalizado conserva el sello de su última
  * entrega —que es lo que lo mantiene reconocible como personalizado— y uno que nunca se
  * entregó no se sella, porque no habría nada que afirmar.
+ *
+ * `scope` existe porque el sello lo escriben **dos entregas distintas**: el chasis y los
+ * módulos (`sync-site`) por un lado, y lo que el generador redacta para esta web
+ * (`sync-written`) por otro. Sin separarlas, cada una podaría los sellos de la otra al no
+ * verlos entre sus pares, y un fichero sin sello pasa a «no se sabe» —que a efectos de
+ * pisarlo es igual que no tenerlo—.
  */
-export function writeSeal(site, pairs) {
+export function writeSeal(site, pairs, { scope = 'shared' } = {}) {
   const previo = readSeal(site)
 
   // Sin pares no hay nada que sellar, y reescribir aquí vaciaría el sello entero por un
@@ -176,9 +185,10 @@ export function writeSeal(site, pairs) {
   // plantilla, su hash no afirma nada sobre nada, y guardarlo para siempre convierte el
   // sello en el mismo archivo de restos que este trabajo existe para evitar.
   const vigentes = new Set(pairs.map((pair) => pair.rel))
+  const mio = (rel) => (scope === 'shared' ? isShared(rel) : !isShared(rel))
   const seal = {}
   for (const [rel, hash] of Object.entries(previo)) {
-    if (vigentes.has(rel)) seal[rel] = hash
+    if (vigentes.has(rel) || !mio(rel)) seal[rel] = hash
   }
 
   for (const pair of pairs) {
@@ -201,6 +211,40 @@ export function writeSeal(site, pairs) {
 }
 
 /**
+ * Lo que se regenera pero no se compara.
+ *
+ * `package.json` lo mueve npm en cada instalación y de la versión del núcleo ya lleva
+ * cuenta `sync-core`. `public/icon.svg` es un marcador de posición con las iniciales: la
+ * web de Sandunguera tiene uno dibujado a mano y saldría eternamente «distinto». Y el
+ * blueprint es el propio origen de la comparación.
+ */
+const SKIP_WRITTEN = ['package.json', 'public/icon.svg', 'sitewright.json']
+
+/**
+ * Lo que el generador acaba de escribir, como entrega que sellar.
+ *
+ * `from` y `to` son el mismo fichero **a propósito**: lo que la fábrica entregó es,
+ * literalmente, lo que hay ahí en este instante. Sellarlo al generar es lo único que
+ * permite que la próxima vez se pueda decir si alguien lo ha tocado; sin esto, cada
+ * fichero redactado para la web nace «sin sello», y sin sello no se pisa nada.
+ */
+export function writtenPairs(site) {
+  return WRITTEN.filter((rel) => !SKIP_WRITTEN.includes(rel) && existsSync(join(site, rel))).map(
+    (rel) => ({ rel, from: join(site, rel), to: join(site, rel) }),
+  )
+}
+
+/** Los módulos que hay dentro de una web, por su directorio. */
+function modulesIn(site) {
+  const dir = join(site, 'src/modules')
+  if (!existsSync(dir)) return []
+  return readdirSync(dir, { withFileTypes: true })
+    .filter((e) => e.isDirectory())
+    .map((e) => e.name)
+    .sort()
+}
+
+/**
  * Lo que el generador escribiría hoy para esta web, comparado con lo que tiene.
  *
  * Es la otra mitad de la deriva: `site.config.ts`, la portada, los ajustes del panel, la
@@ -209,13 +253,21 @@ export function writeSeal(site, pairs) {
  * propio blueprint y mirar en qué se diferencia. Por eso el blueprint vive dentro del
  * sitio: sin él esto no se puede ni preguntar.
  *
- * No se aplica solo, y no debería: aquí un fichero distinto puede ser una corrección que
- * falta o una decisión que alguien tomó a mano, y eso lo dice una persona mirando el diff.
+ * Y es lo que convierte **editar el blueprint** en añadir una sección a una web viva: los
+ * módulos que el blueprint enciende y esta web todavía no tiene entran aquí como ficheros
+ * que faltan, que es el caso que nunca destruye nada. Los que ya están son de `sync-site`,
+ * que para eso los copia iguales a todas las webs.
+ *
+ * `keep` deja el sitio regenerado en el disco —y devuelve dónde— para quien vaya a copiar
+ * de él. **Quien lo pida se encarga de borrarlo**: aquí no se puede saber cuándo terminó
+ * de usarlo.
  */
-export function writtenDrift(root, site) {
+export function writtenDrift(root, site, { keep = false } = {}) {
+  const vacio = { pairs: [], differ: [], behind: [], customised: [], unknown: [], missing: [], added: [], removed: [] }
+
   const blueprint = join(site, 'sitewright.json')
   if (!existsSync(blueprint)) {
-    return { available: false, why: 'esta web no lleva su blueprint (sitewright.json)', differ: [] }
+    return { available: false, why: 'esta web no lleva su blueprint (sitewright.json)', ...vacio }
   }
 
   const out = mkdtempSync(join(tmpdir(), 'sitewright-drift-'))
@@ -227,49 +279,94 @@ export function writtenDrift(root, site) {
     )
   } catch (err) {
     rmSync(out, { recursive: true, force: true })
-    return { available: false, why: `no se pudo regenerar: ${err.stderr ?? err}`, differ: [] }
+    return { available: false, why: `no se pudo regenerar: ${err.stderr ?? err}`, ...vacio }
   }
 
-  const differ = []
+  const pairs = []
   for (const rel of WRITTEN) {
     if (SKIP_WRITTEN.includes(rel)) continue
-    const fresh = join(out, rel)
-    if (!existsSync(fresh) || !existsSync(join(site, rel))) continue
-    if (!same(fresh, join(site, rel))) differ.push({ rel })
+    if (!existsSync(join(out, rel))) continue
+    pairs.push({ rel, from: join(out, rel), to: join(site, rel) })
   }
 
-  rmSync(out, { recursive: true, force: true })
-  return { available: true, checked: WRITTEN.length - SKIP_WRITTEN.length, differ }
-}
+  // Un módulo que el blueprint enciende y la web no tiene: todos sus ficheros son nuevos,
+  // así que traerlos no pisa nada. Uno que la web tiene y el blueprint ya no enciende se
+  // dice y no se toca — borrar un directorio del que alguien puede haber editado la mitad
+  // no es una puesta al día.
+  const tiene = modulesIn(site)
+  const toca = modulesIn(out)
+  const added = toca.filter((id) => !tiene.includes(id))
+  const removed = tiene.filter((id) => !toca.includes(id))
 
-/**
- * Lo que se regenera pero no se compara.
- *
- * `package.json` lo mueve npm en cada instalación y de la versión del núcleo ya lleva
- * cuenta `sync-core`. `public/icon.svg` es un marcador de posición con las iniciales: la
- * web de Sandunguera tiene uno dibujado a mano y saldría eternamente «distinto». Y el
- * blueprint es el propio origen de la comparación.
- */
-const SKIP_WRITTEN = ['package.json', 'public/icon.svg', 'sitewright.json']
+  for (const id of added) {
+    for (const rel of filesIn(join(out, 'src/modules', id))) {
+      pairs.push({
+        rel: `src/modules/${id}/${rel}`,
+        from: join(out, 'src/modules', id, rel),
+        to: join(site, 'src/modules', id, rel),
+      })
+    }
+  }
+
+  const seal = readSeal(site)
+  const behind = []
+  const customised = []
+  const unknown = []
+  const missing = []
+
+  for (const pair of pairs) {
+    if (!existsSync(pair.to)) {
+      missing.push(pair)
+      continue
+    }
+    if (same(pair.from, pair.to)) continue
+
+    const why = classify(hashOf(pair.to), seal[pair.rel])
+    if (why === 'behind') behind.push(pair)
+    else if (why === 'customised') customised.push(pair)
+    else unknown.push(pair)
+  }
+
+  if (!keep) rmSync(out, { recursive: true, force: true })
+
+  return {
+    available: true,
+    out: keep ? out : null,
+    checked: pairs.length,
+    pairs,
+    differ: [...behind, ...customised, ...unknown],
+    behind,
+    customised,
+    unknown,
+    missing,
+    added,
+    removed,
+  }
+}
 
 /**
  * Un resumen de una línea, que es lo que cabe en un diagnóstico.
  *
  * Separa lo que se puede traer solo de lo que no, porque son dos noticias distintas: una
  * es trabajo pendiente y la otra es una decisión que alguien tomó en esta web.
+ *
+ * `noun` porque lo usan las dos derivas y no son lo mismo: unos ficheros viajan iguales a
+ * todas las webs y otros los redacta el generador para ésta. Entró como parámetro después
+ * de escribirse una vez como `.replace('compartidos', 'redactados')` sobre el resultado,
+ * que es una costura que se descose sola en cuanto alguien reescriba la frase.
  */
 const plural = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`
 
-export function driftSummary({ checked, behind, customised, unknown, missing }) {
+export function driftSummary({ checked, behind, customised, unknown, missing }, noun = 'compartidos') {
   const atrasados = behind.length + missing.length
   const propios = customised.length + unknown.length
 
-  if (!atrasados && !propios) return `${checked} ficheros compartidos, todos al día`
+  if (!atrasados && !propios) return `${checked} ficheros ${noun}, todos al día`
 
   const partes = []
   if (atrasados) partes.push(`${atrasados} por traer`)
   if (propios) partes.push(plural(propios, 'personalizado aquí', 'personalizados aquí'))
-  return `${partes.join(' · ')}, de ${checked} ficheros compartidos`
+  return `${partes.join(' · ')}, de ${checked} ficheros ${noun}`
 }
 
 export { relative }

@@ -42,6 +42,14 @@ comprueban con el resto, se leen con resaltado y las sirve una sola ruta de la p
 que las busca por su `route`. Una ficha necesita además que sus documentos tengan `slug`
 —es lo que las nombra en la dirección— y exporta `documentMeta` para decir cómo se titula.
 
+## Añadir uno a una web que ya existe
+
+Se enciende en el `sitewright.json` de esa web y se aplica con `npm run sync-written`, que
+regenera desde el blueprint y trae lo que falte sin pisar lo que alguien haya escrito allí.
+El módulo entero es «lo que falta», así que llega siempre; lo que puede quedarse fuera es el
+fichero que lo enchufa, si esa web lo tiene personalizado — y entonces el comando lo dice.
+La colección nueva pide `migrate:create`, y eso no lo hace ningún guion.
+
 ## La regla del vocabulario
 
 **El mismo módulo cambia de nombre según el negocio**: el catálogo es "Servicios" en un

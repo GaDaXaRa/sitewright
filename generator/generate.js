@@ -4,7 +4,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { sectionOrder, validateBlueprint, validateWiring } from './schema.js'
 import { MODULE_SKIP, TEMPLATE_SKIP } from './generated.js'
-import { siteDrift, writeSeal } from '../scripts/lib/drift.mjs'
+import { siteDrift, writeSeal, writtenPairs } from '../scripts/lib/drift.mjs'
 import { defaultIconSvg } from '../core/dist/index.js'
 import { GeneratorStopped, replaceOrDie } from './lib/text.js'
 import { homePage, siteConfig, siteModules } from './lib/site.js'
@@ -228,6 +228,12 @@ writing(() => {
   pkg.dependencies['sitewright-core'] =
     arg('core') ?? `^${JSON.parse(readFileSync(join(ROOT, 'core/package.json'), 'utf8')).version}`
   write('package.json', JSON.stringify(pkg, null, 2) + '\n')
+
+  // Y el sello de lo que el generador redacta para esta web. Va el último porque sella lo
+  // que hay en el disco, y hasta aquí seguía escribiéndose. Es lo que permite que mañana,
+  // con el blueprint cambiado, `sync-written` distinga una sección nueva de la portada que
+  // alguien reescribió a mano: sin sello, todo eso sería intocable.
+  writeSeal(target, writtenPairs(target), { scope: 'written' })
 })
 
 console.log(`

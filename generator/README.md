@@ -66,9 +66,26 @@ receta viaje con la web. Guardarlo aparte ya salió caro: de las dos webs en pro
 una no tenía el suyo en ninguna parte, y hubo que reconstruirlo leyendo hacia atrás sus
 ficheros generados.
 
+## Y el segundo día
+
+Editar ese `sitewright.json` **cambia la web**, no sólo el papel: `sync-written` la regenera
+desde él y trae lo que falte, sin pisar lo que alguien haya escrito allí.
+
 ```bash
-node generate.js --blueprint ../../mi-sitio/sitewright.json --out ../../mi-sitio
+# desde la raíz del repositorio, no desde aquí
+npm run sync-written -- ../mi-sitio            # enseña qué cambiaría
+npm run sync-written -- ../mi-sitio --apply    # lo trae
 ```
+
+Es la vía **y la única**. `generate.js --out` apuntando a una web que ya existe se niega, y
+con `--force` borra el directorio entero —`.git` incluido— antes de escribir: sirve para
+crear y para regenerar en un temporal, nunca para poner al día.
+
+Un módulo nuevo trae una colección nueva, y eso el guion no lo puede hacer: lo dice al
+terminar (`migrate:create`, `migrate`, y `seed` si se quiere su contenido de ejemplo). Que
+la vía incremental y la inicial no diverjan lo vigila
+[`scripts/regenerate.test.js`](../scripts/regenerate.test.js), comparando las dos webs
+fichero a fichero.
 
 ## El blueprint
 

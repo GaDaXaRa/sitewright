@@ -18,9 +18,17 @@ Las que pueden romper algo tienen un único punto de entrada, porque hacerlas a 
 mal más de una vez:
 
 ```
-npm run release                  publica sitewright-core tras pasar las puertas
-npm run sync-core ../<sitio>    instala el núcleo en un sitio y verifica el resultado
+npm run release                     publica sitewright-core tras pasar las puertas
+npm run doctor -- ../<sitio>        qué versión tiene, qué se está perdiendo y qué es suyo
+npm run sync-core -- ../<sitio>     instala el núcleo y verifica el resultado
+npm run sync-site -- ../<sitio>     trae el chasis y los módulos
+npm run sync-written -- ../<sitio>  trae lo que el blueprint de esa web dice que es
 ```
+
+Los dos que copian encima de ficheros —`sync-site` y `sync-written`— **no escriben sin
+`--apply`**: enseñan qué cambiaría. `sync-core` sí instala directo, porque instalar un
+paquete se deshace y pisar el fichero de alguien no. Y `sync-written` es el que convierte
+editar el `sitewright.json` de una web en añadir una sección a una web viva.
 
 ## Convenciones
 

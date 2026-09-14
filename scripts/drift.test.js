@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import test from 'node:test'
 
-import { classify, hashOf, readSeal, siteDrift, whatToCopy, writeSeal } from './lib/drift.mjs'
+import { classify, hashOf, readSeal, siteDrift, whatToCopy, writeSeal, writtenPairs } from './lib/drift.mjs'
 
 /**
  * Lo que decide si se pisa el trabajo de alguien.
@@ -228,4 +228,79 @@ test('un fichero sin sello se trata como personalizado, no como atrasado', () =>
 
 test('sin nada que traer no se inventa trabajo', () => {
   assert.deepEqual(whatToCopy({}, { apply: true }), { copy: [], respected: [], seals: true })
+})
+
+/**
+ * El sello lo escriben dos entregas distintas.
+ *
+ * El chasis y los módulos los sella `sync-site`; lo que el generador redacta para esta web,
+ * `sync-written`. Ninguna de las dos ve los pares de la otra, así que podar por todo lo que
+ * no venga en la entrega propia borraría los sellos ajenos — y un fichero sin sello pasa a
+ * «no se sabe», que a efectos de pisarlo es igual que no tenerlo. Cada una poda lo suyo.
+ */
+const redactado = (sitio) => [
+  { rel: 'src/site.config.ts', from: join(sitio, 'src/site.config.ts'), to: join(sitio, 'src/site.config.ts') },
+]
+
+test('sellar el chasis no borra el sello de lo que redacta el generador', () => {
+  const { raiz, sitio, escribe, limpia } = escenario()
+  try {
+    escribe(sitio, 'src/site.config.ts', 'lo redactó el generador\n')
+    writeSeal(sitio, redactado(sitio), { scope: 'written' })
+
+    // `sync-site` pasa después, y entre sus pares no está `site.config.ts`: es de esta web.
+    writeSeal(sitio, siteDrift(raiz, sitio).pairs)
+
+    assert.ok('src/site.config.ts' in readSeal(sitio))
+    assert.ok('src/comun.ts' in readSeal(sitio))
+  } finally {
+    limpia()
+  }
+})
+
+test('y sellar lo redactado no borra el del chasis', () => {
+  const { raiz, sitio, escribe, limpia } = escenario()
+  try {
+    escribe(sitio, 'src/site.config.ts', 'lo redactó el generador\n')
+    writeSeal(sitio, siteDrift(raiz, sitio).pairs)
+
+    writeSeal(sitio, redactado(sitio), { scope: 'written' })
+
+    assert.ok('src/comun.ts' in readSeal(sitio))
+    assert.ok('src/site.config.ts' in readSeal(sitio))
+  } finally {
+    limpia()
+  }
+})
+
+test('lo redactado sella su contenido tal cual, que es lo que la fábrica acaba de entregar', () => {
+  const { sitio, escribe, limpia } = escenario()
+  try {
+    escribe(sitio, 'src/site.config.ts', 'lo redactó el generador\n')
+    writeSeal(sitio, redactado(sitio), { scope: 'written' })
+
+    assert.equal(readSeal(sitio)['src/site.config.ts'], hashOf(join(sitio, 'src/site.config.ts')))
+  } finally {
+    limpia()
+  }
+})
+
+test('no se sella lo que npm y la clienta mueven por su cuenta', () => {
+  const { sitio, escribe, limpia } = escenario()
+  try {
+    escribe(sitio, 'src/site.config.ts', 'del generador\n')
+    escribe(sitio, 'public/icon.svg', '<svg/>\n')
+    escribe(sitio, 'sitewright.json', '{}\n')
+
+    const rels = writtenPairs(sitio).map((p) => p.rel)
+
+    // `package.json` lo reescribe npm en cada instalación; el icono lo reemplaza la clienta
+    // desde el panel; y el blueprint es el origen de la comparación, no su resultado.
+    assert.ok(rels.includes('src/site.config.ts'))
+    assert.ok(!rels.includes('package.json'))
+    assert.ok(!rels.includes('public/icon.svg'))
+    assert.ok(!rels.includes('sitewright.json'))
+  } finally {
+    limpia()
+  }
 })

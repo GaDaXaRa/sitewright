@@ -20,21 +20,32 @@ el comando que las comprueba: si no hay comando, no hay regla, hay buena intenci
    fábrica no son los suyos** y **en qué se diferencia de lo que el generador escribiría
    hoy** —esto último regenerándola desde el `sitewright.json` que lleva dentro—. Ninguna
    se actualiza sola y hasta ahora nadie llevaba esa cuenta.
-3. **Poner una web al día son dos comandos, y hacen cosas distintas.**
+3. **Poner una web al día son tres comandos, y hacen cosas distintas.**
    `npm run sync-core -- ../<sitio>` trae el núcleo, que va por npm: el guion borra la
    dependencia —npm no refresca una `file:` que conserva su versión— y compara el hash de
    todo `dist` con lo que acaba de construir. `npm run sync-site -- ../<sitio> --apply`
    trae lo que se copió el día que la web nació —el chasis y los módulos—, que no tiene
-   número de versión y por eso se quedaba atrás sin que nadie lo supiera. Sin `--apply` no
-   escribe: enseña qué cambiaría. Lo que el generador escribe por web no lo toca nunca
-   (`generator/generated.js`, y una prueba lo vigila contra `generate.js`), y **tampoco
-   pisa lo que se personalizó en esa web**: cada sitio lleva un sello
-   (`.sitewright-sync.json`) con el hash de lo que la fábrica le entregó, así que «este
-   fichero no es el de la fábrica» se parte en dos —se ha quedado atrás, o alguien lo tocó
-   aquí— y sólo lo primero se aplica solo. Lo segundo pide `--force`, escrito a propósito.
-   Sin sello no se pisa nada: no saber si alguien lo tocó no es permiso para pisarlo. Y la
-   libertad de editar no es teórica —`schedule/Row.tsx` y `faq/Section.tsx` se han tocado
-   en webs vivas—, que es la razón por la que los módulos se copian y no se empaquetan.
+   número de versión y por eso se quedaba atrás sin que nadie lo supiera; lo redactado por
+   web no lo toca, y dónde está esa frontera lo declara `generator/generated.js`, con una
+   prueba que lo vigila contra `generate.js`. Y
+   `npm run sync-written -- ../<sitio> --apply` trae **lo que el generador redacta para esa
+   web** —la portada, las rutas, los ajustes del panel, la hoja de estilos—, regenerándola
+   desde el `sitewright.json` que lleva dentro: es lo que convierte editar el blueprint en
+   añadir una sección a una web viva, en vez de cirugía a mano sobre los seis ficheros que
+   esta misma regla dice que no se tocan a mano.
+   Ninguno de los tres escribe sin `--apply`: sin él enseñan qué cambiaría. Y **ninguno pisa
+   lo que se personalizó en esa web**: cada sitio lleva un sello (`.sitewright-sync.json`)
+   con el hash de lo que la fábrica le entregó, así que «este fichero no es el de la
+   fábrica» se parte en dos —se ha quedado atrás, o alguien lo tocó aquí— y sólo lo primero
+   se aplica solo. Lo segundo pide `--force`, escrito a propósito. Sin sello no se pisa
+   nada: no saber si alguien lo tocó no es permiso para pisarlo. Y la libertad de editar no
+   es teórica —`schedule/Row.tsx` y `faq/Section.tsx` se han tocado en webs vivas—, que es
+   la razón por la que los módulos se copian y no se empaquetan.
+   Lo que `sync-written` no puede hacer solo lo dice al terminar: un módulo nuevo trae una
+   colección nueva, y sin `migrate:create` el despliegue sale bien y el panel revienta más
+   tarde. **Nunca regeneres encima con `generate.js --out <la web> --force`**: eso borra el
+   directorio entero —`.git` incluido— antes de escribir.
+
 4. **Los tipos se comprueban aparte: `npm run typecheck`.** `next build` con caché
    ha dado por bueno un error de tipos que luego tumbó el despliegue.
 5. **Desplegar es `git push`.** Los proyectos están conectados a GitHub; lanzar `vercel

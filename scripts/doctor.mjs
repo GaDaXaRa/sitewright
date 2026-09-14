@@ -70,19 +70,30 @@ if (atrasados) console.log(`      Para traerlos:  npm run sync-site -- ${target}
 if (propios) console.log(`      Los personalizados no los toca sync-site: mira su git diff antes de nada.`)
 
 // Y los que el generador escribe para esta web: se regenera desde su blueprint y se mira
-// en qué difieren. Aquí no hay nada que copiar automáticamente, porque un fichero distinto
-// puede ser una corrección que falta o una decisión que alguien tomó a mano.
+// en qué difieren. Desde que el sello cubre también esto, la diferencia se puede partir en
+// dos —se quedó atrás, o alguien lo tocó aquí— y lo primero lo aplica `sync-written`.
 const written = writtenDrift(root, site)
 if (!written.available) {
   console.log(`  ${SYMBOL.warn} ${'Ficheros de esta web'.padEnd(30)} no se pueden comparar: ${written.why}`)
 } else {
-  const summary = written.differ.length
-    ? `${written.differ.length} de ${written.checked} no son lo que el generador escribiría hoy`
-    : `${written.checked} ficheros, iguales a lo que se generaría hoy`
-  console.log(`  ${written.differ.length ? SYMBOL.warn : SYMBOL.ok} ${'Ficheros de esta web'.padEnd(30)} ${summary}`)
-  for (const { rel } of written.differ) console.log(`      distinto  ${rel}`)
-  if (written.differ.length) {
-    console.log('      Míralos antes de tocar nada: puede ser una mejora que falta o algo hecho a mano.')
+  const wAtrasados = written.behind.length + written.missing.length
+  const wPropios = written.customised.length + written.unknown.length
+  const nivel = wAtrasados || wPropios ? SYMBOL.warn : SYMBOL.ok
+  console.log(
+    `  ${nivel} ${'Ficheros de esta web'.padEnd(30)} ${driftSummary(written, 'redactados')}`,
+  )
+
+  // Un módulo que el blueprint enciende y la web no tiene es la noticia más accionable de
+  // todo el diagnóstico: es una sección que alguien pidió y no está.
+  if (written.added.length) console.log(`      módulo nuevo         ${written.added.join(', ')}`)
+  if (written.removed.length) console.log(`      ya no lo enciende    ${written.removed.join(', ')}`)
+  for (const { rel } of written.behind) console.log(`      se ha quedado atrás  ${rel}`)
+  for (const { rel } of written.missing) console.log(`      falta                ${rel}`)
+  for (const { rel } of written.customised) console.log(`      personalizado aquí   ${rel}`)
+  for (const { rel } of written.unknown) console.log(`      sin sello            ${rel}`)
+  if (wAtrasados) console.log(`      Para traerlos:  npm run sync-written -- ${target} --apply`)
+  if (wPropios) {
+    console.log('      Los personalizados no los toca sync-written: mira su git diff antes de nada.')
   }
 }
 
