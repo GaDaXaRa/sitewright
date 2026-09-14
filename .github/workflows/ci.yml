@@ -15,8 +15,8 @@ jobs:
       run:
         working-directory: core
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -33,8 +33,8 @@ jobs:
     name: Generador
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
       # El generador mide colores con el núcleo —la tinta de un botón y la de cada color
@@ -65,8 +65,8 @@ jobs:
       run:
         working-directory: template
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -118,8 +118,8 @@ jobs:
         # que **puede** enlazar con otro compile sin él.
         blueprint: [ejemplo-completo, ejemplo-asociacion, ejemplo-portafolio, ejemplo-solista]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
       # Los módulos no se compilan en ningún sitio: sólo existen dentro de una web
