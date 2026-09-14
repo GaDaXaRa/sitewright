@@ -4,7 +4,11 @@ Generador de sitios web profesionales: una conversación produce un *blueprint*,
 blueprint produce una web Next.js + Payload desplegada. El núcleo es el paquete npm
 `sitewright-core`; `template/` es el chasis; `modules/` son las secciones.
 
-- **El código va en inglés**; lo que ve una persona, en español.
+- **El código va en inglés**: identificadores, comentarios y **mensajes de commit**. Lo que
+  ve una persona, en español. Los setenta y cuatro primeros commits lo cumplían; el 7 de
+  septiembre de 2026 (`b778824`) el log se pasó al español y siguió así cuarenta y dos
+  commits, porque la regla estaba en el README y no aquí, que es lo que se lee antes de
+  tocar nada.
 - Los comentarios explican **por qué**, no qué hace la línea. Densidad baja.
 
 ## Las once reglas
