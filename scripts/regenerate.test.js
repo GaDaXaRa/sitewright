@@ -313,6 +313,72 @@ test('y lo que ya difería en ella no se pisa: no saberlo no es permiso', () => 
   }
 })
 
+/**
+ * `--only`: traer un fichero y no los demás.
+ *
+ * Es la salida de un callejón real. En una web anterior al sello, todo lo redactado sale
+ * «sin sello» y `--force` es lo único que trae algo — pero fuerza **todo**, incluida la hoja
+ * de estilos con el trabajo de diseño de esa web. Esto es lo que decide qué se pisa, así que
+ * se prueba como se prueba `whatToCopy`.
+ */
+test('--only trae el que se le dice y deja los demás', () => {
+  const { dir, limpia } = escenario()
+  try {
+    const viva = dir('viva')
+    generate(PORTAFOLIO, viva)
+    enable(viva, 'team', EQUIPO)
+
+    syncWritten(viva, '--apply', '--only', 'src/site.config.ts')
+
+    assert.match(readFileSync(join(viva, 'src/site.config.ts'), 'utf8'), /equipo/)
+    // La portada también se había quedado atrás, y no se ha tocado.
+    assert.doesNotMatch(readFileSync(join(viva, 'src/app/(frontend)/page.tsx'), 'utf8'), /TeamSection/)
+  } finally {
+    limpia()
+  }
+})
+
+test('con --force pisa sólo el nombrado, no lo personalizado de al lado', () => {
+  const { dir, limpia } = escenario()
+  try {
+    const viva = dir('viva')
+    generate(PORTAFOLIO, viva)
+
+    const hoja = join(viva, 'src/app/(frontend)/styles.css')
+    const mio = '\n/* el trabajo de diseño de esta web */\n'
+    appendFileSync(hoja, mio)
+    despuesDelSello(viva)
+    enable(viva, 'team', EQUIPO)
+
+    syncWritten(viva, '--apply', '--force', '--only', 'src/site.config.ts')
+
+    assert.match(readFileSync(join(viva, 'src/site.config.ts'), 'utf8'), /equipo/)
+    // Lo que `--force` a secas habría borrado.
+    assert.ok(readFileSync(hoja, 'utf8').endsWith(mio))
+  } finally {
+    limpia()
+  }
+})
+
+test('--only con una ruta que no existe se para en vez de no hacer nada', () => {
+  const { dir, limpia } = escenario()
+  try {
+    const viva = dir('viva')
+    generate(PORTAFOLIO, viva)
+    enable(viva, 'team', EQUIPO)
+
+    // Una errata en la ruta terminaría con éxito y sin copiar nada: el guion diría que fue
+    // bien y la web seguiría igual. Es el fallo que la tabla de herramientas que mienten
+    // describe como «un guion que termina con éxito».
+    assert.throws(
+      () => syncWritten(viva, '--apply', '--only', 'src/site.confg.ts'),
+      (err) => /--only no reconoce/.test(`${err.stderr}`),
+    )
+  } finally {
+    limpia()
+  }
+})
+
 test('no deja copias de la web en el directorio temporal', () => {
   const { dir, limpia } = escenario()
   try {

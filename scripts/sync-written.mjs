@@ -45,8 +45,19 @@ const apply = args.includes('--apply')
 // Aquí `--force` pisa la portada y la hoja de estilos de una web viva, que es donde vive
 // casi todo lo que alguien escribe a mano. Tiene que ser una decisión, no una inercia.
 const force = args.includes('--force')
-const target = args.find((a) => !a.startsWith('--'))
-if (!target) stop('Uso: npm run sync-written -- <ruta-del-sitio> [--apply] [--force]')
+/**
+ * Traer un fichero y no los demás.
+ *
+ * Apareció en el primer uso real: una web anterior al sello tiene todo lo redactado «sin
+ * sello», y ahí `--force` es la única forma de traer nada — pero fuerza **todo**, incluida
+ * la hoja de estilos con el trabajo de diseño de esa web. Mirar un diff, comprobar que la
+ * única diferencia es la de la fábrica y traer ese fichero es una operación legítima; sin
+ * esto había que hacerla copiando a mano, que es justo lo que estos guiones existen para
+ * que nadie tenga que hacer.
+ */
+const only = args.filter((a, i) => args[i - 1] === '--only')
+const target = args.find((a, i) => !a.startsWith('--') && args[i - 1] !== '--only')
+if (!target) stop('Uso: npm run sync-written -- <ruta-del-sitio> [--apply] [--force] [--only <fichero>]')
 
 const site = isAbsolute(target) ? target : resolve(process.cwd(), target)
 if (!existsSync(join(site, 'package.json'))) stop(`${site} no parece un sitio: no hay package.json.`)
@@ -66,10 +77,25 @@ try {
 }
 
 function main() {
-  const { checked, behind, customised, unknown, missing, added, removed, pairs } = drift
+  const { checked, added, removed, pairs } = drift
+  // El sello se escribe con **todos** los pares aunque se traiga uno: sellar es comprobar
+  // que el contenido es el de la fábrica, y eso vale para cada fichero por separado.
+  const chosen = (list) => (only.length ? list.filter(({ rel }) => only.includes(rel)) : list)
+  const [behind, customised, unknown, missing] = [
+    chosen(drift.behind),
+    chosen(drift.customised),
+    chosen(drift.unknown),
+    chosen(drift.missing),
+  ]
 
   console.log(`\n  ${name}  ${site}`)
-  console.log(`  ${checked} ficheros redactados para esta web, regenerados desde su blueprint\n`)
+  console.log(`  ${checked} ficheros redactados para esta web, regenerados desde su blueprint`)
+  if (only.length) {
+    const desconocidos = only.filter((rel) => !pairs.some((pair) => pair.rel === rel))
+    if (desconocidos.length) stop(`--only no reconoce: ${desconocidos.join(', ')}`)
+    console.log(`  Sólo se mira: ${only.join(', ')}`)
+  }
+  console.log('')
 
   if (added.length) console.log(`  módulo nuevo         ${added.join(', ')}`)
   if (removed.length) {
@@ -79,7 +105,10 @@ function main() {
   }
   if (added.length || removed.length) console.log('')
 
-  const { copy: aCopiar, respected, seals } = whatToCopy(drift, { apply, force })
+  const { copy: aCopiar, respected, seals } = whatToCopy(
+    { behind, customised, unknown, missing },
+    { apply, force },
+  )
   const traibles = [...behind, ...missing]
   const propios = [...customised, ...unknown]
 
@@ -107,7 +136,8 @@ function main() {
       : ''
   }
     git -C ${target} diff -- <fichero>    para ver qué tiene de propio
-    npm run sync-written -- ${target} --apply --force    para pisarlos de todas formas`)
+    npm run sync-written -- ${target} --apply --force    para pisarlos de todas formas
+    npm run sync-written -- ${target} --apply --force --only <fichero>    para uno solo`)
   }
 
   if (!apply) {
