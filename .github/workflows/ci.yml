@@ -101,11 +101,18 @@ jobs:
       matrix:
         # `ejemplo-completo` enciende los once módulos, y está por eso: con sólo la
         # asociación, cuatro de ellos —about, media, partners, reviews— no los compilaba
-        # nadie, y una errata en cualquiera la habría descubierto un cliente. Los otros dos
+        # nadie, y una errata en cualquiera la habría descubierto un cliente. Los otros
         # son combinaciones reales, que es lo que cambia el cableado: un catálogo con
         # precios enlaza su JSON-LD y sin ellos no, y sólo `media` pone el consentimiento
         # de los reproductores en el layout.
-        blueprint: [ejemplo-completo, ejemplo-asociacion, ejemplo-portafolio]
+        #
+        # `ejemplo-solista` existe por un fallo concreto: los tres primeros encienden
+        # `pricing` **y** `catalog`, así que nadie compilaba nunca las tarifas sin catálogo
+        # —y `pricing/collection.ts` nombraba `'catalog'` en un tipo, lo que tumbaba el
+        # typecheck de la web entera por una rama que no se ejecuta—. Lo descubrió una web
+        # de cliente al añadirle tarifas. Lo que esta combinación vigila es que un módulo
+        # que **puede** enlazar con otro compile sin él.
+        blueprint: [ejemplo-completo, ejemplo-asociacion, ejemplo-portafolio, ejemplo-solista]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

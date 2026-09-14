@@ -1,0 +1,72 @@
+{
+  "identity": {
+    "id": "nube-baja",
+    "name": "Nube Baja",
+    "url": "https://nubebaja.example",
+    "schemaType": "MusicGroup",
+    "email": "hola@nubebaja.example",
+    "city": "Gijón",
+    "tagline": "Directo de guitarra y loops, para salas pequeñas"
+  },
+  "modules": {
+    "about": {
+      "title": "Quién soy"
+    },
+    "media": {
+      "labels": { "singular": "Grabación", "plural": "Escucha" },
+      "route": "/escucha",
+      "title": "Escucha"
+    },
+    "schedule": {
+      "labels": { "singular": "Concierto", "plural": "Conciertos" },
+      "route": "/conciertos",
+      "title": "Próximos conciertos"
+    },
+    "pricing": {
+      "labels": { "singular": "Formato", "plural": "Formatos" },
+      "route": "/formatos",
+      "title": "Cómo se contrata"
+    },
+    "faq": {
+      "labels": { "singular": "Pregunta frecuente", "plural": "Preguntas frecuentes" },
+      "route": "/preguntas-frecuentes",
+      "title": "Antes de escribir"
+    },
+    "contact": {
+      "labels": { "singular": "Solicitud", "plural": "Contratación" },
+      "title": "Contratación",
+      "kinds": {
+        "sala": "Sala o bar",
+        "festival": "Festival",
+        "privado": "Evento privado",
+        "otro": "Otra cosa"
+      }
+    }
+  },
+  "design": {
+    "scheme": "dark",
+    "altExample": "Concierto en una sala pequeña, guitarra y pedalera",
+    "palette": {
+      "ground": "#101214",
+      "ground2": "#171a1d",
+      "surface": "#1c2024",
+      "surface2": "#23282d",
+      "ink": "#eef1f3",
+      "inkSoft": "#b3bbc2",
+      "inkFaint": "#8e979f",
+      "line": "#2b3136",
+      "accent": "#6fb3d2",
+      "accentSoft": "#9ccbe1"
+    },
+    "fonts": {
+      "display": { "family": "Archivo", "weights": ["600", "700"] },
+      "body": { "family": "Public Sans", "weights": ["400", "500", "600"] }
+    },
+    "sections": ["about", "media", "schedule", "pricing", "faq", "contact"]
+  },
+  "legal": {
+    "holder": "Nube Baja S.C.",
+    "id": "J00000000",
+    "address": "Gijón"
+  }
+}

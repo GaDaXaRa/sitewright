@@ -1,4 +1,4 @@
-import type { CollectionConfig, Field } from 'payload'
+import type { CollectionConfig, CollectionSlug, Field } from 'payload'
 import { revalidator } from '@/collections/hooks/revalidate'
 
 /**
@@ -15,8 +15,16 @@ export function pricingCollection({
 }: {
   labels: { singular: string; plural: string }
   route: string
-  /** The catalogue collection each price belongs to, when the site has one. */
-  linkedTo?: 'catalog'
+  /**
+   * The collection each price belongs to, when the site has one to point at.
+   *
+   * It is `CollectionSlug` and not the literal `'catalog'` because **this module has to
+   * compile in a site that has no catalogue**. The wiring only passes it where the module
+   * exists, but the type is checked either way: a literal naming a collection this site
+   * never generated is not a `CollectionSlug` here, and the whole site failed to typecheck
+   * over a branch that never runs. A DJ with rates and no catalogue found it.
+   */
+  linkedTo?: CollectionSlug
 }): CollectionConfig {
   const revalidation = revalidator(route)
 
