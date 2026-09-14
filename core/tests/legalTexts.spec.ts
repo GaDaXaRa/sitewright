@@ -3,7 +3,7 @@ import type { LegalSettings } from '../src/lib/types.js'
 import { cookiePolicy, legalNotice, privacyPolicy } from '../src/lib/legalTexts.js'
 
 const settings = (extra: Partial<LegalSettings> = {}) =>
-  ({ siteName: 'Subsuelo', ...extra }) as LegalSettings
+  ({ siteName: 'Bajocero', ...extra }) as LegalSettings
 
 const text = (sections: { paragraphs: string[] }[]) =>
   sections.flatMap((s) => s.paragraphs).join(' ')
@@ -17,15 +17,15 @@ describe('legal notice', () => {
   it('names the holder with the details that were filled in', () => {
     const sections = legalNotice(
       settings({
-        legalHolder: 'Asociación Cultural Subsuelo',
+        legalHolder: 'Asociación Cultural Bajocero',
         legalId: 'G00000000',
         legalAddress: 'Calle de ejemplo 1, Madrid',
-        email: 'hola@subsuelo.es',
+        email: 'hola@bajocero.example',
       }),
       'https://ejemplo.es',
     )
 
-    expect(text(sections)).toContain('Asociación Cultural Subsuelo')
+    expect(text(sections)).toContain('Asociación Cultural Bajocero')
     expect(text(sections)).toContain('NIF G00000000')
     expect(text(sections)).toContain('Calle de ejemplo 1, Madrid')
   })
@@ -55,8 +55,8 @@ describe('the shape of the pages', () => {
   })
 
   it('names the site where the text speaks about it, or falls back to a neutral wording', () => {
-    expect(text(legalNotice(settings({ siteName: 'Subsuelo' }), 'https://ejemplo.es'))).toContain(
-      'Subsuelo',
+    expect(text(legalNotice(settings({ siteName: 'Bajocero' }), 'https://ejemplo.es'))).toContain(
+      'Bajocero',
     )
     expect(text(legalNotice(settings({ siteName: null }), 'https://ejemplo.es'))).toContain(
       'este sitio',
@@ -64,8 +64,8 @@ describe('the shape of the pages', () => {
   })
 
   it('prints the site address it is given', () => {
-    expect(text(legalNotice(settings(), 'https://subsuelo.example'))).toContain(
-      'https://subsuelo.example',
+    expect(text(legalNotice(settings(), 'https://bajocero.example'))).toContain(
+      'https://bajocero.example',
     )
   })
 
@@ -150,11 +150,11 @@ describe('with nothing filled in at all', () => {
 describe('privacy policy', () => {
   it('points at the address for exercising rights, preferring the legal one', () => {
     const sections = privacyPolicy(
-      settings({ email: 'hola@subsuelo.es', legalEmail: 'datos@subsuelo.es' }),
+      settings({ email: 'hola@bajocero.example', legalEmail: 'datos@bajocero.example' }),
     )
 
-    expect(text(sections)).toContain('datos@subsuelo.es')
-    expect(text(sections)).not.toContain('hola@subsuelo.es')
+    expect(text(sections)).toContain('datos@bajocero.example')
+    expect(text(sections)).not.toContain('hola@bajocero.example')
   })
 
   it('mentions the processors that really see the data', () => {

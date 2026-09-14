@@ -8,18 +8,18 @@ import { parseEmbed, PROVIDER_NAMES } from '../src/lib/embeds.js'
  */
 describe('parseEmbed', () => {
   it('turns a SoundCloud track into its widget, keeping the track as the fallback link', () => {
-    const embed = parseEmbed('https://soundcloud.com/subsuelo/sesion-012')
+    const embed = parseEmbed('https://soundcloud.com/bajocero/sesion-012')
 
     expect(embed?.provider).toBe('soundcloud')
     expect(embed?.embedUrl).toContain('w.soundcloud.com/player')
-    expect(embed?.embedUrl).toContain(encodeURIComponent('https://soundcloud.com/subsuelo/sesion-012'))
-    expect(embed?.canonicalUrl).toBe('https://soundcloud.com/subsuelo/sesion-012')
+    expect(embed?.embedUrl).toContain(encodeURIComponent('https://soundcloud.com/bajocero/sesion-012'))
+    expect(embed?.canonicalUrl).toBe('https://soundcloud.com/bajocero/sesion-012')
   })
 
   it('drops the tracking parameters a share link carries', () => {
-    const embed = parseEmbed('https://soundcloud.com/subsuelo/sesion-012?si=abc123&utm_source=clipboard')
+    const embed = parseEmbed('https://soundcloud.com/bajocero/sesion-012?si=abc123&utm_source=clipboard')
 
-    expect(embed?.canonicalUrl).toBe('https://soundcloud.com/subsuelo/sesion-012')
+    expect(embed?.canonicalUrl).toBe('https://soundcloud.com/bajocero/sesion-012')
   })
 
   it('accepts the three shapes a YouTube link comes in', () => {
@@ -34,12 +34,12 @@ describe('parseEmbed', () => {
   })
 
   it('normalises a Mixcloud feed with and without its trailing slash', () => {
-    const withSlash = parseEmbed('https://www.mixcloud.com/subsuelo/sesion-010/')
-    const without = parseEmbed('https://www.mixcloud.com/subsuelo/sesion-010')
+    const withSlash = parseEmbed('https://www.mixcloud.com/bajocero/sesion-010/')
+    const without = parseEmbed('https://www.mixcloud.com/bajocero/sesion-010')
 
     expect(withSlash?.provider).toBe('mixcloud')
     expect(withSlash?.embedUrl).toBe(without?.embedUrl)
-    expect(withSlash?.canonicalUrl).toBe('https://www.mixcloud.com/subsuelo/sesion-010/')
+    expect(withSlash?.canonicalUrl).toBe('https://www.mixcloud.com/bajocero/sesion-010/')
   })
 
   it('takes a Bandcamp player address, which is the only thing Bandcamp gives out', () => {
@@ -57,11 +57,11 @@ describe('parseEmbed', () => {
   })
 
   it('refuses plain http, which browsers block inside an https page anyway', () => {
-    expect(parseEmbed('http://soundcloud.com/subsuelo/sesion-012')).toBeNull()
+    expect(parseEmbed('http://soundcloud.com/bajocero/sesion-012')).toBeNull()
   })
 
   it('survives the whitespace a paste leaves behind', () => {
-    expect(parseEmbed('  https://soundcloud.com/subsuelo/sesion-012  ')?.provider).toBe(
+    expect(parseEmbed('  https://soundcloud.com/bajocero/sesion-012  ')?.provider).toBe(
       'soundcloud',
     )
   })
@@ -80,7 +80,7 @@ describe('parseEmbed', () => {
   })
 
   it('refuses a bandcamp address that is not a player, since it cannot be embedded', () => {
-    expect(parseEmbed('https://bandcamp.com/subsuelo/album/x')).toBeNull()
+    expect(parseEmbed('https://bandcamp.com/bajocero/album/x')).toBeNull()
   })
 
   it('refuses somebody else\'s /EmbeddedPlayer path: the host is what makes it Bandcamp', () => {
@@ -88,15 +88,15 @@ describe('parseEmbed', () => {
   })
 
   it('refuses a youtube address with no video in it', () => {
-    expect(parseEmbed('https://www.youtube.com/@subsuelo')).toBeNull()
+    expect(parseEmbed('https://www.youtube.com/@bajocero')).toBeNull()
     expect(parseEmbed('https://youtu.be/')).toBeNull()
     // "embed" has to be where the path starts, not anywhere in it.
     expect(parseEmbed('https://www.youtube.com/x/embed/abc123')).toBeNull()
   })
 
   it('builds the exact player address each platform expects', () => {
-    expect(parseEmbed('https://www.mixcloud.com/subsuelo/sesion-010/')?.embedUrl).toBe(
-      'https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&light=0&feed=%2Fsubsuelo%2Fsesion-010%2F',
+    expect(parseEmbed('https://www.mixcloud.com/bajocero/sesion-010/')?.embedUrl).toBe(
+      'https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&light=0&feed=%2Fbajocero%2Fsesion-010%2F',
     )
     expect(parseEmbed('https://youtu.be/abc123')?.canonicalUrl).toBe(
       'https://www.youtube.com/watch?v=abc123',

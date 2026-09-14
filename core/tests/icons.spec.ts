@@ -3,7 +3,7 @@ import { buildIcons, CMS_ICON_ROUTE, defaultIconSvg, initials } from '../src/lib
 
 describe('initials', () => {
   it('takes one letter from one word and two from two', () => {
-    expect(initials('Subsuelo')).toBe('S')
+    expect(initials('Bajocero')).toBe('B')
     expect(initials('Marta Ibáñez')).toBe('MI')
   })
 

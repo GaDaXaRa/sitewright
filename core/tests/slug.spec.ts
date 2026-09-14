@@ -12,7 +12,7 @@ describe('slugify', () => {
   })
 
   it('collapses anything that is not a letter or a digit', () => {
-    expect(slugify('Subsuelo 012 — Nea Kore!')).toBe('subsuelo-012-nea-kore')
+    expect(slugify('Bajocero 012 — Nea Kore!')).toBe('bajocero-012-nea-kore')
   })
 
   it('leaves no hyphen hanging at either end', () => {

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Qué versión del núcleo tiene una web, cuántas se está perdiendo y qué hay en medio.
-// Existe porque nadie lleva esa cuenta: subsuelo lleva desde agosto cinco versiones por
-// detrás y nada lo dice hasta que alguien va a mirarlo a mano.
+// Existe porque nadie lleva esa cuenta: la primera vez que se miró, una de las webs
+// arrastraba cinco versiones de retraso desde hacía un mes y nada lo decía hasta que
+// alguien fue a mirarlo a mano.
 import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, isAbsolute, join, resolve } from 'node:path'

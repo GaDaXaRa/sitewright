@@ -1,6 +1,6 @@
 # H1 — qué es común y qué no
 
-Cuaderno de campo del hito 1: la web del colectivo de djs ([subsuelo](../../subsuelo))
+Cuaderno de campo del hito 1: la web del colectivo de djs (subsuelo)
 construida a mano sobre el chasis de [Organic Yoga](../../organicYoga). Esta es la materia
 prima de H2: **lo que aparezca como igual es candidato a núcleo; lo que aparezca como
 distinto se queda en el sitio.**

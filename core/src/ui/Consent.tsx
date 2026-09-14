@@ -83,7 +83,7 @@ export function ConsentProvider({
   showBanner = true,
   children,
 }: {
-  /** Something stable and site-specific, e.g. "subsuelo". */
+  /** Something stable and site-specific, e.g. "bajocero". */
   storageKey: string
   /** Where the cookie policy lives on this site. */
   cookiesHref?: string
