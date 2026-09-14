@@ -24,7 +24,7 @@ webs y caben en la cabeza de una persona.
 
 | Pieza | Estado |
 |---|---|
-| Núcleo `sitewright-core` | 0.16.0 en npm · 18 baterías · mutación 95,56% con el corte en 95 |
+| Núcleo `sitewright-core` | 0.16.0 en npm · 18 baterías · mutación 96,29% con el corte en 95 |
 | Módulos | Los once, copiados al sitio y editables, con sus pruebas viajando dentro |
 | Generador | Determinista, escritores puros y probados, tres blueprints compilando en la CI |
 | Auditoría | 17 puertas: identidad, canonical, sitemap, JSON-LD, `llms.txt`, cabeceras, legal, consentimiento, imágenes, relleno, peso, alcanzables, páginas vacías, panel privado, contraste, portada, esquema |

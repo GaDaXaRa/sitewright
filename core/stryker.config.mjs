@@ -19,9 +19,11 @@
  * 1. **A mutant that breaks the module's import counts as a survivor**, because the vitest
  *    runner only looks at failing tests, not at files that never load. Before believing a
  *    row, apply the change by hand and run the tests.
- * 2. **The twenty-eight survivors that remain cannot be killed**, gone through one by one
- *    on 7 September 2026 by applying each one and running the battery. They fall into four
- *    families, and knowing which is which is what stops the next person re-deriving them:
+ * 2. **The survivors that remain cannot be killed** — twenty-six of them plus two that time
+ *    out, gone through one by one on 7 September 2026 by applying each one and running the
+ *    battery, and checked again on 14 September against the report: same files, same lines.
+ *    They fall into four families, and knowing which is which is what stops the next person
+ *    re-deriving them:
  *
  *    - **The code itself undoes the change** (9): the `filter` after `initials`'s `split`
  *      drops the empty words a coarser separator creates; `recordSubmission`'s own filter
@@ -50,20 +52,26 @@
  *    `contrastRatio` returning null when the **second** colour is invalid, and a
  *    `/EmbeddedPlayer` path on a host that is not Bandcamp.
  *
- * Score when last measured: **95.56%** (28 survivors of 631), on 8 September 2026.
+ * **The score is not written here.** It was, and it rotted: this comment claimed 95.56%
+ * with a margin of 0.56 over the threshold for a week during which the real figures were
+ * 96.49% and 1.49, because the core grew and nobody came back to edit a number in a
+ * comment. A number kept by hand is a number that lies, which is the whole point of the
+ * table of lying tools in CLAUDE.md — so the figure lives where it is produced:
  *
- * It **rose** from 95.46% and that is not an improvement either: `relationPointsTo` was
- * deleted — nothing called it, not a site, not the template, not the core itself — and it
- * took 8 mutants with it, 7 killed and **one survivor**, the `String(null)` guard that used
- * to sit in the list above. A survivor leaving raises the score without a single test being
- * written, which is worth knowing before anyone reads a rise as progress.
+ *   npm run test:mutacion                        # prints it, and breaks below 95
+ *   reports/mutacion/informe.html                # and shows every mutant behind it
  *
- * Before that it had dropped from 96.08%, and that was not a regression: `versions.ts`
- * moved out to `scripts/lib/`, where it belongs — it is the factory's own tooling and no
- * site imports it — taking 100 mutants with a perfect score with it.
+ * What is worth writing down is what a rerun cannot tell you. Two things, both of which
+ * have already misled someone reading a number in isolation:
  *
- * The margin over the 95 threshold is 0.56: the next module added without tests breaks the
- * build, which is the point.
+ * - **A survivor leaving raises the score without a test being written.** Deleting
+ *   `relationPointsTo` — which nothing called, not a site, not the template, not the core —
+ *   took 8 mutants with it, 7 killed and one survivor, and the score went up.
+ * - **A drop is not always a regression.** Moving `versions.ts` out to `scripts/lib/`,
+ *   where it belongs, took 100 mutants with a perfect score with it and the score fell.
+ *
+ * So read a change in the number against what moved, never on its own. What the threshold
+ * is actually for: the next module added without tests breaks the build.
  */
 /** @type {import('@stryker-mutator/api/core').PartialStrykerOptions} */
 const configuration = {

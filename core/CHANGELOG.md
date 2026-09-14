@@ -3,6 +3,23 @@
 Qué gana una web al actualizar. Escrito para quien tiene que decidir si le compensa, no
 para quien escribió el código.
 
+## 0.18.0 — 14 de septiembre de 2026
+
+- **La puerta de la tarjeta social pasa de avisar a fallar.** Nació avisando porque el día
+  que se escribió ninguna sección de las dos webs en producción tenía descripción ni imagen,
+  y una puerta que pone en rojo lo que nadie ha tenido ocasión de arreglar es una puerta que
+  alguien desactiva. Con las dos corregidas y en verde, seguir avisando sólo servía para que
+  la siguiente web naciera con el mismo hueco.
+
+  El mensaje dice **dónde se arregla** —la descripción sale de Ajustes: «descripción para
+  buscadores», el lema o el texto de portada—, que es lo que convierte un rojo en una
+  instrucción. La imagen no puede faltar nunca: si no hay foto ni logotipo, está la tarjeta
+  dibujada.
+
+  **Ojo con una web sin lema**: `identity.tagline` no es obligatorio en el blueprint, y sin
+  él ni el seed escribe nada que heredar. Esa web fallará la auditoría hasta que alguien
+  escriba una línea en Ajustes, que es exactamente lo que la puerta pide.
+
 ## 0.17.0 — 14 de septiembre de 2026
 
 - **La auditoría mira la accesibilidad de verdad, con axe.** El plan de la v1 prometía

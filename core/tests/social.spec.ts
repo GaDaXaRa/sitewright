@@ -134,18 +134,19 @@ describe('checkSocialCard', () => {
     expect(finding!.status).toBe('ok')
   })
 
-  it('avisa, y dice de qué página y qué le falta', () => {
+  it('falla, y dice de qué página y qué le falta', () => {
     const [finding] = checkSocialCard([page('/equipo', '<title>Equipo</title>')])
 
-    expect(finding!.status).toBe('warn')
+    expect(finding!.status).toBe('fail')
     expect(finding!.detail).toContain('/equipo')
     expect(finding!.detail).toContain('descripción')
     expect(finding!.detail).toContain('imagen')
   })
 
-  it('avisa en vez de fallar: el día que existió, ninguna sección en producción pasaba', () => {
-    // Una puerta que pone en rojo lo que nadie ha tenido ocasión de arreglar se desactiva.
-    expect(checkSocialCard([page('/x', '')])[0]!.status).not.toBe('fail')
+  it('y dice dónde se arregla, que es lo que convierte un rojo en una instrucción', () => {
+    // Sin esto, «sin descripción» manda a alguien a buscar por el código un texto que se
+    // escribe una vez en el panel.
+    expect(checkSocialCard([page('/x', '')])[0]!.detail).toContain('Ajustes')
   })
 
   it('no mira lo que no respondió', () => {

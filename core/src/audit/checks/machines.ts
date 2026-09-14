@@ -182,10 +182,14 @@ const titleOf = (html: string) => html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[
  * Es el sitio por el que más llega la gente a una web pequeña, y las páginas de sección
  * salían con **sólo un título**: compartir `/equipo` por WhatsApp daba un enlace pelado.
  *
- * Avisa en vez de fallar, y a propósito: el día que esta puerta existió, las dos webs en
- * producción no tenían descripción ni imagen en ninguna sección. Una puerta que pone en
- * rojo lo que nadie ha tenido ocasión de arreglar es una puerta que alguien desactiva.
- * Asciende a fallo cuando las dos lleven la corrección.
+ * **Falla**, desde que se ganó el derecho. Nació avisando porque el día que se escribió las
+ * dos webs en producción no tenían descripción ni imagen en ninguna sección, y una puerta
+ * que pone en rojo lo que nadie ha tenido ocasión de arreglar es una puerta que alguien
+ * desactiva. Con las dos corregidas y en verde, avisar ya sólo servía para que la siguiente
+ * web naciera con el mismo hueco.
+ *
+ * La imagen siempre se puede dar —la tarjeta dibujada está ahí para eso—, así que lo único
+ * que puede faltar de verdad es el texto, y sale de algo que el cliente escribe una vez.
  */
 export function checkSocialCard(pages: Fetched[]): Finding[] {
   const live = pages.filter((page) => page.status === 200)
@@ -204,13 +208,20 @@ export function checkSocialCard(pages: Fetched[]): Finding[] {
   }
 
   const what = 'La tarjeta al compartir'
+  const cuantas = (n: number) => `${n} ${n === 1 ? 'página' : 'páginas'}`
+
   return [
     missing.length
-      ? warn(
+      ? fail(
           GATE_SOCIAL,
           what,
-          `${missing.length} de ${live.length} ${live.length === 1 ? 'página' : 'páginas'} sin todo lo que necesita una tarjeta: ${missing.slice(0, 4).join(', ')}${missing.length > 4 ? `, y ${missing.length - 4} más` : ''}.`,
+          `${missing.length} de ${cuantas(live.length)} sin todo lo que necesita una tarjeta: ` +
+            `${missing.slice(0, 4).join(', ')}${missing.length > 4 ? `, y ${missing.length - 4} más` : ''}. ` +
+            // El mensaje dice dónde se arregla: sin esto, «sin descripción» manda a alguien
+            // a buscar por el código un texto que se escribe una vez en el panel.
+            'La descripción sale de Ajustes —«descripción para buscadores», el lema o el texto ' +
+            'de portada—; la imagen, de la foto de portada, del logotipo o de la tarjeta dibujada.',
         )
-      : ok(GATE_SOCIAL, what, `${live.length} ${live.length === 1 ? 'página' : 'páginas'} con título, descripción e imagen.`),
+      : ok(GATE_SOCIAL, what, `${cuantas(live.length)} con título, descripción e imagen.`),
   ]
 }
