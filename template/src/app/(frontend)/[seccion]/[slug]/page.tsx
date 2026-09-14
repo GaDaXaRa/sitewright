@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { loadSiteContent } from '@/lib/data'
 import { modules } from '@/site.modules'
+import { pageMetadata } from '@/lib/metadata'
 import type { SiteModule } from '@/lib/modules'
 
 /**
@@ -66,11 +67,15 @@ export async function generateMetadata({
   const meta = documentMeta?.(found.item as never, found.module.route!)
   if (!meta) return {}
 
-  return {
+  // La ficha tenía título y descripción y ninguna imagen, teniendo cada una la suya
+  // delante: la foto del servicio, el retrato de la persona.
+  return pageMetadata({
     title: meta.title,
-    ...(meta.description ? { description: meta.description } : {}),
-    alternates: { canonical: `${found.module.route}/${slug}` },
-  }
+    description: meta.description,
+    image: meta.image,
+    canonical: `${found.module.route}/${slug}`,
+    settings: found.content.settings,
+  })
 }
 
 export default async function DocumentPage({

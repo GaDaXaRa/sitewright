@@ -7,6 +7,7 @@ import {
   checkIdentity,
   checkSecurityHeaders,
   checkSitemapAndRobots,
+  checkSocialCard,
   checkStructuredData,
   checkConsentGating,
   checkContrast,
@@ -115,6 +116,25 @@ export async function runAudit(options: AuditOptions): Promise<Finding[]> {
 
   const sitemapUrls = [...sitemap.body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]!)
 
+  /**
+   * Todo lo que se ha descargado, que es lo que las dos puertas nuevas tienen que mirar.
+   *
+   * Incluye lo que el recorrido encuentra pinchando —ahí viven las páginas de sección— y es
+   * justo donde aparecieron las dos cosas que estas puertas existen para cazar: el salto de
+   * encabezado y las secciones sin tarjeta. Mirando sólo la portada, las dos habrían dicho
+   * que todo estaba bien.
+   */
+  const crawled: Fetched[] = [
+    ...[...bodies].map(([path, body]) => ({
+      url: `${base}${path}`,
+      status: 200,
+      finalUrl: `${base}${path}`,
+      headers: {},
+      body,
+    })),
+    ...legalPages.filter((page) => page.status === 200),
+  ]
+
   const findings: Finding[] = [
     ...checkIdentity(home, siteUrl),
     ...checkCanonicalAnswers(canonical),
@@ -130,17 +150,10 @@ export async function runAudit(options: AuditOptions): Promise<Finding[]> {
     ...checkReachable(sitemapUrls, reachable),
     ...checkAdvertisedEmpty(sitemapUrls, bodies),
     ...checkAdminPrivate(guide),
+    ...checkSocialCard(crawled),
   ]
 
-  // Sobre todo lo que se ha descargado, que incluye lo que el recorrido encontró pinchando:
-  // es donde viven las páginas de sección, y es justo donde apareció el primer salto de
-  // encabezado real. Medir sólo la portada habría dicho que todo estaba bien.
-  findings.push(
-    ...(await checkAccessibility([
-      ...[...bodies].map(([path, body]) => ({ url: `${base}${path}`, body })),
-      ...legalPages.filter((page) => page.status === 200),
-    ])),
-  )
+  findings.push(...(await checkAccessibility(crawled)))
 
   if (options.cssPath) {
     try {

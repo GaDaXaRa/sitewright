@@ -33,6 +33,14 @@ export const site = {
   /** A quién escribe la clienta si algo no cuadra. Sale del blueprint; puede no haberlo. */
   support: null as { name?: string; email?: string } | null,
 
+  /**
+   * Los dos colores con los que se dibuja la tarjeta social cuando la web no tiene foto.
+   *
+   * Están aquí y no leídos de la hoja de estilos porque quien la dibuja necesita valores
+   * literales: `ImageResponse` no resuelve variables de CSS.
+   */
+  palette: { ground: '#0b0b0d', accent: '#ff4d2e' },
+
   /** El ejemplo de texto alternativo que lee quien sube una foto, en sus propias palabras. */
   altExample: 'Una foto del equipo trabajando',
 

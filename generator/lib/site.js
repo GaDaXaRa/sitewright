@@ -52,6 +52,14 @@ ${nav.join('\n')}
 
   support: ${bp.support ? JSON.stringify(bp.support) : 'null'} as { name?: string; email?: string } | null,
 
+  /**
+   * Los dos colores con los que se dibuja la tarjeta social cuando la web no tiene foto.
+   *
+   * Están aquí y no leídos de la hoja de estilos porque quien la dibuja necesita valores
+   * literales: \`ImageResponse\` no resuelve variables de CSS.
+   */
+  palette: { ground: '${bp.design.palette.ground}', accent: '${bp.design.palette.accent}' },
+
   /** El ejemplo de texto alternativo que lee quien sube una foto, en sus propias palabras. */
   altExample: '${bp.design.altExample ?? 'Una foto del equipo trabajando'}',
 
@@ -169,6 +177,7 @@ ${imports}
 ${jsonldImports}
 
 import { loadSiteContent, visibleNav } from '@/lib/data'
+import { pageMetadata } from '@/lib/metadata'
 import { buildHomeJsonLd } from '@/lib/jsonLd'
 import { site } from '@/site.config'
 import { alternateTones, mediaAlt, mediaFocal, mediaSize, mediaUrl${usesSplit ? ', splitEvents' : ''} } from 'sitewright-core'
@@ -182,17 +191,15 @@ export async function generateMetadata(): Promise<Metadata> {
   const title =
     settings.seoTitle?.trim() ||
     (settings.tagline?.trim() ? \`\${settings.siteName} — \${settings.tagline.trim()}\` : undefined)
-  const description = settings.seoDescription || settings.heroText || undefined
-  const image = mediaUrl(settings.heroImage) || mediaUrl(settings.logo)
 
+  // La portada es la página que más se comparte, y era la única que se quedaba sin tarjeta
+  // cuando la web todavía no tenía ni foto de portada ni logotipo. El título se pone aparte
+  // porque el de la portada es absoluto: no lleva detrás el nombre del sitio.
+  const meta = pageMetadata({ canonical: '/', settings })
   return {
+    ...meta,
     ...(title ? { title: { absolute: title } } : {}),
-    ...(description ? { description } : {}),
-    openGraph: {
-      ...(title ? { title } : {}),
-      ...(description ? { description } : {}),
-      ...(image ? { images: [{ url: image }] } : {}),
-    },
+    openGraph: { ...meta.openGraph, ...(title ? { title } : {}) },
   }
 }
 

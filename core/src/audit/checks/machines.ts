@@ -1,8 +1,9 @@
-import { type Fetched, type Finding, fail, ok, warn } from '../types.js'
+import { type Fetched, type Finding, fail, ok, skip, warn } from '../types.js'
 
 /**
- * Lo que leen las máquinas y no las personas: el grafo de datos estructurados y el
- * resumen que se dejan los modelos de lenguaje.
+ * Lo que leen las máquinas y no las personas: el grafo de datos estructurados, el resumen
+ * que se dejan los modelos de lenguaje, y la tarjeta que arma quien pega el enlace en un
+ * chat —que la lee una persona, pero la construye un rastreador—.
  */
 
 // ── datos estructurados ─────────────────────────────────────────────────────────────────
@@ -156,4 +157,60 @@ export function checkLlmsTxt(llms: Fetched, siteName?: string): Finding[] {
   }
 
   return findings
+}
+
+// ── tarjeta social ──────────────────────────────────────────────────────────────────────
+
+const GATE_SOCIAL = 'social'
+
+/** El contenido de un `<meta>`, sin depender del orden en que vengan sus atributos. */
+export function metaContent(html: string, key: string, value: string): string | undefined {
+  for (const [tag] of html.matchAll(/<meta\b[^>]*>/g)) {
+    const matchesKey = new RegExp(`\\b${key}=["']${value}["']`, 'i').test(tag)
+    if (!matchesKey) continue
+    const content = tag.match(/\bcontent=["']([^"']*)["']/i)?.[1]
+    if (content?.trim()) return content.trim()
+  }
+  return undefined
+}
+
+const titleOf = (html: string) => html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1]?.trim()
+
+/**
+ * Lo que se ve cuando alguien comparte una página.
+ *
+ * Es el sitio por el que más llega la gente a una web pequeña, y las páginas de sección
+ * salían con **sólo un título**: compartir `/equipo` por WhatsApp daba un enlace pelado.
+ *
+ * Avisa en vez de fallar, y a propósito: el día que esta puerta existió, las dos webs en
+ * producción no tenían descripción ni imagen en ninguna sección. Una puerta que pone en
+ * rojo lo que nadie ha tenido ocasión de arreglar es una puerta que alguien desactiva.
+ * Asciende a fallo cuando las dos lleven la corrección.
+ */
+export function checkSocialCard(pages: Fetched[]): Finding[] {
+  const live = pages.filter((page) => page.status === 200)
+  if (!live.length) {
+    return [skip(GATE_SOCIAL, 'La tarjeta al compartir', 'No se descargó ninguna página que mirar.')]
+  }
+
+  const missing: string[] = []
+  for (const page of live) {
+    const path = new URL(page.url).pathname
+    const gaps: string[] = []
+    if (!titleOf(page.body)) gaps.push('título')
+    if (!metaContent(page.body, 'name', 'description')) gaps.push('descripción')
+    if (!metaContent(page.body, 'property', 'og:image')) gaps.push('imagen')
+    if (gaps.length) missing.push(`${path} (sin ${gaps.join(' ni ')})`)
+  }
+
+  const what = 'La tarjeta al compartir'
+  return [
+    missing.length
+      ? warn(
+          GATE_SOCIAL,
+          what,
+          `${missing.length} de ${live.length} ${live.length === 1 ? 'página' : 'páginas'} sin todo lo que necesita una tarjeta: ${missing.slice(0, 4).join(', ')}${missing.length > 4 ? `, y ${missing.length - 4} más` : ''}.`,
+        )
+      : ok(GATE_SOCIAL, what, `${live.length} ${live.length === 1 ? 'página' : 'páginas'} con título, descripción e imagen.`),
+  ]
 }

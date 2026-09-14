@@ -17,6 +17,25 @@ para quien escribió el código.
   necesita la página pintada, y de eso sigue ocupándose la puerta «contraste» sobre los
   tokens, que es donde se decide.
 
+- **Las páginas ya no se comparten peladas.** Una sección emitía **sólo un título**: ni
+  descripción ni imagen, así que pegar `/equipo` en un chat daba un enlace desnudo —y es por
+  donde más llega la gente a una web pequeña—. Las fichas tenían texto y ninguna foto,
+  teniendo cada una la suya delante.
+
+  Ahora cada página resuelve su tarjeta cayendo por una cadena: lo suyo, lo del sitio
+  —descripción de buscadores, lema o texto de portada; foto de portada antes que logotipo— y,
+  si la web todavía no tiene ninguna imagen, una **tarjeta dibujada** con su nombre sobre su
+  color, en `/tarjeta-social.png`. Esa última existe para que la puerta nueva se pueda
+  cumplir siempre: una puerta que pide algo imposible es una puerta que alguien apaga.
+
+  La puerta **avisa y no falla**, también a propósito: el día que se escribió, ninguna
+  sección de las dos webs en producción tenía descripción ni imagen. Asciende a fallo cuando
+  las dos lleven la corrección.
+
+  **Esta llega con los dos comandos**: `sync-site` trae el ayudante y las rutas compartidas,
+  y `sync-written` la paleta que necesita la tarjeta dibujada en `site.config.ts`. Con sólo
+  el primero, `npm run typecheck` se queja —que es como hay que enterarse—.
+
 - **Arreglado el salto de encabezado que encontró nada más existir.** En su propia página la
   sección se queda sin `<h2>` a propósito —el título es el `<h1>` de la página— pero sus
   fichas seguían en `<h3>`: de `h1` a `h3`, saltando un nivel, en `catalog`, `team`,

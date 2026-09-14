@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { loadSiteContent } from '@/lib/data'
+import { loadSettings, loadSiteContent } from '@/lib/data'
 import { modules } from '@/site.modules'
+import { pageMetadata } from '@/lib/metadata'
 
 /**
  * La página propia de cada sección, servida por una sola ruta.
@@ -34,7 +35,14 @@ export async function generateMetadata({
   const module = seccion(segmento)
   if (!module) return {}
 
-  return { title: module.plural ?? module.title, alternates: { canonical: module.route } }
+  // Emitía sólo el título: compartir una sección daba un enlace pelado, y es por donde más
+  // llega la gente a una web pequeña. La sección no tiene texto propio —no hay campo para
+  // ello— así que hereda el del sitio, que al menos es algo que escribió el cliente.
+  return pageMetadata({
+    title: module.plural ?? module.title,
+    canonical: module.route!,
+    settings: await loadSettings(),
+  })
 }
 
 export default async function SeccionPage({ params }: { params: Promise<{ seccion: string }> }) {

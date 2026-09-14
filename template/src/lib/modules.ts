@@ -124,7 +124,19 @@ export type ModuleDetailProps = {
  */
 export type ModuleDetail = {
   default: ComponentType<ModuleDetailProps>
-  documentMeta?: (item: never, route: string) => { title: string; description?: string }
+  documentMeta?: (
+    item: never,
+    route: string,
+  ) => {
+    title: string
+    description?: string
+    /**
+     * La foto de este documento, si la tiene: es la que se ve al compartir la ficha.
+     *
+     * Sin ella la tarjeta hereda la del sitio, que es la misma para las doce fichas.
+     */
+    image?: string
+  }
 }
 
 /** Los que guardan algo, que son los que Payload tiene que conocer. */

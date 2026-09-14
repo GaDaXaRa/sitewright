@@ -7,6 +7,7 @@ import Footer from './components/Footer'
 import JsonLd from './components/JsonLd'
 
 import { loadSiteContent } from '@/lib/data'
+import { pageMetadata } from '@/lib/metadata'
 import { buildHomeJsonLd } from '@/lib/jsonLd'
 import { mediaAlt, mediaFocal, mediaUrl } from 'sitewright-core'
 
@@ -21,17 +22,15 @@ export async function generateMetadata(): Promise<Metadata> {
   const title =
     settings?.seoTitle?.trim() ||
     (settings?.tagline?.trim() ? `${name} — ${settings.tagline.trim()}` : undefined)
-  const description = settings?.seoDescription || settings?.heroText || undefined
-  const image = mediaUrl(settings?.heroImage) || mediaUrl(settings?.logo)
 
+  // La portada es la página que más se comparte, y era la única que se quedaba sin tarjeta
+  // cuando la web todavía no tenía ni foto de portada ni logotipo. El título se pone aparte
+  // porque el de la portada es absoluto: no lleva detrás el nombre del sitio.
+  const meta = pageMetadata({ canonical: '/', settings })
   return {
+    ...meta,
     ...(title ? { title: { absolute: title } } : {}),
-    ...(description ? { description } : {}),
-    openGraph: {
-      ...(title ? { title } : {}),
-      ...(description ? { description } : {}),
-      ...(image ? { images: [{ url: image }] } : {}),
-    },
+    openGraph: { ...meta.openGraph, ...(title ? { title } : {}) },
   }
 }
 

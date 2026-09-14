@@ -23,6 +23,7 @@ export { buildIcons, defaultIconSvg, type IconSettings, type IconDescriptor } fr
 
 // Colour, where it has a right answer
 export { bestTextOn, buttonColors, type ButtonColors } from './lib/color.js'
+export { socialCard, socialDescription, type SocialCard, type SocialSource } from './lib/social.js'
 
 // Consent, and whether a banner is needed at all
 export {

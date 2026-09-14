@@ -20,7 +20,14 @@ export type CatalogDoc = Item & {
 
 /** El título y la descripción de la ficha, que es lo que lee un buscador. */
 export function documentMeta(item: CatalogDoc) {
-  return { title: item.title, ...(item.summary ? { description: item.summary } : {}) }
+  // La foto de este elemento es la que se ve al compartir su ficha. Sin ella, las doce
+  // fichas comparten la misma tarjeta, que es la del sitio.
+  const image = mediaUrl(item.image)
+  return {
+    title: item.title,
+    ...(item.summary ? { description: item.summary } : {}),
+    ...(image ? { image } : {}),
+  }
 }
 
 export default function CatalogDetailPage({ item, settings, options }: ModuleDetailProps) {

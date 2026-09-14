@@ -9,7 +9,7 @@
  * todo se puede probar sin una web delante.
  */
 export { canonicalOf, checkIdentity, checkCanonicalAnswers, checkSitemapAndRobots, internalLinks, checkReachable, checkAdvertisedEmpty, isEmptyPage } from './indexing.js'
-export { jsonLdOf, graphOf, checkStructuredData, checkLlmsTxt } from './machines.js'
+export { jsonLdOf, graphOf, checkStructuredData, checkLlmsTxt, checkSocialCard, metaContent } from './machines.js'
 export {
   checkSecurityHeaders,
   checkLegalPages,

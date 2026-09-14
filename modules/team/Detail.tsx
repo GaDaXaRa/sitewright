@@ -17,7 +17,13 @@ import { mediaAlt, mediaUrl } from 'sitewright-core'
  * resuelve es peor que no marcar nada.
  */
 export function documentMeta(item: Person) {
-  return { title: item.name, ...(item.bio?.[0]?.text ? { description: item.bio[0].text } : {}) }
+  // El retrato es lo que se ve al compartir la ficha de una persona.
+  const image = mediaUrl(item.photo)
+  return {
+    title: item.name,
+    ...(item.bio?.[0]?.text ? { description: item.bio[0].text } : {}),
+    ...(image ? { image } : {}),
+  }
 }
 
 export default function TeamDetailPage({ item, settings, route }: ModuleDetailProps) {
