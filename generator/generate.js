@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { cpSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { sectionOrder, validateBlueprint, validateWiring } from './schema.js'
 import { MODULE_SKIP, TEMPLATE_SKIP } from './generated.js'
 import { siteDrift, writeSeal, writtenPairs } from '../scripts/lib/drift.mjs'
 import { defaultIconSvg } from '../core/dist/index.js'
+import { prepareOutput } from './lib/output.js'
 import { GeneratorStopped, replaceOrDie } from './lib/text.js'
 import { homePage, siteConfig, siteModules } from './lib/site.js'
 import { seedScript, siteSettings } from './lib/panel.js'
@@ -87,14 +88,18 @@ if (errors.length) {
   process.exit(1)
 }
 
-const target = resolve(out)
-if (existsSync(target) && !flag('force')) {
-  console.error(`Ya existe ${target}. Usa --force para reescribirlo.`)
-  process.exit(1)
+bp.schemaVersion = 1
+
+let output
+try {
+  output = prepareOutput(out, ROOT, flag('force'))
+} catch (err) {
+  abort(err.message)
 }
-rmSync(target, { recursive: true, force: true })
-mkdirSync(target, { recursive: true })
+const target = output.staging
 started = target
+// Cleanup also covers unexpected exceptions and failed filesystem writes.
+process.on('exit', output.cleanup)
 
 // 1. The chassis, minus what belongs to the generator's own machinery.
 cpSync(join(ROOT, 'template'), target, {
@@ -184,7 +189,7 @@ writing(() => {
     let env = replaceOrDie(
       read('.env.example'),
       /^EMAIL_FROM_NAME=.*$/m,
-      `EMAIL_FROM_NAME=${bp.identity.name}`,
+      () => `EMAIL_FROM_NAME=${JSON.stringify(bp.identity.name)}`,
       'el nombre del remitente de los correos',
     )
     if (bp.identity.url) {
@@ -236,8 +241,11 @@ writing(() => {
   writeSeal(target, writtenPairs(target), { scope: 'written' })
 })
 
+output.commit()
+started = null
+
 console.log(`
-Sitio generado en ${target}
+Sitio generado en ${resolve(out)}
 
   ${Object.keys(modules).length} módulos: ${Object.keys(modules).join(', ')}
   ${wirings.filter((w) => w.pagePath).length} secciones con página propia y ${wirings.filter((w) => w.detailPath).length} con ficha, servidas por [seccion] y [seccion]/[slug]

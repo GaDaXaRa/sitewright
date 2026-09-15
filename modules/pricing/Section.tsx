@@ -1,3 +1,4 @@
+import { contactLink } from '@/lib/contactLink'
 import React from 'react'
 import type { Tone } from 'sitewright-core'
 
@@ -67,7 +68,7 @@ export default function PricingSection({
                 </ul>
               ) : null}
               {ctaHref ? (
-                <a className="btn btn-ghost" href={`${ctaHref}?tarifa=${price.id}`}>
+                <a className="btn btn-ghost" href={contactLink(ctaHref, price.id)}>
                   {ctaLabel}
                 </a>
               ) : null}

@@ -71,7 +71,7 @@ describe('los días', () => {
 
 describe('el enlace al formulario', () => {
   it('lleva la tarifa ya elegida', () => {
-    expect(enrolLink(conTarifa, '/#contacto')).toBe('/#contacto?tarifa=3')
+    expect(enrolLink(conTarifa, '/#contacto')).toBe('/?tarifa=3#contacto')
   })
 
   it('y no existe sin tarifa: no hay nada que preseleccionar', () => {

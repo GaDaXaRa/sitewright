@@ -95,3 +95,13 @@ escribir nueve módulos, lo que de verdad cambia entre un negocio y otro es eso.
 
 Lo valida [`schema.js`](schema.js), y valida **cosas que duelen**: dos módulos peleándose por
 la misma ruta, un formulario sin dirección a la que escribir, un sitio sin titular legal.
+
+## Generación segura
+
+El destino debe ser nuevo. `--force` solo acepta un directorio existente si está vacío:
+no borra una web, sus personalizaciones ni su historial. El generador prepara el sitio en
+un directorio temporal junto al destino y lo entrega al terminar; un error limpia solo
+esa copia temporal. Para cambiar una web existente, usa `sync-site` y `sync-written`.
+
+Los textos se serializan como valores de JavaScript antes de insertarlos en los ficheros.
+Las pruebas incluyen comillas, apóstrofos, saltos de línea y marcadores de plantilla.

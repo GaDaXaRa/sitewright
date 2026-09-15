@@ -1,14 +1,16 @@
+import { sourceString } from '../../generator/lib/text.js'
+
 export const wiring = {
   id: 'media',
   collectionSlug: 'embeds',
   variable: 'embeds',
   collectionImport: "import { mediaModuleCollection } from './modules/media/collection'",
   collectionCall: (m) =>
-    `mediaModuleCollection({ labels: ${JSON.stringify(m.labels)}, route: '${m.route}' })`,
+    `mediaModuleCollection({ labels: ${JSON.stringify(m.labels)}, route: ${sourceString(m.route)} })`,
   query: { collection: 'embeds', limit: 100, sort: '-publishedAt' },
   sectionImport: "import MediaSection from '@/modules/media/Section'",
   sectionRender: (m) =>
-    `<MediaSection items={embeds} title="${m.title}" route="${m.route}" tone={mediaTone ?? undefined} />`,
+    `<MediaSection items={embeds} title={${sourceString(m.title)}} route={${sourceString(m.route)}} tone={mediaTone ?? undefined} />`,
   renders: 'embeds.length > 0',
   llmsImport: "import { mediaSection } from '@/modules/media/llms'",
   llmsName: 'mediaSection',

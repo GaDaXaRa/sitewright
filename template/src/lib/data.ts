@@ -6,36 +6,11 @@ import { modules, type Content } from '@/site.modules'
 import { publishedSections } from '@/lib/modules'
 import type { SiteSetting } from '@/payload-types'
 
-/**
- * Lo que las páginas públicas leen del CMS, cacheado por render.
- *
- * Dos cosas que garantiza. La primera, que `generateMetadata` y la página compartan una
- * consulta en vez de preguntar dos veces. La segunda, **que la web se degrade en vez de
- * romperse**: si la base no responde mientras se genera una página, sale igual con los
- * valores por defecto.
- *
- * Recorre el manifiesto, así que añadir un módulo no toca este fichero.
- */
-const FALLBACK = { id: 0, siteName: site.name } as SiteSetting
-
+/** A failed CMS read must not become a successful, empty ISR page. */
 export const loadSettings = cache(async (): Promise<SiteSetting> => {
-  try {
-    const payload = await getPayload({ config: await config })
-    return (await payload.findGlobal({ slug: 'site-settings' })) ?? FALLBACK
-  } catch (err) {
-    console.error('No se pudieron leer los ajustes del sitio:', err)
-    return FALLBACK
-  }
+  const payload = await getPayload({ config: await config })
+  return await payload.findGlobal({ slug: 'site-settings' })
 })
-
-/** Lo que cada módulo aporta cuando no hay base de datos: nada, pero de la forma correcta. */
-function empty(): Record<string, unknown> {
-  const out: Record<string, unknown> = {}
-  for (const module of modules) {
-    if (module.query && module.variable) out[module.variable] = module.pick ? null : []
-  }
-  return out
-}
 
 export const loadSiteContent = cache(async (): Promise<Content> => {
   // El momento en que se genera la página. Viaja con los datos porque un componente no
@@ -48,7 +23,7 @@ export const loadSiteContent = cache(async (): Promise<Content> => {
     const queried = modules.filter((m) => m.query)
 
     const [settings, ...results] = await Promise.all([
-      payload.findGlobal({ slug: 'site-settings' }),
+      loadSettings(),
       ...queried.map((m) =>
         payload.find({
           collection: m.query!.collection as never,
@@ -68,10 +43,10 @@ export const loadSiteContent = cache(async (): Promise<Content> => {
 
     // El único sitio donde se afirma la forma: `site.modules.ts` declara el tipo y este
     // bucle lo rellena. Un módulo que declare mal su variable se ve en la portada.
-    return { settings: (settings as SiteSetting) ?? FALLBACK, ...content, now } as Content
+    return { settings: settings as SiteSetting, ...content, now } as Content
   } catch (err) {
     console.error('No se pudo cargar el contenido del sitio:', err)
-    return { settings: FALLBACK, ...empty(), now: Date.now() } as Content
+    throw err
   }
 })
 

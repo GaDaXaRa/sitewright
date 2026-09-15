@@ -15,29 +15,48 @@ export const sendRequestEmails: CollectionAfterChangeHook = async ({ doc, operat
   const { payload } = req
 
   try {
-    const settings = await payload.findGlobal({ slug: 'site-settings' })
+    const settings = await payload.findGlobal({ slug: 'site-settings', req })
     const to = settings?.email || process.env.EMAIL_NOTIFY
     const siteName = settings?.siteName || 'la web'
     const summary = requestSummary(doc)
 
-    if (to) {
-      await payload.sendEmail({
-        to,
-        replyTo: doc.email,
-        subject: `Nueva solicitud: ${doc.name}`,
-        html: noticeToOwner(doc),
-      })
-    } else {
-      payload.logger.warn(
-        'Solicitud recibida pero no hay email de destino (configura el email en Ajustes del sitio o EMAIL_NOTIFY).',
-      )
-    }
-
-    await payload.sendEmail({
-      to: doc.email,
-      subject: `Hemos recibido tu solicitud — ${siteName}`,
-      html: confirmationToSender(doc.name, siteName, summary),
-    })
+    const deliveries = [
+      {
+        label: 'Confirmación al visitante',
+        send: () =>
+          payload.sendEmail({
+            to: doc.email,
+            subject: `Hemos recibido tu solicitud — ${siteName}`,
+            html: confirmationToSender(doc.name, siteName, summary),
+          }),
+      },
+      ...(to
+        ? [
+            {
+              label: 'Aviso al propietario',
+              send: () =>
+                payload.sendEmail({
+                  to,
+                  replyTo: doc.email,
+                  subject: `Nueva solicitud: ${doc.name}`,
+                  html: noticeToOwner(doc),
+                }),
+            },
+          ]
+        : []),
+    ]
+    if (!to)
+      payload.logger.warn('Solicitud recibida sin email de destino. Revisa Ajustes del sitio.')
+    // One failed delivery must not suppress the other recipient's notification.
+    await Promise.all(
+      deliveries.map(async ({ label, send }) => {
+        try {
+          await send()
+        } catch (err) {
+          payload.logger.error(`${label}: ${err}`)
+        }
+      }),
+    )
   } catch (err) {
     payload.logger.error(`Error enviando los correos de la solicitud: ${err}`)
   }

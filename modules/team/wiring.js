@@ -1,20 +1,22 @@
+import { sourceString } from '../../generator/lib/text.js'
+
 export const wiring = {
   id: 'team',
   collectionSlug: 'team',
   variable: 'team',
   collectionImport: "import { teamCollection } from './modules/team/collection'",
   collectionCall: (m) =>
-    `teamCollection({ labels: ${JSON.stringify(m.labels)}, route: '${m.route}' })`,
+    `teamCollection({ labels: ${JSON.stringify(m.labels)}, route: ${sourceString(m.route)} })`,
   query: { collection: 'team', limit: 50, sort: 'order' },
   sectionImport: "import TeamSection from '@/modules/team/Section'",
   sectionRender: (m) =>
-    `<TeamSection items={team} title="${m.title}" route="${m.route}" tone={teamTone ?? undefined} />`,
+    `<TeamSection items={team} title={${sourceString(m.title)}} route={${sourceString(m.route)}} tone={teamTone ?? undefined} />`,
   renders: 'team.length > 0',
   jsonldImport: "import { teamNodes } from '@/modules/team/jsonld'",
   // People first in the graph: everything else refers to them by @id, and a reference that
   // resolves to nothing is worse than no markup at all.
   jsonldFirst: true,
-  jsonldNodes: (m) => `...teamNodes(team, '${m.route}')`,
+  jsonldNodes: (m) => `...teamNodes(team, ${sourceString(m.route)})`,
   llmsImport: "import { teamSection } from '@/modules/team/llms'",
   llmsName: 'teamSection',
 

@@ -1,7 +1,9 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
+
+export type InterestOption = { id: string | number; name: string }
 
 /**
  * The public form. It posts to Payload's REST API (`requests`), whose create permission is
@@ -14,6 +16,8 @@ export default function RequestForm({
   askCity = true,
   privacyHref = '/privacidad',
   submitLabel = 'Enviar',
+  interests = [],
+  interestParam = 'interes',
 }: {
   /** The kinds of request, in the client's words. Empty hides the field. */
   kinds?: Record<string, string>
@@ -21,17 +25,30 @@ export default function RequestForm({
   askCity?: boolean
   privacyHref?: string
   submitLabel?: string
+  interests?: InterestOption[]
+  interestParam?: string
 }) {
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle')
 
+  const [interest, setInterest] = useState('')
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    const selected = new URLSearchParams(window.location.search).get(interestParam)
+    if (selected && interests.some((item) => String(item.id) === selected)) setInterest(selected)
+  }, [interestParam, interests])
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    if (status === 'sending') return
     setStatus('sending')
+    setError('')
 
     const form = e.currentTarget
     const data = new FormData(form)
 
     const body = {
+      interest: interests.find((item) => String(item.id) === interest)?.id,
       name: data.get('name'),
       email: data.get('email'),
       phone: data.get('phone') || undefined,
@@ -51,24 +68,46 @@ export default function RequestForm({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
-      if (!res.ok) throw new Error('Request failed')
+      if (!res.ok) {
+        const fallback =
+          'No se ha podido enviar. Inténtalo de nuevo en unos minutos, o escríbenos por correo.'
+        const result = await res.json().catch(() => null)
+        const message = result?.errors?.[0]?.message
+        setError(res.status < 500 && typeof message === 'string' ? message : fallback)
+        setStatus('error')
+        return
+      }
       setStatus('ok')
       form.reset()
     } catch {
+      setError('No hay conexión. Inténtalo de nuevo o escríbenos por correo.')
       setStatus('error')
     }
   }
 
   if (status === 'ok') {
     return (
-      <p className="form-ok">
+      <p className="form-ok" role="status">
         Recibido. Te contestamos por correo lo antes posible.
       </p>
     )
   }
 
   return (
-    <form className="booking-form" onSubmit={handleSubmit}>
+    <form className="booking-form" onSubmit={handleSubmit} aria-busy={status === 'sending'}>
+      {interests.length > 0 ? (
+        <label>
+          Me interesa
+          <select name="interest" value={interest} onChange={(e) => setInterest(e.target.value)}>
+            <option value="">— Elige una opción —</option>
+            {interests.map((item) => (
+              <option key={item.id} value={String(item.id)}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : null}
       <label>
         Nombre*
         <input type="text" name="name" required autoComplete="name" />
@@ -108,14 +147,19 @@ export default function RequestForm({
       ) : null}
       <label className="field-wide">
         Cuéntanos
-        <textarea name="message" rows={4} placeholder="Cuéntanos lo que necesitas" />
+        <textarea
+          name="message"
+          rows={4}
+          maxLength={5000}
+          placeholder="Cuéntanos lo que necesitas"
+        />
       </label>
 
       <label className="field-consent">
         <input type="checkbox" name="consent" required />
         <span>
-          He leído y acepto la <Link href="/privacidad">política de privacidad</Link>. Usaremos
-          tus datos solo para contestarte.*
+          He leído y acepto la <Link href={privacyHref}>política de privacidad</Link>. Usaremos tus
+          datos solo para contestarte.*
         </span>
       </label>
 
@@ -131,8 +175,8 @@ export default function RequestForm({
       </button>
 
       {status === 'error' ? (
-        <p className="form-error">
-          No se ha podido enviar. Inténtalo de nuevo en unos minutos, o escríbenos por correo.
+        <p className="form-error" role="alert">
+          {error}
         </p>
       ) : null}
     </form>

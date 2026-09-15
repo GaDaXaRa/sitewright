@@ -1,19 +1,21 @@
+import { sourceString } from '../../generator/lib/text.js'
+
 export const wiring = {
   id: 'timetable',
   collectionSlug: 'timetable',
   variable: 'timetable',
   collectionImport: "import { timetableCollection } from './modules/timetable/collection'",
   collectionCall: (m, bp) =>
-    `timetableCollection({ labels: ${JSON.stringify(m.labels)}, route: '${m.route}'${bp.modules.pricing ? ", linkedTo: 'pricing'" : ''} })`,
+    `timetableCollection({ labels: ${JSON.stringify(m.labels)}, route: ${sourceString(m.route)}${bp.modules.pricing ? ", linkedTo: 'pricing'" : ''} })`,
   // `depth: 1` porque el nombre público lo pone la tarifa enlazada: sin cargarla, el
   // horario mostraría el título del panel y volvería a discrepar de la lista de precios.
   query: { collection: 'timetable', where: { active: { equals: true } }, limit: 100, sort: 'startTime', depth: 1 },
   sectionImport: "import TimetableSection from '@/modules/timetable/Section'",
   sectionRender: (m, bp) =>
-    `<TimetableSection\n        items={timetable}\n        title="${m.title}"\n        route="${m.route}"\n        tone={timetableTone ?? undefined}${bp.modules.contact ? '\n        ctaHref="/#contacto"' : ''}\n      />`,
+    `<TimetableSection\n        items={timetable}\n        title={${sourceString(m.title)}}\n        route={${sourceString(m.route)}}\n        tone={timetableTone ?? undefined}${bp.modules.contact ? '\n        ctaHref="/#contacto"' : ''}\n      />`,
   renders: 'timetable.length > 0',
   jsonldImport: "import { timetableNodes } from '@/modules/timetable/jsonld'",
-  jsonldNodes: (m) => `...timetableNodes(timetable, '${m.route}'${m.mode === 'online' ? ", 'online'" : ''})`,
+  jsonldNodes: (m) => `...timetableNodes(timetable, ${sourceString(m.route)}${m.mode === 'online' ? ", 'online'" : ''})`,
   llmsImport: "import { timetableSection } from '@/modules/timetable/llms'",
   llmsName: 'timetableSection',
   // Lo que su página necesita y no está en el registro: si se da en línea o en un sitio, y
@@ -40,6 +42,6 @@ export const wiring = {
     for (const example of examples) {
       await payload.create({ collection: 'timetable', data: { ...example, active: true } })
     }
-    payload.logger.info('3 ${m.labels.plural.toLowerCase()} de ejemplo')
+    payload.logger.info(${sourceString('3 ' + m.labels.plural.toLowerCase() + ' de ejemplo')})
   }`,
 }

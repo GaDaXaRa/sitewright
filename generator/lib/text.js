@@ -93,3 +93,8 @@ export function fill(template, values, what) {
 
   return template.replace(/\{\{(\w+)\}\}/g, (_, hueco) => values[hueco])
 }
+
+/** A JavaScript string literal, including quotes, for generated source. */
+export function sourceString(value) {
+  return "'" + JSON.stringify(String(value)).slice(1, -1).replaceAll("'", "\\'") + "'"
+}

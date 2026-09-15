@@ -1,3 +1,5 @@
+import { sourceString } from './text.js'
+
 /**
  * Los tres ficheros que describen la web: su configuración, sus módulos y su portada.
  *
@@ -6,33 +8,32 @@
  * una web entera.
  */
 
-import { capitalise, replaceOrDie } from './text.js'
 
 // ── site.config.ts ──────────────────────────────────────────────────────────────────────
 
 export function siteConfig(bp, modules, wirings) {
   const routes = Object.entries(modules)
     .filter(([, m]) => m.route)
-    .map(([id, m]) => `    ${id}: '${m.route}',`)
+    .map(([id, m]) => `    ${id}: ${sourceString(m.route)},`)
 
   // The menu belongs to the site, not to a page: the home and every inner page paint the
   // same one, and an inner page that quietly loses it is a dead end.
   const nav = wirings
     .map((w) => w.navLink?.(modules[w.id]))
     .filter(Boolean)
-    .map((link) => `    { href: '${link.href}', label: '${link.label}' },`)
+    .map((link) => `    { href: ${sourceString(link.href)}, label: ${sourceString(link.label)} },`)
   const cta = wirings.map((w) => w.navCta?.(modules[w.id])).find(Boolean)
 
   return `/**
- * Everything the core cannot know, in one file. Written by the generator from the blueprint
- * of ${bp.identity.name}; edit it by hand and nothing else has to move.
+ * Everything the core cannot know, written from the blueprint.
+ * Edit it by hand and nothing else has to move.
  */
 export const site = {
-  id: '${bp.identity.id}',
-  name: '${bp.identity.name}',
+  id: ${sourceString(bp.identity.id)},
+  name: ${sourceString(bp.identity.name)},
   ${
     bp.identity.url
-      ? `url: '${bp.identity.url}',`
+      ? `url: ${sourceString(bp.identity.url)},`
       : `// Sin dominio propio todavía: el sitio usa la dirección que Vercel da al proyecto,
   // que es real desde el primer despliegue y pasa a ser la de verdad en cuanto se compre
   // el dominio y se configure ahí. Cuando eso ocurra, se escribe aquí.
@@ -58,12 +59,12 @@ ${nav.join('\n')}
    * Están aquí y no leídos de la hoja de estilos porque quien la dibuja necesita valores
    * literales: \`ImageResponse\` no resuelve variables de CSS.
    */
-  palette: { ground: '${bp.design.palette.ground}', accent: '${bp.design.palette.accent}' },
+  palette: { ground: ${sourceString(bp.design.palette.ground)}, accent: ${sourceString(bp.design.palette.accent)} },
 
   /** El ejemplo de texto alternativo que lee quien sube una foto, en sus propias palabras. */
-  altExample: '${bp.design.altExample ?? 'Una foto del equipo trabajando'}',
+  altExample: ${sourceString(bp.design.altExample ?? 'Una foto del equipo trabajando')},
 
-  cta: ${cta ? `{ href: '${cta.href}', label: '${cta.label}' }` : 'null'} as { href: string; label: string } | null,
+  cta: ${cta ? `{ href: ${sourceString(cta.href)}, label: ${sourceString(cta.label)} }` : 'null'} as { href: string; label: string } | null,
 } as const
 
 /** Routes whose content is generated and therefore goes stale with any edit. */
@@ -91,16 +92,16 @@ export function siteModules(bp, modules, wirings) {
     if (w.llmsImport) imports.push(w.llmsImport)
     if (w.pickImport) imports.push(w.pickImport)
 
-    const campos = [`id: '${w.id}'`, `variable: ${JSON.stringify(w.variable)}`, `title: ${JSON.stringify(m.title)}`]
+    const campos = [`id: ${sourceString(w.id)}`, `variable: ${JSON.stringify(w.variable)}`, `title: ${JSON.stringify(m.title)}`]
     if (m.labels?.plural) campos.push(`plural: ${JSON.stringify(m.labels.plural)}`)
-    if (m.route) campos.push(`route: '${m.route}'`)
+    if (m.route) campos.push(`route: ${sourceString(m.route)}`)
     if (w.collectionCall) campos.push(`collection: ${w.collectionCall(m, bp)}`)
     if (w.query) campos.push(`query: ${JSON.stringify(w.query).replace(/"([a-zA-Z_$][\w$]*)":/g, '$1:')}`)
     if (w.pickName) campos.push(`pick: ${w.pickName}`)
     if (w.llmsName) campos.push(`llms: ${w.llmsName}`)
     if (w.options) campos.push(`options: ${JSON.stringify(w.options(m, bp))}`)
-    if (w.pagePath) campos.push(`Page: () => import('${w.pagePath}')`)
-    if (w.detailPath) campos.push(`Detail: () => import('${w.detailPath}')`)
+    if (w.pagePath) campos.push(`Page: () => import(${sourceString(w.pagePath)})`)
+    if (w.detailPath) campos.push(`Detail: () => import(${sourceString(w.detailPath)})`)
     if (w.indexPage) campos.push('indexPage: true')
     if (w.detailPath) campos.push('documentPages: true')
 
@@ -108,7 +109,7 @@ export function siteModules(bp, modules, wirings) {
 
     // El tipo sale del esquema de Payload, así que no puede quedarse viejo.
     if (w.query) {
-      const docs = `Config['collections']['${w.query.collection}']`
+      const docs = `Config['collections'][${sourceString(w.query.collection)}]`
       tipos.push(`  ${w.variable}: ${w.pickName ? `${docs} | null` : `${docs}[]`}`)
     }
   }
@@ -157,10 +158,6 @@ export function homePage(bp, modules, wirings, order) {
   const toneNames = toned.map((w) => `${w.id === 'faq' ? 'faq' : w.id}Tone`)
   const toneConditions = toned.map((w) => `      ${w.renders},`)
 
-  const navLinks = wirings
-    .map((w) => w.navLink?.(modules[w.id]))
-    .filter(Boolean)
-    .map((link) => `          { href: '${link.href}', label: '${link.label}' },`)
   const cta = wirings.map((w) => w.navCta?.(modules[w.id])).find(Boolean)
 
   const usesSplit = wirings.some((w) => w.id === 'schedule')
@@ -244,7 +241,7 @@ ${overlays.map((w) => `      ${w.overlayRender()}`).join('\n')}
         textHeight={settings.heroTextHeight}
         shade={settings.heroShade}
         textColour={settings.heroTextColour}
-${cta ? `        actions={[{ href: '${cta.href}', label: '${cta.label}' }]}\n` : ''}      />
+${cta ? `        actions={[{ href: ${sourceString(cta.href)}, label: ${sourceString(cta.label)} }]}\n` : ''}      />
 
 ${sectioned.map((w) => `      ${w.sectionRender(modules[w.id], bp)}`).join('\n\n')}
 

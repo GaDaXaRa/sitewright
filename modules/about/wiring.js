@@ -1,10 +1,12 @@
+import { sourceString } from '../../generator/lib/text.js'
+
 export const wiring = {
   id: 'about',
   variable: null,
   // No collection: one text, edited where the rest of the site's own words live.
   settingsFields: (m) => `    {
       type: 'collapsible',
-      label: '${m.title}',
+      label: ${sourceString(m.title)},
       admin: { initCollapsed: true },
       fields: [
         {
@@ -27,7 +29,7 @@ export const wiring = {
     },`,
   sectionImport: "import AboutSection from '@/modules/about/Section'",
   sectionRender: (m) =>
-    `<AboutSection\n        text={settings.about}\n        image={settings.aboutImage}\n        title="${m.title}"\n        tone={aboutTone ?? undefined}\n      />`,
+    `<AboutSection\n        text={settings.about}\n        image={settings.aboutImage}\n        title={${sourceString(m.title)}}\n        tone={aboutTone ?? undefined}\n      />`,
   // Painted only when written: a heading over nothing reads as an unfinished site.
   renders: "Boolean(settings.about?.trim())",
   llmsImport: "import { aboutSection } from '@/modules/about/llms'",

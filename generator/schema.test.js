@@ -346,3 +346,19 @@ test('cada campo del blueprint lo lee alguien', async () => {
     }
   }
 })
+
+test('rejects routes the single-segment router cannot serve or that belong to the chassis', () => {
+  for (const route of ['/admin', '/privacidad', '/actividades/clases', '/actividades/', '/']) {
+    const bp = valid()
+    bp.modules.catalog.route = route
+    assert.ok(validateBlueprint(bp).some((error) => error.includes('route')), route)
+  }
+})
+test('rejects unsupported schema versions and string booleans', () => {
+  const bp = valid()
+  bp.schemaVersion = 2
+  bp.modules.contact.askDate = 'false'
+  const errors = validateBlueprint(bp)
+  assert.ok(errors.some((error) => error.includes('schemaVersion')))
+  assert.ok(errors.some((error) => error.includes('askDate')))
+})

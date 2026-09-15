@@ -254,3 +254,37 @@ test('la hoja firma de quién es', () => {
   const out = nameStylesheet(plantilla('src/app/(frontend)/styles.css'), 'Once')
   assert.match(out, /Once — sistema de diseño/)
 })
+
+test('human copy remains valid source with quotes, newlines and template markers', async () => {
+  const { default: ts } = await import('../core/node_modules/typescript/lib/typescript.js')
+  const { bp, modules, wirings, order } = await preparar('ejemplo-completo')
+  const text = `L'équipe "Nord"\n\\ chemin $& \${value} */ <tag>`
+  bp.identity.name = text
+  bp.identity.city = text
+  bp.design.altExample = text
+  for (const module of Object.values(modules)) {
+    module.title = text
+    if (module.labels) module.labels = { singular: text, plural: text }
+  }
+  for (const [file, source] of [
+    ['site.config.ts', siteConfig(bp, modules, wirings)],
+    ['site.modules.ts', siteModules(bp, modules, wirings)],
+    ['page.tsx', homePage(bp, modules, wirings, order)],
+    ['settings.ts', siteSettings(plantilla('src/globals/SiteSettings.ts'), bp, modules, wirings)],
+    ['seed.ts', seedScript(bp, modules, wirings)],
+  ]) {
+    const parsed = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true)
+    assert.deepEqual(parsed.parseDiagnostics.map((d) => ts.flattenDiagnosticMessageText(d.messageText, ' ')), [], file)
+  }
+})
+
+test('contact options reach both the collection and the rendered form', async () => {
+  const { bp, modules, wirings, order } = await preparar('ejemplo-completo')
+  modules.contact.askDate = false
+  modules.contact.askCity = false
+  const out = homePage(bp, modules, wirings, order)
+  assert.match(out, /askDate=\{false\}/)
+  assert.match(out, /askCity=\{false\}/)
+  assert.match(out, /interests=\{pricing\.map/)
+  assert.match(out, /interestParam="tarifa"/)
+})

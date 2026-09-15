@@ -1,5 +1,5 @@
 import React from 'react'
-import RequestForm from './Form'
+import RequestForm, { type InterestOption } from './Form'
 
 /**
  * The form, and the reason to fill it in.
@@ -16,6 +16,8 @@ export default function ContactSection({
   askCity,
   privacyHref = '/privacidad',
   submitLabel,
+  interests,
+  interestParam,
 }: {
   title: string
   text?: string | null
@@ -25,6 +27,8 @@ export default function ContactSection({
   askCity?: boolean
   privacyHref?: string
   submitLabel?: string
+  interests?: InterestOption[]
+  interestParam?: string
 }) {
   return (
     <section className="section booking" id="contacto">
@@ -45,6 +49,8 @@ export default function ContactSection({
             askCity={askCity}
             privacyHref={privacyHref}
             submitLabel={submitLabel}
+            interests={interests}
+            interestParam={interestParam}
           />
         </div>
       </div>

@@ -1,10 +1,12 @@
+import { sourceString } from '../../generator/lib/text.js'
+
 export const wiring = {
   id: 'notices',
   collectionSlug: 'notices',
   variable: 'notice',
   collectionImport: "import { noticesCollection } from './modules/notices/collection'",
   collectionCall: (m, bp) =>
-    `noticesCollection({ labels: ${JSON.stringify(m.labels)}, buttonUrl: '${m.buttonUrl ?? Object.values(bp.modules).find((x) => x.route)?.route ?? '/'}' })`,
+    `noticesCollection({ labels: ${JSON.stringify(m.labels)}, buttonUrl: ${sourceString(m.buttonUrl ?? Object.values(bp.modules).find((x) => x.route)?.route ?? '/')} })`,
   // El aviso se elige en el cargador, no aquí: sólo sale el primero activo **y en fecha**,
   // y eso es una decisión, no una consulta.
   pickImport: "import { pickNotice } from '@/modules/notices/pick'",

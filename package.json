@@ -8,6 +8,7 @@
     "sync-site": "node scripts/sync-site.mjs",
     "sync-written": "node scripts/sync-written.mjs",
     "sync-core": "node scripts/sync-core.mjs",
-    "doctor": "node scripts/doctor.mjs"
+    "doctor": "node scripts/doctor.mjs",
+    "test:browser": "node template/node_modules/@playwright/test/cli.js test --config browser/playwright.config.mjs"
   }
 }

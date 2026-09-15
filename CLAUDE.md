@@ -37,7 +37,8 @@ el comando que las comprueba: si no hay comando, no hay regla, hay buena intenci
    desde el `sitewright.json` que lleva dentro: es lo que convierte editar el blueprint en
    añadir una sección a una web viva, en vez de cirugía a mano sobre los seis ficheros que
    esta misma regla dice que no se tocan a mano.
-   Ninguno de los tres escribe sin `--apply`: sin él enseñan qué cambiaría. Y **ninguno pisa
+   `sync-site` y `sync-written` no escriben sin `--apply`: sin él enseñan qué cambiaría.
+   `sync-core` instala directamente el paquete. Los dos que copian archivos **no pisan
    lo que se personalizó en esa web**: cada sitio lleva un sello (`.sitewright-sync.json`)
    con el hash de lo que la fábrica le entregó, así que «este fichero no es el de la
    fábrica» se parte en dos —se ha quedado atrás, o alguien lo tocó aquí— y sólo lo primero
@@ -47,8 +48,8 @@ el comando que las comprueba: si no hay comando, no hay regla, hay buena intenci
    la razón por la que los módulos se copian y no se empaquetan.
    Lo que `sync-written` no puede hacer solo lo dice al terminar: un módulo nuevo trae una
    colección nueva, y sin `migrate:create` el despliegue sale bien y el panel revienta más
-   tarde. **Nunca regeneres encima con `generate.js --out <la web> --force`**: eso borra el
-   directorio entero —`.git` incluido— antes de escribir.
+   tarde. **Nunca regeneres encima con `generate.js --out <la web> --force`**: el generador rechaza destinos con contenido, incluso con `--force`. Genera en un
+   directorio temporal y entrega el resultado solo al terminar.
 
 4. **Los tipos se comprueban aparte: `npm run typecheck`.** `next build` con caché
    ha dado por bueno un error de tipos que luego tumbó el despliegue.

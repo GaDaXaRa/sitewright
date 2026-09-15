@@ -54,11 +54,26 @@ export function contactCollection({
     labels,
     admin: {
       useAsTitle: 'name',
-      defaultColumns: ['name', 'email', 'processed', 'createdAt'],
+      defaultColumns: ['name', 'email', 'status', 'createdAt'],
       group: labels.plural,
     },
     hooks: {
       beforeValidate: [
+        ({ data, req, operation }) => {
+          if (!data) return data
+          if (!req.user && operation === 'create') {
+            data.status = 'new'
+            data.processed = false
+            delete data.internalNotes
+          } else if (data.status !== undefined) {
+            data.processed = data.status === 'resolved'
+          } else if (data.processed !== undefined) {
+            data.status = data.processed ? 'resolved' : 'new'
+          } else if (operation === 'create') {
+            data.status = 'new'
+          }
+          return data
+        },
         async ({ data, req, operation }) => {
           // Only anonymous submissions from the public form are filtered; from the panel (an
           // authenticated user) anything can be created.
@@ -84,7 +99,10 @@ export function contactCollection({
           // 4) Consent is not decoration: without it there is no legal basis to store the
           //    request or to reply to it, so the submission is refused rather than kept.
           if (!data?.consent) {
-            throw new APIError('Hay que aceptar la política de privacidad para enviar el formulario.', 400)
+            throw new APIError(
+              'Hay que aceptar la política de privacidad para enviar el formulario.',
+              400,
+            )
           }
           data.consentAt = new Date().toISOString()
 
@@ -168,7 +186,39 @@ export function contactCollection({
             },
           ] as Field[])
         : []),
-      { name: 'message', label: 'Mensaje', type: 'textarea' },
+      { name: 'message', label: 'Mensaje', type: 'textarea', maxLength: 5000 },
+      {
+        name: 'status',
+        label: 'Estado',
+        type: 'select',
+        hooks: {
+          afterRead: [
+            ({ value, siblingData }) => value ?? (siblingData?.processed ? 'resolved' : 'new'),
+          ],
+        },
+        options: [
+          { label: 'Nueva', value: 'new' },
+          { label: 'En curso', value: 'in_progress' },
+          { label: 'Resuelta', value: 'resolved' },
+        ],
+        access: { read: ({ req }) => Boolean(req.user), update: ({ req }) => Boolean(req.user) },
+        admin: {
+          position: 'sidebar',
+          description:
+            'Nueva → En curso → Resuelta. Las solicitudes antiguas conservan también la marca Contestada.',
+        },
+      },
+      {
+        name: 'internalNotes',
+        label: 'Notas internas',
+        type: 'textarea',
+        access: {
+          read: ({ req }) => Boolean(req.user),
+          create: ({ req }) => Boolean(req.user),
+          update: ({ req }) => Boolean(req.user),
+        },
+        admin: { description: 'Solo para el equipo. No se incluyen en los correos.' },
+      },
       {
         name: 'consent',
         label: 'Aceptó la política de privacidad',

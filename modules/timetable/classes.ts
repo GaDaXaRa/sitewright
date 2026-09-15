@@ -1,3 +1,4 @@
+import { contactLink } from '@/lib/contactLink'
 import { relationId } from 'sitewright-core'
 import type { ClassItem, LinkedPrice } from './Section'
 
@@ -50,7 +51,7 @@ export function className(item: ClassItem): string {
  */
 export function enrolLink(item: ClassItem, anchor: string): string | null {
   const id = relationId(item.belongsTo)
-  return id == null ? null : `${anchor}?tarifa=${id}`
+  return id == null ? null : contactLink(anchor, id)
 }
 
 /** Sus días, de lunes a domingo, venga como venga la multiselección del panel. */

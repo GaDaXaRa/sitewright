@@ -17,9 +17,11 @@ export function siteSettings(template, bp, modules, wirings) {
     .join('\n')
 
   return fields
-    ? template.replace(
+    ? replaceOrDie(
+        template,
         "    // The generator appends each module's own settings here.",
-        fields,
+        () => fields,
+        'los ajustes de los módulos',
       )
     : template
 }
@@ -57,7 +59,7 @@ export function seedSettings(bp) {
   for (const [key, value] of Object.entries(bp.content?.settings ?? {})) add(key, value)
   settings.set('analyticsConsent', 'true')
 
-  return [...settings].map(([key, value]) => `${key}: ${value},`).join('\n      ')
+  return [...settings].map(([key, value]) => `${JSON.stringify(key)}: ${value},`).join('\n      ')
 }
 
 export function seedScript(bp, modules, wirings) {
@@ -88,7 +90,7 @@ import config from '../src/payload.config'
 import { site } from '../src/site.config'
 
 /**
- * Example content, so the site can be looked at before ${bp.identity.name} has written a
+ * Example content, so the site can be looked at before its owner has written a
  * word — and so the client sees what a filled-in field is supposed to look like.
  *
  * Idempotent by collection: running it twice duplicates nothing. **Never against

@@ -35,7 +35,8 @@ const WITHOUT_COLLECTION = ['about']
 
 const HEX = /^#[0-9a-fA-F]{6}$/
 const ID = /^[a-z][a-z0-9-]*$/
-const ROUTE = /^\/[a-z0-9-/]*$/
+const ROUTE = /^\/[a-z0-9]+(?:-[a-z0-9]+)*$/
+const RESERVED_ROUTES = new Set(['/admin', '/api', '/aviso-legal', '/privacidad', '/cookies'])
 const TOKEN = /^[a-z][a-z0-9-]*$/
 
 /**
@@ -85,9 +86,28 @@ function required(value, path, errors, what = 'falta') {
 export function validateBlueprint(blueprint) {
   const errors = []
   const bp = blueprint ?? {}
+  if (typeof bp !== 'object' || Array.isArray(bp)) return ['blueprint: tiene que ser un objeto']
+  for (const key of ['identity', 'modules', 'design', 'legal', 'content']) {
+    if (bp[key] !== undefined && (!bp[key] || typeof bp[key] !== 'object' || Array.isArray(bp[key]))) {
+      errors.push(`${key}: tiene que ser un objeto`)
+    }
+  }
+  if (errors.length) return errors
+  if (bp.schemaVersion !== undefined && bp.schemaVersion !== 1) {
+    errors.push('schemaVersion: versión no compatible (se admite 1)')
+  }
 
   // ── identity
   const identity = bp.identity ?? {}
+  for (const key of ['id', 'name', 'url', 'email', 'city', 'tagline']) {
+    if (identity[key] !== undefined && typeof identity[key] !== 'string') errors.push(`identity.${key}: tiene que ser texto`)
+  }
+  if (identity.url) {
+    try {
+      const url = new URL(identity.url)
+      if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash || url.pathname !== '/') throw new Error()
+    } catch { errors.push('identity.url: una dirección https válida, sin ruta, credenciales ni parámetros') }
+  }
   required(identity.id, 'identity.id', errors)
   if (identity.id && !ID.test(identity.id)) {
     errors.push('identity.id: solo minúsculas, números y guiones (se usa en claves y rutas)')
@@ -117,6 +137,16 @@ export function validateBlueprint(blueprint) {
   const routes = []
   for (const [id, module] of Object.entries(modules)) {
     if (!MODULE_IDS.includes(id)) continue
+    if (!module || typeof module !== 'object' || Array.isArray(module)) {
+      errors.push(`modules.${id}: tiene que ser un objeto`)
+      continue
+    }
+    for (const key of ['askDate', 'askCity', 'dated', 'online']) {
+      if (module[key] !== undefined && typeof module[key] !== 'boolean') errors.push(`modules.${id}.${key}: tiene que ser true o false`)
+    }
+    for (const [key, value] of Object.entries({ title: module.title, route: module.route, singular: module.labels?.singular, plural: module.labels?.plural })) {
+      if (value !== undefined && typeof value !== 'string') errors.push(`modules.${id}.${key}: tiene que ser texto`)
+    }
     if (WITHOUT_COLLECTION.includes(id)) {
       required(module?.title, `modules.${id}.title`, errors, 'falta el título de la sección')
     } else {
@@ -127,8 +157,9 @@ export function validateBlueprint(blueprint) {
 
     if (module?.route) {
       if (!ROUTE.test(module.route)) {
-        errors.push(`modules.${id}.route: empieza por / y sin acentos ni mayúsculas`)
+        errors.push(`modules.${id}.route: una ruta de un solo segmento, en minúsculas, sin acentos ni barra final`)
       }
+      if (RESERVED_ROUTES.has(module.route)) errors.push(`modules.${id}.route: ruta reservada ${module.route}`)
       routes.push([id, module.route])
     }
   }
@@ -179,6 +210,9 @@ export function validateBlueprint(blueprint) {
     }
   }
 
+  if (design.sections !== undefined && (!Array.isArray(design.sections) || design.sections.some((id) => typeof id !== 'string'))) {
+    errors.push('design.sections: tiene que ser una lista de módulos')
+  }
   const fonts = design.fonts ?? {}
   required(fonts.display, 'design.fonts.display', errors)
   required(fonts.body, 'design.fonts.body', errors)

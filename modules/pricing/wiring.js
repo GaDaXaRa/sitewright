@@ -1,21 +1,24 @@
+import { sourceString } from '../../generator/lib/text.js'
+
 export const wiring = {
   id: 'pricing',
   collectionSlug: 'pricing',
   variable: 'pricing',
   collectionImport: "import { pricingCollection } from './modules/pricing/collection'",
   collectionCall: (m, bp) =>
-    `pricingCollection({ labels: ${JSON.stringify(m.labels)}, route: '${m.route}'${bp.modules.catalog ? ", linkedTo: 'catalog'" : ''} })`,
+    `pricingCollection({ labels: ${JSON.stringify(m.labels)}, route: ${sourceString(m.route)}${bp.modules.catalog ? ", linkedTo: 'catalog'" : ''} })`,
   query: { collection: 'pricing', where: { active: { equals: true } }, limit: 50, sort: 'order' },
   sectionImport: "import PricingSection from '@/modules/pricing/Section'",
   sectionRender: (m, bp) =>
-    `<PricingSection items={pricing} title="${m.title}" tone={pricingTone ?? undefined}${bp.modules.contact ? ' ctaHref="/#contacto"' : ''} />`,
+    `<PricingSection items={pricing} title={${sourceString(m.title)}} tone={pricingTone ?? undefined}${bp.modules.contact ? ' ctaHref="/#contacto"' : ''} />`,
   renders: 'pricing.length > 0',
   jsonldImport: "import { pricingNodes } from '@/modules/pricing/jsonld'",
-  jsonldNodes: (m) => `...pricingNodes(pricing, '${m.route}', '${m.title}')`,
+  jsonldNodes: (m) => `...pricingNodes(pricing, ${sourceString(m.route)}, ${sourceString(m.title)})`,
   llmsImport: "import { pricingSection } from '@/modules/pricing/llms'",
   llmsName: 'pricingSection',
   navLink: (m) => ({ href: m.route, label: m.labels.plural }),
 
+  options: (m, bp) => ({ hasContact: Boolean(bp.modules.contact) }),
   pagePath: '@/modules/pricing/Page',
   indexPage: true,
 
@@ -31,6 +34,6 @@ export const wiring = {
     for (const example of examples) {
       await payload.create({ collection: 'pricing', data: { ...example, active: true } })
     }
-    payload.logger.info('3 ${m.labels.plural.toLowerCase()} de ejemplo')
+    payload.logger.info(${sourceString('3 ' + m.labels.plural.toLowerCase() + ' de ejemplo')})
   }`,
 }

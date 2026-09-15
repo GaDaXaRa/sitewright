@@ -1,3 +1,5 @@
+import { sourceString } from '../../generator/lib/text.js'
+
 /**
  * How this module is wired into a site.
  *
@@ -12,17 +14,17 @@ export const wiring = {
   variable: 'catalog',
   collectionImport: "import { catalogCollection } from './modules/catalog/collection'",
   collectionCall: (m) =>
-    `catalogCollection({ labels: ${JSON.stringify(m.labels)}, route: '${m.route}'${m.dated ? ', dated: true' : ''} })`,
+    `catalogCollection({ labels: ${JSON.stringify(m.labels)}, route: ${sourceString(m.route)}${m.dated ? ', dated: true' : ''} })`,
   query: { collection: 'catalog', limit: 100, sort: 'order' },
   sectionImport: "import CatalogSection from '@/modules/catalog/Section'",
   sectionRender: (m) =>
-    `<CatalogSection items={catalog} title="${m.title}" route="${m.route}" tone={catalogTone ?? undefined} limit={6} />`,
+    `<CatalogSection items={catalog} title={${sourceString(m.title)}} route={${sourceString(m.route)}} tone={catalogTone ?? undefined} limit={6} />`,
   renders: 'catalog.length > 0',
   jsonldImport: "import { catalogNodes } from '@/modules/catalog/jsonld'",
   jsonldNodes: (m, bp) =>
     bp.modules.pricing
-      ? `...catalogNodes(catalog, '${m.route}', (item) =>\n          pricing.filter((price) => {\n            const owner = price.belongsTo\n            const id = typeof owner === 'object' ? owner?.id : owner\n            return String(id) === String(item.id)\n          }),\n        )`
-      : `...catalogNodes(catalog, '${m.route}')`,
+      ? `...catalogNodes(catalog, ${sourceString(m.route)}, (item) =>\n          pricing.filter((price) => {\n            const owner = price.belongsTo\n            const id = typeof owner === 'object' ? owner?.id : owner\n            return String(id) === String(item.id)\n          }),\n        )`
+      : `...catalogNodes(catalog, ${sourceString(m.route)})`,
   llmsImport: "import { catalogSection } from '@/modules/catalog/llms'",
   llmsName: 'catalogSection',
   navLink: (m) => ({ href: m.route, label: m.labels.plural }),
@@ -38,7 +40,7 @@ export const wiring = {
   // anybody has written a word, and so the client sees what a filled-in field looks like.
   seed: (m) => `  const catalogCount = await payload.count({ collection: 'catalog' })
   if (catalogCount.totalDocs === 0) {
-    for (const [i, title] of ['Primera ${m.labels.singular.toLowerCase()}', 'Segunda ${m.labels.singular.toLowerCase()}', 'Tercera ${m.labels.singular.toLowerCase()}'].entries()) {
+    for (const [i, title] of [${sourceString('Primera ' + m.labels.singular.toLowerCase())}, ${sourceString('Segunda ' + m.labels.singular.toLowerCase())}, ${sourceString('Tercera ' + m.labels.singular.toLowerCase())}].entries()) {
       await payload.create({
         collection: 'catalog',
         data: {
@@ -49,6 +51,6 @@ export const wiring = {
         },
       })
     }
-    payload.logger.info('3 ${m.labels.plural.toLowerCase()} de ejemplo')
+    payload.logger.info(${sourceString('3 ' + m.labels.plural.toLowerCase() + ' de ejemplo')})
   }`,
 }

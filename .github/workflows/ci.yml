@@ -141,3 +141,23 @@ jobs:
         working-directory: /tmp/sitio
       - run: npm run test:int
         working-directory: /tmp/sitio
+
+  browser:
+    name: Recorridos en navegador
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: template/package-lock.json
+      - run: npm ci --prefix template
+      - run: npm ci --prefix core && npm run build --prefix core
+      - run: node template/node_modules/@playwright/test/cli.js install --with-deps chromium
+      - run: npm run test:browser
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-traces
+          path: test-results/browser
