@@ -19,8 +19,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const entries: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/`, lastModified: new Date(), changeFrequency: 'weekly', priority: 1 },
-    ...publishedSections(modules, content as unknown as Record<string, unknown>).map((module) => ({
-      url: `${SITE_URL}${module.route}`,
+    ...publishedSections(modules, content as unknown as Record<string, unknown>).map((section) => ({
+      url: `${SITE_URL}${section.route}`,
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.8,
@@ -36,11 +36,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const payload = await getPayload({ config: await config })
 
-    for (const module of modules) {
-      if (!module.documentPages || !module.query || !module.route) continue
+    for (const section of modules) {
+      if (!section.documentPages || !section.query || !section.route) continue
 
       const { docs } = await payload.find({
-        collection: module.query.collection as never,
+        collection: section.query.collection as never,
         limit: 200,
         depth: 0,
       })
@@ -48,7 +48,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       for (const doc of docs as { slug?: string; updatedAt?: string }[]) {
         if (!doc.slug) continue
         entries.push({
-          url: `${SITE_URL}${module.route}/${doc.slug}`,
+          url: `${SITE_URL}${section.route}/${doc.slug}`,
           lastModified: doc.updatedAt ? new Date(doc.updatedAt) : new Date(),
           changeFrequency: 'monthly',
           priority: 0.7,

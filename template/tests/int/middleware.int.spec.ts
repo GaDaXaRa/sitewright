@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
 import { NextRequest } from 'next/server'
-import { config, middleware as middleware } from '@/middleware'
+import { config } from '@/middleware'
 
 const VERCEL = 'sitio-abc123.vercel.app'
 // Fijado aquí y no leído del sitio: con el dominio todavía pendiente, la dirección resuelta

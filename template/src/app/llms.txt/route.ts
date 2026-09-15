@@ -20,16 +20,16 @@ export async function GET() {
   const sections: LlmsSection[] = []
   const todo = content as unknown as Record<string, unknown>
 
-  for (const module of modules) {
-    if (!module.llms) continue
+  for (const section of modules) {
+    if (!section.llms) continue
     // Un módulo sin consulta —la presentación, por ejemplo— escribe desde los ajustes.
-    const items = module.variable ? todo[module.variable] : []
-    const aporta = module.llms(items as never[], {
-      title: module.title,
-      route: module.route,
+    const items = section.variable ? todo[section.variable] : []
+    const aporta = section.llms(items as never[], {
+      title: section.title,
+      route: section.route,
       now: content.now,
       settings: content.settings,
-      options: module.options,
+      options: section.options,
     })
     sections.push(...(Array.isArray(aporta) ? aporta : [aporta]))
   }

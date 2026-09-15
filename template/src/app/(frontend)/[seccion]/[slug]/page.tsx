@@ -20,7 +20,7 @@ export const revalidate = 300
 
 type Doc = { slug?: string | null }
 
-const segmentOf = (module: SiteModule) => module.route!.replace(/^\//, '')
+const segmentOf = (section: SiteModule) => section.route!.replace(/^\//, '')
 
 /** Los módulos que tienen ficha: con componente, con ruta y con datos que buscar. */
 function withDetail() {
@@ -28,26 +28,26 @@ function withDetail() {
 }
 
 async function find(segmento: string, slug: string) {
-  const module = withDetail().find((m) => segmentOf(m) === segmento)
-  if (!module) return null
+  const section = withDetail().find((m) => segmentOf(m) === segmento)
+  if (!section) return null
 
   const content = await loadSiteContent()
-  const items = (content as unknown as Record<string, unknown>)[module.variable!]
+  const items = (content as unknown as Record<string, unknown>)[section.variable!]
   if (!Array.isArray(items)) return null
 
   const item = (items as Doc[]).find((doc) => doc.slug === slug)
-  return item ? { module, item, content } : null
+  return item ? { section, item, content } : null
 }
 
 export async function generateStaticParams() {
   const content = await loadSiteContent()
   const params: { seccion: string; slug: string }[] = []
 
-  for (const module of withDetail()) {
-    const items = (content as unknown as Record<string, unknown>)[module.variable!]
+  for (const section of withDetail()) {
+    const items = (content as unknown as Record<string, unknown>)[section.variable!]
     if (!Array.isArray(items)) continue
     for (const doc of items as Doc[]) {
-      if (doc.slug) params.push({ seccion: segmentOf(module), slug: doc.slug })
+      if (doc.slug) params.push({ seccion: segmentOf(section), slug: doc.slug })
     }
   }
 
@@ -63,8 +63,8 @@ export async function generateMetadata({
   const found = await find(seccion, slug)
   if (!found) return {}
 
-  const { documentMeta } = await found.module.Detail!()
-  const meta = documentMeta?.(found.item as never, found.module.route!)
+  const { documentMeta } = await found.section.Detail!()
+  const meta = documentMeta?.(found.item as never, found.section.route!)
   if (!meta) return {}
 
   // La ficha tenía título y descripción y ninguna imagen, teniendo cada una la suya
@@ -73,7 +73,7 @@ export async function generateMetadata({
     title: meta.title,
     description: meta.description,
     image: meta.image,
-    canonical: `${found.module.route}/${slug}`,
+    canonical: `${found.section.route}/${slug}`,
     settings: found.content.settings,
   })
 }
@@ -87,14 +87,14 @@ export default async function DocumentPage({
   const found = await find(seccion, slug)
   if (!found) notFound()
 
-  const { default: Detail } = await found.module.Detail!()
+  const { default: Detail } = await found.section.Detail!()
   return (
     <Detail
       item={found.item as never}
       settings={found.content.settings}
       now={found.content.now}
-      route={found.module.route!}
-      options={found.module.options}
+      route={found.section.route!}
+      options={found.section.options}
     />
   )
 }
