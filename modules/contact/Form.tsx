@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 
 export type InterestOption = { id: string | number; name: string }
@@ -29,13 +29,17 @@ export default function RequestForm({
   interestParam?: string
 }) {
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle')
-
-  const [interest, setInterest] = useState('')
   const [error, setError] = useState('')
 
+  // The selection travels in the URL, which the server render cannot see: reading it into
+  // state would render twice and disagree with the server's HTML on the way. The field is
+  // uncontrolled and the choice is written straight to it, which is what an effect is for.
+  const selection = useRef<HTMLSelectElement>(null)
   useEffect(() => {
-    const selected = new URLSearchParams(window.location.search).get(interestParam)
-    if (selected && interests.some((item) => String(item.id) === selected)) setInterest(selected)
+    const chosen = new URLSearchParams(window.location.search).get(interestParam)
+    if (chosen && interests.some((item) => String(item.id) === chosen) && selection.current) {
+      selection.current.value = chosen
+    }
   }, [interestParam, interests])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -48,7 +52,7 @@ export default function RequestForm({
     const data = new FormData(form)
 
     const body = {
-      interest: interests.find((item) => String(item.id) === interest)?.id,
+      interest: interests.find((item) => String(item.id) === data.get('interest'))?.id,
       name: data.get('name'),
       email: data.get('email'),
       phone: data.get('phone') || undefined,
@@ -98,7 +102,7 @@ export default function RequestForm({
       {interests.length > 0 ? (
         <label>
           Me interesa
-          <select name="interest" value={interest} onChange={(e) => setInterest(e.target.value)}>
+          <select name="interest" ref={selection} defaultValue="">
             <option value="">— Elige una opción —</option>
             {interests.map((item) => (
               <option key={item.id} value={String(item.id)}>
