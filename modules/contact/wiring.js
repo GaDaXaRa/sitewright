@@ -1,4 +1,4 @@
-import { sourceString } from '../../generator/lib/text.js'
+import { sourceAttr, sourceString } from '../../generator/lib/text.js'
 
 export const wiring = {
   id: 'contact',
@@ -24,7 +24,7 @@ export const wiring = {
     },`,
   sectionImport: "import ContactSection from '@/modules/contact/Section'",
   sectionRender: (m, bp) =>
-    `<ContactSection\n        title={${sourceString(m.title)}}\n        text={settings.contactText}\n        email={settings.email}${m.kinds ? `\n        kinds={${JSON.stringify(m.kinds)}}` : ''}${m.askDate === false ? '\n        askDate={false}' : ''}${m.askCity === false ? '\n        askCity={false}' : ''}${bp.modules.pricing ? '\n        interests={pricing.map((item) => ({ id: item.id, name: item.name }))}\n        interestParam="tarifa"' : bp.modules.catalog ? '\n        interests={catalog.map((item) => ({ id: item.id, name: item.title }))}' : ''}\n        privacyHref={site.routes.privacy}\n      />`,
+    `<ContactSection\n        title=${sourceAttr(m.title)}\n        text={settings.contactText}\n        email={settings.email}${m.kinds ? `\n        kinds={${JSON.stringify(m.kinds)}}` : ''}${m.askDate === false ? '\n        askDate={false}' : ''}${m.askCity === false ? '\n        askCity={false}' : ''}${bp.modules.pricing ? '\n        interests={pricing.map((item) => ({ id: item.id, name: item.name }))}\n        interestParam="tarifa"' : bp.modules.catalog ? '\n        interests={catalog.map((item) => ({ id: item.id, name: item.title }))}' : ''}\n        privacyHref={site.routes.privacy}\n      />`,
   // Always painted: a site whose form disappears when nothing else has content is a site
   // nobody can write to.
   renders: null,

@@ -1,4 +1,4 @@
-import { sourceString } from '../../generator/lib/text.js'
+import { sourceAttr, sourceString } from '../../generator/lib/text.js'
 
 export const wiring = {
   id: 'pricing',
@@ -10,7 +10,7 @@ export const wiring = {
   query: { collection: 'pricing', where: { active: { equals: true } }, limit: 50, sort: 'order' },
   sectionImport: "import PricingSection from '@/modules/pricing/Section'",
   sectionRender: (m, bp) =>
-    `<PricingSection items={pricing} title={${sourceString(m.title)}} tone={pricingTone ?? undefined}${bp.modules.contact ? ' ctaHref="/#contacto"' : ''} />`,
+    `<PricingSection items={pricing} title=${sourceAttr(m.title)} tone={pricingTone ?? undefined}${bp.modules.contact ? ' ctaHref="/#contacto"' : ''} />`,
   renders: 'pricing.length > 0',
   jsonldImport: "import { pricingNodes } from '@/modules/pricing/jsonld'",
   jsonldNodes: (m) => `...pricingNodes(pricing, ${sourceString(m.route)}, ${sourceString(m.title)})`,

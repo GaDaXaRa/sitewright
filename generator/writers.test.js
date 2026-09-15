@@ -288,3 +288,14 @@ test('contact options reach both the collection and the rendered form', async ()
   assert.match(out, /interests=\{pricing\.map/)
   assert.match(out, /interestParam="tarifa"/)
 })
+
+test('ordinary copy is written as a plain attribute, and only the awkward kind is not', async () => {
+  const { bp, modules, wirings, order } = await preparar('ejemplo-completo')
+  modules.about.title = 'Sobre m\u00ed'
+  modules.faq.title = 'Caf\u00e9 & t\u00e9'
+  const out = homePage(bp, modules, wirings, order)
+  // JSX decodes entities inside an attribute, so the ampersand cannot travel between quotes.
+  assert.match(out, /title="Sobre m\u00ed"/)
+  assert.match(out, /title=\{'Caf\u00e9 & t\u00e9'\}/)
+  assert.doesNotMatch(out, /title=\{'Sobre m\u00ed'\}/)
+})

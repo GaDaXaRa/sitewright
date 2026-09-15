@@ -1,4 +1,4 @@
-import { sourceString } from '../../generator/lib/text.js'
+import { sourceAttr, sourceString } from '../../generator/lib/text.js'
 
 export const wiring = {
   id: 'schedule',
@@ -13,7 +13,7 @@ export const wiring = {
     // `emptyText` se pasa sólo si el blueprint lo pide: la sección se esconde cuando no
     // hay nada por delante, y el texto es lo que dice «aquí va a haber algo, escríbenos».
     // Pasarlo siempre hacía inalcanzable el `return null` del propio componente.
-    `<ScheduleSection\n        items={schedule}\n        now={now}\n        title={${sourceString(m.title)}}\n        route={${sourceString(m.route)}}\n        tone={scheduleTone ?? undefined}${m.emptyText ? `\n        emptyText={${sourceString(m.emptyText)}}` : ''}\n      />`,
+    `<ScheduleSection\n        items={schedule}\n        now={now}\n        title=${sourceAttr(m.title)}\n        route=${sourceAttr(m.route)}\n        tone={scheduleTone ?? undefined}${m.emptyText ? `\n        emptyText=${sourceAttr(m.emptyText)}` : ''}\n      />`,
   // Deliberately not `schedule.length`: what decides whether the section paints is whether
   // anything is still upcoming, and that is a decision of the core, not of a count.
   renders: 'splitEvents(schedule, now).upcoming.length > 0',

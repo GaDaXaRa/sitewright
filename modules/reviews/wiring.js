@@ -1,4 +1,4 @@
-import { sourceString } from '../../generator/lib/text.js'
+import { sourceAttr } from '../../generator/lib/text.js'
 
 export const wiring = {
   id: 'reviews',
@@ -9,7 +9,7 @@ export const wiring = {
   query: { collection: 'reviews', where: { active: { equals: true } }, limit: 50, sort: 'order' },
   sectionImport: "import ReviewsSection from '@/modules/reviews/Section'",
   sectionRender: (m) =>
-    `<ReviewsSection items={reviews} title={${sourceString(m.title)}} tone={reviewsTone ?? undefined} />`,
+    `<ReviewsSection items={reviews} title=${sourceAttr(m.title)} tone={reviewsTone ?? undefined} />`,
   renders: 'reviews.length > 0',
 
   seed: () => `  const reviewsCount = await payload.count({ collection: 'reviews' })

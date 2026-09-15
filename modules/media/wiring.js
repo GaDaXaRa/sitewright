@@ -1,4 +1,4 @@
-import { sourceString } from '../../generator/lib/text.js'
+import { sourceAttr, sourceString } from '../../generator/lib/text.js'
 
 export const wiring = {
   id: 'media',
@@ -10,7 +10,7 @@ export const wiring = {
   query: { collection: 'embeds', limit: 100, sort: '-publishedAt' },
   sectionImport: "import MediaSection from '@/modules/media/Section'",
   sectionRender: (m) =>
-    `<MediaSection items={embeds} title={${sourceString(m.title)}} route={${sourceString(m.route)}} tone={mediaTone ?? undefined} />`,
+    `<MediaSection items={embeds} title=${sourceAttr(m.title)} route=${sourceAttr(m.route)} tone={mediaTone ?? undefined} />`,
   renders: 'embeds.length > 0',
   llmsImport: "import { mediaSection } from '@/modules/media/llms'",
   llmsName: 'mediaSection',

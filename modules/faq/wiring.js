@@ -1,4 +1,4 @@
-import { sourceString } from '../../generator/lib/text.js'
+import { sourceAttr, sourceString } from '../../generator/lib/text.js'
 
 export const wiring = {
   id: 'faq',
@@ -8,7 +8,7 @@ export const wiring = {
   collectionCall: (m) => `faqCollection({ labels: ${JSON.stringify(m.labels)}, route: ${sourceString(m.route)} })`,
   query: { collection: 'faqs', where: { active: { equals: true } }, limit: 100, sort: 'order' },
   sectionImport: "import FaqSection from '@/modules/faq/Section'",
-  sectionRender: (m) => `<FaqSection items={faqs} title={${sourceString(m.title)}} tone={faqTone ?? undefined} />`,
+  sectionRender: (m) => `<FaqSection items={faqs} title=${sourceAttr(m.title)} tone={faqTone ?? undefined} />`,
   renders: 'faqs.length > 0',
   jsonldImport: "import { faqNode } from '@/modules/faq/jsonld'",
   jsonldNodes: () => `...(faqs.length ? [faqNode(faqs)] : [])`,

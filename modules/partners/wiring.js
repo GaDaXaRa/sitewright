@@ -1,4 +1,4 @@
-import { sourceString } from '../../generator/lib/text.js'
+import { sourceAttr } from '../../generator/lib/text.js'
 
 export const wiring = {
   id: 'partners',
@@ -9,7 +9,7 @@ export const wiring = {
   query: { collection: 'partners', where: { active: { equals: true } }, limit: 50, sort: 'order', depth: 1 },
   sectionImport: "import PartnersSection from '@/modules/partners/Section'",
   sectionRender: (m) =>
-    `<PartnersSection items={partners} title={${sourceString(m.title)}} tone={partnersTone ?? undefined} />`,
+    `<PartnersSection items={partners} title=${sourceAttr(m.title)} tone={partnersTone ?? undefined} />`,
   renders: 'partners.length > 0',
   llmsImport: "import { partnersSection } from '@/modules/partners/llms'",
   llmsName: 'partnersSection',

@@ -1,4 +1,4 @@
-import { sourceString } from '../../generator/lib/text.js'
+import { sourceAttr, sourceString } from '../../generator/lib/text.js'
 
 export const wiring = {
   id: 'team',
@@ -10,7 +10,7 @@ export const wiring = {
   query: { collection: 'team', limit: 50, sort: 'order' },
   sectionImport: "import TeamSection from '@/modules/team/Section'",
   sectionRender: (m) =>
-    `<TeamSection items={team} title={${sourceString(m.title)}} route={${sourceString(m.route)}} tone={teamTone ?? undefined} />`,
+    `<TeamSection items={team} title=${sourceAttr(m.title)} route=${sourceAttr(m.route)} tone={teamTone ?? undefined} />`,
   renders: 'team.length > 0',
   jsonldImport: "import { teamNodes } from '@/modules/team/jsonld'",
   // People first in the graph: everything else refers to them by @id, and a reference that

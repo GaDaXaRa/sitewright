@@ -1,4 +1,4 @@
-import { sourceString } from '../../generator/lib/text.js'
+import { sourceAttr, sourceString } from '../../generator/lib/text.js'
 
 export const wiring = {
   id: 'about',
@@ -29,7 +29,7 @@ export const wiring = {
     },`,
   sectionImport: "import AboutSection from '@/modules/about/Section'",
   sectionRender: (m) =>
-    `<AboutSection\n        text={settings.about}\n        image={settings.aboutImage}\n        title={${sourceString(m.title)}}\n        tone={aboutTone ?? undefined}\n      />`,
+    `<AboutSection\n        text={settings.about}\n        image={settings.aboutImage}\n        title=${sourceAttr(m.title)}\n        tone={aboutTone ?? undefined}\n      />`,
   // Painted only when written: a heading over nothing reads as an unfinished site.
   renders: "Boolean(settings.about?.trim())",
   llmsImport: "import { aboutSection } from '@/modules/about/llms'",

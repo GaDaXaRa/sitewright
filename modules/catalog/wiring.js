@@ -1,4 +1,4 @@
-import { sourceString } from '../../generator/lib/text.js'
+import { sourceAttr, sourceString } from '../../generator/lib/text.js'
 
 /**
  * How this module is wired into a site.
@@ -18,7 +18,7 @@ export const wiring = {
   query: { collection: 'catalog', limit: 100, sort: 'order' },
   sectionImport: "import CatalogSection from '@/modules/catalog/Section'",
   sectionRender: (m) =>
-    `<CatalogSection items={catalog} title={${sourceString(m.title)}} route={${sourceString(m.route)}} tone={catalogTone ?? undefined} limit={6} />`,
+    `<CatalogSection items={catalog} title=${sourceAttr(m.title)} route=${sourceAttr(m.route)} tone={catalogTone ?? undefined} limit={6} />`,
   renders: 'catalog.length > 0',
   jsonldImport: "import { catalogNodes } from '@/modules/catalog/jsonld'",
   jsonldNodes: (m, bp) =>

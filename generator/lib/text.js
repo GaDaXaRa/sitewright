@@ -98,3 +98,19 @@ export function fill(template, values, what) {
 export function sourceString(value) {
   return "'" + JSON.stringify(String(value)).slice(1, -1).replaceAll("'", "\\'") + "'"
 }
+
+const SAFE = /^[^"&<>{}\\\u0000-\u001f]*$/
+
+/**
+ * The same text as a JSX attribute.
+ *
+ * `title="Sobre mí"` is what a person would have written and what every hand-written
+ * attribute around it looks like; `title={'...'}` is correct but reads like machinery, and
+ * it was showing up on every section of every generated page. The braces are kept only for
+ * copy that cannot survive between quotes: JSX decodes HTML entities inside an attribute,
+ * so an `&` would not come back out the way it went in.
+ */
+export function sourceAttr(value) {
+  const text = String(value)
+  return SAFE.test(text) ? `"${text}"` : `{${sourceString(text)}}`
+}

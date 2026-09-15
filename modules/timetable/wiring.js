@@ -1,4 +1,4 @@
-import { sourceString } from '../../generator/lib/text.js'
+import { sourceAttr, sourceString } from '../../generator/lib/text.js'
 
 export const wiring = {
   id: 'timetable',
@@ -12,7 +12,7 @@ export const wiring = {
   query: { collection: 'timetable', where: { active: { equals: true } }, limit: 100, sort: 'startTime', depth: 1 },
   sectionImport: "import TimetableSection from '@/modules/timetable/Section'",
   sectionRender: (m, bp) =>
-    `<TimetableSection\n        items={timetable}\n        title={${sourceString(m.title)}}\n        route={${sourceString(m.route)}}\n        tone={timetableTone ?? undefined}${bp.modules.contact ? '\n        ctaHref="/#contacto"' : ''}\n      />`,
+    `<TimetableSection\n        items={timetable}\n        title=${sourceAttr(m.title)}\n        route=${sourceAttr(m.route)}\n        tone={timetableTone ?? undefined}${bp.modules.contact ? '\n        ctaHref="/#contacto"' : ''}\n      />`,
   renders: 'timetable.length > 0',
   jsonldImport: "import { timetableNodes } from '@/modules/timetable/jsonld'",
   jsonldNodes: (m) => `...timetableNodes(timetable, ${sourceString(m.route)}${m.mode === 'online' ? ", 'online'" : ''})`,
