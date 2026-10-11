@@ -8,7 +8,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { dirname, isAbsolute, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { changelogSections, diagnose, versionsAfter } from './lib/versions.mjs'
-import { driftSummary, siteDrift, writtenDrift } from './lib/drift.mjs'
+import { BLUEPRINT, driftSummary, isCoreOnly, siteDrift, writtenDrift } from './lib/drift.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -53,48 +53,57 @@ for (const d of diagnose({ declared, installed, published })) {
   console.log(`  ${SYMBOL[d.level]} ${d.title.padEnd(30)} ${d.detail}`)
 }
 
-// El núcleo no es lo único que se queda atrás: el chasis y los módulos se copiaron el día
-// que nació la web, y una corrección posterior no llega sola.
-const drift = siteDrift(root, site)
-const atrasados = drift.behind.length + drift.missing.length
-const propios = drift.customised.length + drift.unknown.length
-console.log(
-  `  ${atrasados || propios ? SYMBOL.warn : SYMBOL.ok} ${'Ficheros de la fábrica'.padEnd(30)} ${driftSummary(drift)}`,
-)
-for (const { rel } of drift.behind) console.log(`      se ha quedado atrás  ${rel}`)
-for (const { rel } of drift.missing) console.log(`      falta                ${rel}`)
-// Personalizado y atrasado piden cosas contrarias, así que no se cuentan juntos: uno se
-// trae con un comando y el otro es una decisión que alguien tomó aquí.
-for (const { rel } of drift.customised) console.log(`      personalizado aquí   ${rel}`)
-for (const { rel } of drift.unknown) console.log(`      sin sello            ${rel}`)
-if (atrasados) console.log(`      Para traerlos:  npm run sync-site -- ${target} --apply`)
-if (propios) console.log(`      Los personalizados no los toca sync-site: mira su git diff antes de nada.`)
-
-// Y los que el generador escribe para esta web: se regenera desde su blueprint y se mira
-// en qué difieren. Desde que el sello cubre también esto, la diferencia se puede partir en
-// dos —se quedó atrás, o alguien lo tocó aquí— y lo primero lo aplica `sync-written`.
-const written = writtenDrift(root, site)
-if (!written.available) {
-  console.log(`  ${SYMBOL.warn} ${'Ficheros de esta web'.padEnd(30)} no se pueden comparar: ${written.why}`)
-} else {
-  const wAtrasados = written.behind.length + written.missing.length
-  const wPropios = written.customised.length + written.unknown.length
-  const nivel = wAtrasados || wPropios ? SYMBOL.warn : SYMBOL.ok
+// A site that only consumes the core has no chassis to fall behind on: comparing it to the
+// template would list every generated route as "to bring in" and point at sync-site, which
+// would add them to its public site.
+if (isCoreOnly(site)) {
   console.log(
-    `  ${nivel} ${'Ficheros de esta web'.padEnd(30)} ${driftSummary(written, 'redactados')}`,
+    `  ${SYMBOL.ok} ${'Sólo núcleo'.padEnd(30)} no salió del generador (sin ${BLUEPRINT}): sólo le aplica sync-core`,
   )
+} else {
+  // El núcleo no es lo único que se queda atrás: el chasis y los módulos se copiaron el día
+  // que nació la web, y una corrección posterior no llega sola.
+  const drift = siteDrift(root, site)
+  const atrasados = drift.behind.length + drift.missing.length
+  const propios = drift.customised.length + drift.unknown.length
+  console.log(
+    `  ${atrasados || propios ? SYMBOL.warn : SYMBOL.ok} ${'Ficheros de la fábrica'.padEnd(30)} ${driftSummary(drift)}`,
+  )
+  for (const { rel } of drift.behind) console.log(`      se ha quedado atrás  ${rel}`)
+  for (const { rel } of drift.missing) console.log(`      falta                ${rel}`)
+  // Personalizado y atrasado piden cosas contrarias, así que no se cuentan juntos: uno se
+  // trae con un comando y el otro es una decisión que alguien tomó aquí.
+  for (const { rel } of drift.customised) console.log(`      personalizado aquí   ${rel}`)
+  for (const { rel } of drift.unknown) console.log(`      sin sello            ${rel}`)
+  if (atrasados) console.log(`      Para traerlos:  npm run sync-site -- ${target} --apply`)
+  if (propios) console.log(`      Los personalizados no los toca sync-site: mira su git diff antes de nada.`)
 
-  // Un módulo que el blueprint enciende y la web no tiene es la noticia más accionable de
-  // todo el diagnóstico: es una sección que alguien pidió y no está.
-  if (written.added.length) console.log(`      módulo nuevo         ${written.added.join(', ')}`)
-  if (written.removed.length) console.log(`      ya no lo enciende    ${written.removed.join(', ')}`)
-  for (const { rel } of written.behind) console.log(`      se ha quedado atrás  ${rel}`)
-  for (const { rel } of written.missing) console.log(`      falta                ${rel}`)
-  for (const { rel } of written.customised) console.log(`      personalizado aquí   ${rel}`)
-  for (const { rel } of written.unknown) console.log(`      sin sello            ${rel}`)
-  if (wAtrasados) console.log(`      Para traerlos:  npm run sync-written -- ${target} --apply`)
-  if (wPropios) {
-    console.log('      Los personalizados no los toca sync-written: mira su git diff antes de nada.')
+  // Y los que el generador escribe para esta web: se regenera desde su blueprint y se mira
+  // en qué difieren. Desde que el sello cubre también esto, la diferencia se puede partir en
+  // dos —se quedó atrás, o alguien lo tocó aquí— y lo primero lo aplica `sync-written`.
+  const written = writtenDrift(root, site)
+  if (!written.available) {
+    console.log(`  ${SYMBOL.warn} ${'Ficheros de esta web'.padEnd(30)} no se pueden comparar: ${written.why}`)
+  } else {
+    const wAtrasados = written.behind.length + written.missing.length
+    const wPropios = written.customised.length + written.unknown.length
+    const nivel = wAtrasados || wPropios ? SYMBOL.warn : SYMBOL.ok
+    console.log(
+      `  ${nivel} ${'Ficheros de esta web'.padEnd(30)} ${driftSummary(written, 'redactados')}`,
+    )
+
+    // Un módulo que el blueprint enciende y la web no tiene es la noticia más accionable de
+    // todo el diagnóstico: es una sección que alguien pidió y no está.
+    if (written.added.length) console.log(`      módulo nuevo         ${written.added.join(', ')}`)
+    if (written.removed.length) console.log(`      ya no lo enciende    ${written.removed.join(', ')}`)
+    for (const { rel } of written.behind) console.log(`      se ha quedado atrás  ${rel}`)
+    for (const { rel } of written.missing) console.log(`      falta                ${rel}`)
+    for (const { rel } of written.customised) console.log(`      personalizado aquí   ${rel}`)
+    for (const { rel } of written.unknown) console.log(`      sin sello            ${rel}`)
+    if (wAtrasados) console.log(`      Para traerlos:  npm run sync-written -- ${target} --apply`)
+    if (wPropios) {
+      console.log('      Los personalizados no los toca sync-written: mira su git diff antes de nada.')
+    }
   }
 }
 

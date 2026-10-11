@@ -40,6 +40,20 @@ export function readSeal(site) {
   }
 }
 
+/** The recipe a generated site carries inside it; see `writtenDrift`. */
+export const BLUEPRINT = 'sitewright.json'
+
+/**
+ * Whether a site only consumes `sitewright-core` and never came out of the generator.
+ *
+ * Such a site has no chassis or modules to be behind on: comparing it to `template/` lists
+ * every route the generator would write as "missing", and copying them in adds pages to a
+ * public site that never had them — `[seccion]` can even shadow its own routes. The
+ * blueprint is the only proof a site was generated, because every generated site has
+ * carried one since `a8200e0`.
+ */
+export const isCoreOnly = (site) => !existsSync(join(site, BLUEPRINT))
+
 /**
  * Por qué difiere un fichero, que es lo único que hace falta saber para decidir.
  *
@@ -218,7 +232,7 @@ export function writeSeal(site, pairs, { scope = 'shared' } = {}) {
  * web de Sandunguera tiene uno dibujado a mano y saldría eternamente «distinto». Y el
  * blueprint es el propio origen de la comparación.
  */
-const SKIP_WRITTEN = ['package.json', 'public/icon.svg', 'sitewright.json']
+const SKIP_WRITTEN = ['package.json', 'public/icon.svg', BLUEPRINT]
 
 /**
  * Lo que el generador acaba de escribir, como entrega que sellar.
@@ -265,9 +279,9 @@ function modulesIn(site) {
 export function writtenDrift(root, site, { keep = false } = {}) {
   const vacio = { pairs: [], differ: [], behind: [], customised: [], unknown: [], missing: [], added: [], removed: [] }
 
-  const blueprint = join(site, 'sitewright.json')
-  if (!existsSync(blueprint)) {
-    return { available: false, why: 'esta web no lleva su blueprint (sitewright.json)', ...vacio }
+  const blueprint = join(site, BLUEPRINT)
+  if (isCoreOnly(site)) {
+    return { available: false, why: `esta web no lleva su blueprint (${BLUEPRINT})`, ...vacio }
   }
 
   const out = mkdtempSync(join(tmpdir(), 'sitewright-drift-'))

@@ -7,7 +7,7 @@
 import { copyFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs'
 import { dirname, isAbsolute, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { SEAL, siteDrift, whatToCopy, writeSeal } from './lib/drift.mjs'
+import { BLUEPRINT, SEAL, isCoreOnly, siteDrift, whatToCopy, writeSeal } from './lib/drift.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -30,6 +30,22 @@ const site = isAbsolute(target) ? target : resolve(process.cwd(), target)
 if (!existsSync(join(site, 'package.json'))) stop(`${site} no parece un sitio: no hay package.json.`)
 
 const name = JSON.parse(readFileSync(join(site, 'package.json'), 'utf8')).name ?? '(sin nombre)'
+
+// Refused before comparing anything, with or without --apply: on a site that never had the
+// chassis, every generated route shows up as "missing", and a listing that ends in "to apply
+// it, run --apply" is an invitation to add pages to someone's public site.
+if (isCoreOnly(site)) {
+  stop(`Esta web no salió del generador: no lleva su blueprint (${BLUEPRINT}).
+
+  Es una web que sólo usa el núcleo. No tiene chasis ni módulos que poner al día, y
+  copiárselos le añadiría páginas que no tiene —aviso legal, privacidad, rutas de
+  sección— a una web pública. No se ha escrito nada.
+
+  Lo único que le aplica es el núcleo:  npm run sync-core -- ${target}
+
+  Si esta web sí salió del generador y ha perdido su blueprint, devuélvele su
+  ${BLUEPRINT} antes de nada.`)
+}
 const { checked, modules, pairs, behind, customised, unknown, missing } = siteDrift(root, site)
 
 console.log(`\n  ${name}  ${site}`)
