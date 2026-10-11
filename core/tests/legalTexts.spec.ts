@@ -1,6 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import type { LegalSettings } from '../src/lib/types.js'
-import { cookiePolicy, legalNotice, privacyPolicy } from '../src/lib/legalTexts.js'
+import {
+  cookiePolicy,
+  legalNotice,
+  privacyPolicy,
+  type LegalProfile,
+} from '../src/lib/legalTexts.js'
 
 const settings = (extra: Partial<LegalSettings> = {}) =>
   ({ siteName: 'Bajocero', ...extra }) as LegalSettings
@@ -180,5 +185,135 @@ describe('cookie policy', () => {
 
     expect(body).toContain('se carga sin pedirte permiso')
     expect(body).toContain('Vercel Analytics')
+  })
+})
+
+/**
+ * The pages used to describe the first site, a DJ collective, on every site: sessions,
+ * venues and bookings on an association's notice, a city and a date in the policy of a
+ * form that asks for neither. What they say now comes from what the site is made of.
+ */
+describe('what the site is made of', () => {
+  const profile = (modules: string[], formFields: string[] = []): LegalProfile => ({
+    modules,
+    formFields,
+  })
+  const objeto = (p?: LegalProfile, extra: Partial<LegalSettings> = {}) =>
+    legalNotice(settings(extra), 'https://e.es', p)[1].paragraphs[0]
+
+  it('lists what the site publishes, and nothing when it publishes none of it', () => {
+    expect(objeto(profile(['about', 'faq']))).toContain('la actividad de Bajocero.')
+    expect(objeto(profile(['pricing']))).toContain('de Bajocero: las tarifas.')
+    expect(objeto(profile(['timetable', 'pricing']))).toContain(': los horarios y las tarifas.')
+    expect(objeto(profile(['contact', 'schedule', 'media']))).toContain(
+      ': las grabaciones de audio y vídeo, las fechas anunciadas y la forma de ponerse en contacto.',
+    )
+  })
+
+  it('speaks of the work of a person and of the activity of anything else', () => {
+    expect(objeto(profile([]), { schemaType: 'Person' })).toContain('el trabajo de Bajocero')
+    expect(objeto(profile([]), { schemaType: 'NGO' })).toContain('la actividad de Bajocero')
+  })
+
+  it('warns that dates can change only on a site that announces dates or timetables', () => {
+    const notice = (modules: string[]) => text(legalNotice(settings(), 'https://e.es', profile(modules)))
+
+    expect(notice(['schedule'])).toContain('pueden cambiar')
+    expect(notice(['timetable'])).toContain('pueden cambiar')
+    expect(notice(['catalog', 'contact'])).not.toContain('pueden cambiar')
+    // Not a blank line in its place either: only the sentence about linked sites.
+    expect(legalNotice(settings(), 'https://e.es', profile(['catalog']))[3].paragraphs).toHaveLength(1)
+  })
+
+  it('mentions third-party players only on a site that embeds them', () => {
+    const notice = (modules: string[]) => text(legalNotice(settings(), 'https://e.es', profile(modules)))
+    const cookies = (modules: string[]) => cookiePolicy(settings(), profile(modules))
+
+    expect(notice(['media'])).toContain('reproductores incrustados')
+    expect(notice(['media'])).toContain('plataformas donde se aloja el contenido incrustado')
+    expect(notice(['schedule'])).not.toContain('incrustad')
+    expect(legalNotice(settings(), 'https://e.es', profile(['schedule']))[2].paragraphs).toHaveLength(1)
+    expect(text(cookies(['media']))).toContain('SoundCloud, Mixcloud, YouTube o Bandcamp')
+    expect(cookies(['schedule', 'contact']).map((s) => s.heading)).toEqual([
+      'Qué usamos',
+      'Medición de visitas',
+      'Cómo cambiar de opinión',
+    ])
+  })
+
+  it('lists the fields the form really asks, in its order, and none of the panel’s own', () => {
+    const body = text(
+      privacyPolicy(
+        settings(),
+        profile(['contact'], ['message', 'status', 'email', 'name', 'consentAt', 'phone']),
+      ),
+    )
+
+    expect(body).toContain('en el formulario: nombre, email, teléfono si lo pones y tu mensaje.')
+    expect(body).not.toContain('ciudad')
+    expect(body).not.toContain('fecha,')
+  })
+
+  it('names each optional field when the form has it', () => {
+    const body = text(
+      privacyPolicy(
+        settings(),
+        profile(['contact'], ['name', 'kind', 'interest', 'city', 'eventDate', 'message']),
+      ),
+    )
+
+    expect(body).toContain(
+      'nombre, qué tipo de petición es, qué te interesa de lo que ofrecemos, ciudad, fecha y tu mensaje.',
+    )
+  })
+
+  it('speaks of the form without listing fields it was not told about', () => {
+    expect(text(privacyPolicy(settings(), profile(['contact'])))).toContain(
+      'Solo los que escribes en el formulario.',
+    )
+  })
+
+  it('says that a site with no form asks for nothing, and drops what only a form needs', () => {
+    const sections = privacyPolicy(settings(), profile(['about', 'media']))
+
+    expect(sections.map((s) => s.heading)).toEqual([
+      'Quién trata tus datos',
+      'Qué datos recogemos y para qué',
+      'Quién más los ve',
+      'Tus derechos',
+    ])
+    expect(text(sections)).toContain('no te pide ningún dato personal')
+    expect(text(sections)).not.toContain('Resend')
+    // Someone still sees the visit: whoever hosts the site.
+    expect(sections[2].paragraphs.join(' ')).toContain('Vercel')
+    expect(text(sections)).not.toContain('del formulario')
+    expect(text(sections)).not.toContain('envíos masivos')
+  })
+
+  it('points somewhere to write that exists, when no holder is filled in', () => {
+    const who = (p: LegalProfile, extra: Partial<LegalSettings> = {}) =>
+      privacyPolicy(settings(extra), p)[0].paragraphs
+
+    expect(who(profile(['contact']))).toEqual([
+      'Puedes escribirnos a través del formulario de esta web.',
+    ])
+    expect(who(profile([]), { email: 'hola@e.es' })).toEqual(['Puedes escribirnos a hola@e.es.'])
+    expect(who(profile([]))[0]).toContain('medios de contacto')
+    expect(who(profile([]), { legalHolder: 'X', email: 'hola@e.es' })[0]).toContain('Titular: X')
+  })
+
+  it('keeps every disclosure on a site whose pages do not say what it is made of', () => {
+    // Sites whose pages were generated before the profile existed call without it. They
+    // must not lose a disclosure on updating the core; they just stop being specific.
+    const notice = text(legalNotice(settings(), 'https://e.es'))
+    const privacy = privacyPolicy(settings())
+
+    expect(objeto()).toContain('la actividad de Bajocero.')
+    expect(notice).toContain('pueden cambiar')
+    expect(notice).toContain('reproductores incrustados')
+    expect(privacy).toHaveLength(6)
+    expect(text(privacy)).toContain('Solo los que escribes en el formulario.')
+    expect(text(privacy)).toContain('Resend')
+    expect(text(cookiePolicy(settings()))).toContain('Bandcamp')
   })
 })

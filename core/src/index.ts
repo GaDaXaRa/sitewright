@@ -63,11 +63,12 @@ export {
   TOO_MANY_ERROR,
 } from './lib/rateLimit.js'
 
-// The legal pages, from what the client filled in
+// The legal pages, from what the client filled in and what the site is made of
 export {
   legalNotice,
   privacyPolicy,
   cookiePolicy,
+  type LegalProfile,
   type LegalSection,
 } from './lib/legalTexts.js'
 

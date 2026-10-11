@@ -5,6 +5,8 @@ import { loadSettings } from '@/lib/data'
 import { pageMetadata } from '@/lib/metadata'
 import { legalNotice } from 'sitewright-core'
 import { SITE_URL } from '@/lib/site'
+import { legalProfile } from '@/lib/legal'
+import { modules } from '@/site.modules'
 
 export const revalidate = 3600
 
@@ -22,5 +24,5 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function LegalNoticePage() {
   const settings = await loadSettings()
-  return <LegalPage settings={settings} title="Aviso legal" sections={legalNotice(settings, SITE_URL)} />
+  return <LegalPage settings={settings} title="Aviso legal" sections={legalNotice(settings, SITE_URL, legalProfile(modules))} />
 }

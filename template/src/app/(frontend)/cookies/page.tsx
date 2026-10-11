@@ -4,6 +4,8 @@ import LegalPage from '../components/LegalPage'
 import { loadSettings } from '@/lib/data'
 import { pageMetadata } from '@/lib/metadata'
 import { cookiePolicy } from 'sitewright-core'
+import { legalProfile } from '@/lib/legal'
+import { modules } from '@/site.modules'
 
 export const revalidate = 3600
 
@@ -26,7 +28,7 @@ export default async function CookiesPage() {
       settings={settings}
       title="Política de cookies"
       intro="Qué se carga en tu navegador y cuándo."
-      sections={cookiePolicy(settings)}
+      sections={cookiePolicy(settings, legalProfile(modules))}
     />
   )
 }

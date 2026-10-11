@@ -3,6 +3,31 @@
 Qué gana una web al actualizar. Escrito para quien tiene que decidir si le compensa, no
 para quien escribió el código.
 
+## 0.19.0 — 11 de octubre de 2026
+
+- **Las páginas legales describen la web que las lleva, no la primera que se hizo.** Se
+  escribieron para un colectivo de DJs y así se quedaron: una asociación o un portafolio
+  publicaban un aviso legal que hablaba de «sesiones publicadas», «contrataciones» y
+  «cambios de sala», y una política de privacidad que decía recoger tipo de evento, ciudad y
+  fecha aunque su formulario no preguntase por ninguna de las tres. En una página cuyo
+  trabajo es ser verdad.
+
+  Ahora reciben un tercer dato, opcional: **de qué está hecha la web** —qué módulos tiene y
+  qué campos pide su formulario—. Con él, el aviso dice lo que la web publica, advierte de
+  que las fechas pueden cambiar sólo donde se anuncian fechas u horarios, y nombra los
+  reproductores de terceros sólo donde hay alguno incrustado; la política de privacidad
+  enumera los campos que el formulario pide de verdad, y si no hay formulario lo dice y se
+  ahorra las secciones de consentimiento y conservación; la de cookies quita la sección de
+  reproductores donde no los hay. Un portafolio (`schemaType: Person`) habla del trabajo de
+  la persona, no de «la actividad».
+
+  **Sin ese dato** —una web cuyas páginas son anteriores a esta versión— no se pierde
+  ningún aviso: se dice todo lo que se decía, con palabras que valen para cualquier web, y
+  sólo se deja de enumerar lo que no se sabe. Para que una web viva pase a describirse a sí
+  misma hacen falta las páginas nuevas de la plantilla: primero `sync-core`, después
+  `sync-site --apply`, en ese orden, porque las páginas nuevas llaman a funciones que la
+  versión anterior no tiene.
+
 ## 0.18.0 — 14 de septiembre de 2026
 
 - **La puerta de la tarjeta social pasa de avisar a fallar.** Nació avisando porque el día
