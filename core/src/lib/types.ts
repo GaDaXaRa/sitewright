@@ -26,4 +26,6 @@ export type LegalSettings = {
   email?: string | null
   analyticsConsent?: boolean | null
   cookieBanner?: 'auto' | 'always' | 'never' | null
+  /** The schema.org type picked in the panel; only `Person` changes how the pages speak. */
+  schemaType?: string | null
 }

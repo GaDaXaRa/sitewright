@@ -93,12 +93,22 @@ your stylesheet.
 ```ts
 import { legalNotice, privacyPolicy, cookiePolicy } from 'sitewright-core'
 
-legalNotice(settings, siteUrl) // → [{ heading, paragraphs }, …]
+const profile = { modules: ['media', 'schedule', 'contact'], formFields: ['name', 'email', 'message'] }
+
+legalNotice(settings, siteUrl, profile) // → [{ heading, paragraphs }, …]
+privacyPolicy(settings, profile)
+cookiePolicy(settings, profile)
 ```
 
 Spanish notice, privacy and cookie policies written from the data the client filled in — and
 leaving out what they did not, because a privacy policy naming the wrong data controller is
 worse than one naming none. They are a solid draft, not legal advice.
+
+The optional `profile` says what the site is made of: which modules it has and which fields
+its contact form asks. With it, the pages describe that site — the dates warning only where
+dates are announced, third-party players only where something is embedded, the form's real
+fields, and no form at all where there is none. Without it they keep every disclosure, in
+words that fit any site.
 
 ## The audit
 
