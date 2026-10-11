@@ -2,6 +2,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { getPayload } from 'payload'
 import config from '../src/payload.config'
+import { describeRenames, pendingRenames } from './schema-renames'
 
 /**
  * ¿Las migraciones tienen lo que dice el código?
@@ -18,12 +19,34 @@ import config from '../src/payload.config'
  *
  * Se apoya en tripas de Payload que no son API pública, así que **ante la duda calla**: si
  * no encuentra lo que espera, lo dice y sale bien. Sólo falla cuando drizzle ha calculado
- * sentencias de verdad, que es lo único que significa algo.
+ * sentencias de verdad, o cuando para calcularlas tendría que preguntar si un nombre es
+ * nuevo o renombrado: eso no es duda, es una migración que falta.
  */
 
 const done: (code: number, message: string) => never = (code, message) => {
   console.log(`\n  ${message}\n`)
   process.exit(code)
+}
+
+// Every failure says the same thing: what is missing, how to write it, why it matters.
+const missing: (lines: string[], renames: boolean) => never = (lines, renames) => {
+  console.log(`\n  El código declara un esquema que las migraciones no tienen.
+
+  Falta una migración con esto:\n`)
+  for (const line of lines) console.log(`    ${line.trim()}`)
+  console.log(`
+  Se escribe con:  npm run migrate:create <nombre-corto>
+`)
+  if (renames) {
+    console.log(`  Ese comando pregunta, por cada nombre, si es nuevo o el de antes renombrado, y
+  hay que contestarle en una terminal. Si es un cambio de nombre, elige renombrar: crear
+  y borrar tira lo que hubiera guardado.
+`)
+  }
+  console.log(`  Sin ella el despliegue pasa —no hay nada pendiente que aplicar— y el panel falla el día
+  que alguien toque ese campo.
+`)
+  process.exit(1)
 }
 
 const payload = await getPayload({ config: await config, disableDBConnect: true })
@@ -69,20 +92,24 @@ if (upSnapshot && Number(before.version) < Number(after.version)) {
   before = upSnapshot(before)
 }
 
+// A name that vanished next to a new one makes drizzle ask "renamed or created?" on the
+// terminal, and CI has none: the job used to hang until it timed out.
+const renames = pendingRenames(before, after)
+if (renames.length) missing(describeRenames(renames), true)
+
+// Whatever question the check above did not foresee: drizzle's prompts listen for
+// keypresses on stdin, so the first such listener means it is about to wait for a human.
+// Asking at all means the diff is not empty.
+process.stdin.on('newListener', (event) => {
+  if (event !== 'keypress') return
+  if (process.stdin.isTTY) process.stdin.setRawMode(false)
+  missing(['(drizzle quiere preguntar si algún nombre es nuevo o renombrado)'], true)
+})
+
 const statements = await generateMigration(before, after)
 
 if (!statements?.length) {
   done(0, `El esquema coincide con las migraciones (${snapshots.length} aplicadas).`)
 }
 
-console.log(`\n  El código declara un esquema que las migraciones no tienen.
-
-  Falta una migración con esto:\n`)
-for (const statement of statements) console.log(`    ${statement.trim()}`)
-console.log(`
-  Se escribe con:  npm run migrate:create <nombre-corto>
-
-  Sin ella el despliegue pasa —no hay nada pendiente que aplicar— y el panel falla el día
-  que alguien toque ese campo.
-`)
-process.exit(1)
+missing(statements, false)
