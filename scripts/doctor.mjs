@@ -9,6 +9,7 @@ import { dirname, isAbsolute, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { changelogSections, diagnose, versionsAfter } from './lib/versions.mjs'
 import { BLUEPRINT, driftSummary, isCoreOnly, siteDrift, writtenDrift } from './lib/drift.mjs'
+import { auditSummary, behindTemplate } from './lib/deps.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -64,13 +65,15 @@ if (isCoreOnly(site)) {
   // El núcleo no es lo único que se queda atrás: el chasis y los módulos se copiaron el día
   // que nació la web, y una corrección posterior no llega sola.
   const drift = siteDrift(root, site)
-  const atrasados = drift.behind.length + drift.missing.length
-  const propios = drift.customised.length + drift.unknown.length
+  const atrasados = drift.behind.length + drift.missing.length + drift.retire.length
+  const propios = drift.customised.length + drift.unknown.length + drift.retiredOwn.length
   console.log(
     `  ${atrasados || propios ? SYMBOL.warn : SYMBOL.ok} ${'Ficheros de la fábrica'.padEnd(30)} ${driftSummary(drift)}`,
   )
   for (const { rel } of drift.behind) console.log(`      se ha quedado atrás  ${rel}`)
   for (const { rel } of drift.missing) console.log(`      falta                ${rel}`)
+  for (const { rel } of drift.retire) console.log(`      sobra                ${rel}`)
+  for (const { rel } of drift.retiredOwn) console.log(`      sobra, pero es suyo  ${rel}`)
   // Personalizado y atrasado piden cosas contrarias, así que no se cuentan juntos: uno se
   // trae con un comando y el otro es una decisión que alguien tomó aquí.
   for (const { rel } of drift.customised) console.log(`      personalizado aquí   ${rel}`)
@@ -104,6 +107,49 @@ if (isCoreOnly(site)) {
     if (wPropios) {
       console.log('      Los personalizados no los toca sync-written: mira su git diff antes de nada.')
     }
+  }
+}
+
+// Las dependencias, que no salen en la deriva porque package.json queda fuera a propósito.
+// Una web clava Next y Payload el día que nace, y nada decía cuándo se quedaban con un
+// aviso de seguridad publicado: así siguieron dos webs con uno crítico.
+const behind = behindTemplate(pkg, readJson(join(root, 'template/package.json')))
+console.log(
+  `  ${behind.length ? SYMBOL.warn : SYMBOL.ok} ${'Dependencias'.padEnd(30)} ${
+    behind.length ? `${behind.length} por detrás de la plantilla` : 'al día con la plantilla'
+  }`,
+)
+for (const { name, site: own, template } of behind) {
+  console.log(`      ${name.padEnd(36)} ${own} → ${template}`)
+}
+
+let report = null
+try {
+  report = JSON.parse(
+    execFileSync('npm', ['audit', '--omit=dev', '--json'], { cwd: site, encoding: 'utf8' }),
+  )
+} catch (err) {
+  // npm audit sale con error precisamente cuando encuentra algo; el informe viene igual.
+  try {
+    report = JSON.parse(err.stdout)
+  } catch {
+    // Sin red o sin lockfile no hay informe, y se dice en vez de dar un cero que no es.
+  }
+}
+if (!report) {
+  console.log(`  ${SYMBOL.warn} ${'Avisos de seguridad'.padEnd(30)} npm audit no contestó`)
+} else {
+  const { counts, direct, serious } = auditSummary(report)
+  const parts = Object.entries(counts)
+    .filter(([, n]) => n)
+    .map(([level, n]) => `${n} ${level}`)
+  console.log(
+    `  ${counts.critical ? SYMBOL.fail : serious ? SYMBOL.warn : SYMBOL.ok} ${'Avisos de seguridad'.padEnd(30)} ${
+      parts.length ? parts.join(', ') : 'ninguno'
+    }`,
+  )
+  for (const d of direct.filter((d) => d.severity === 'critical' || d.severity === 'high')) {
+    console.log(`      ${d.severity.padEnd(9)} ${d.name.padEnd(26)} ${d.fix ? `arreglado en ${d.fix}` : ''}`)
   }
 }
 

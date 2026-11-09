@@ -22,6 +22,12 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      # Una web clava sus dependencias el día que nace y nadie vuelve a mirarlas: así
+      # siguieron dos con un Next y un Payload que tenían avisos críticos publicados.
+      # Sólo lo que llega a producción y sólo lo grave. Arreglarlo es `npm run doctor` desde
+      # la fábrica, que dice qué va por detrás de la plantilla.
+      - name: Avisos de seguridad
+        run: npm audit --omit=dev --audit-level=high
       - name: Tipos
         run: npm run typecheck
       - name: Esquema
