@@ -225,14 +225,21 @@ body::after {
     .quotes figure,
     .faqs details,
     .about {
-      animation: var(--reveal) linear both;
+      /* Por separado y no con el atajo: en `animation: none linear both`, el `none` se lee
+         como modo de relleno y `both` acaba siendo el nombre de la animación. */
+      animation-name: var(--reveal);
+      animation-timing-function: linear;
+      animation-fill-mode: both;
       animation-timeline: view();
       animation-range: entry 0% entry 60%;
     }
   }
 
   .hero h1 {
-    animation: var(--intro) 1s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-name: var(--intro);
+    animation-duration: 1s;
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+    animation-fill-mode: both;
   }
 }
 
