@@ -106,3 +106,36 @@ describe('Redirección al dominio de marca', () => {
     expect(res.headers.get('location')).toBeNull()
   })
 })
+
+// Entre el primer despliegue y el seed, la tabla de usuarios está vacía y Payload ofrece
+// el panel a quien llegue primero.
+describe('Alta del primer usuario', () => {
+  afterEach(() => {
+    enProduccion(undefined)
+    delete process.env.NEXT_PUBLIC_SITE_URL
+    vi.resetModules()
+  })
+
+  const puertas = ['/admin/create-first-user', '/api/users/first-register', '/admin/create-first-user/']
+
+  it.each(['production', 'preview'])('la cierra en un despliegue de %s', async (entorno) => {
+    enProduccion(entorno)
+    const proxy = await conDominio()
+
+    for (const ruta of puertas) expect(proxy(peticion(MARCA, ruta)).status).toBe(404)
+  })
+
+  it('la deja abierta en local, donde se crea el primer usuario a mano', async () => {
+    enProduccion(undefined)
+    const res = (await conDominio())(peticion('localhost:3000', puertas[0]))
+
+    expect(res.status).toBe(200)
+  })
+
+  it('no toca el resto del panel', async () => {
+    enProduccion('production')
+    const res = (await conDominio())(peticion(MARCA, '/admin/login'))
+
+    expect(res.status).toBe(200)
+  })
+})

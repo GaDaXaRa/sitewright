@@ -139,6 +139,16 @@ test('el seed escribe los ejemplos de cada módulo activo', async () => {
   assert.match(out, /collection: 'faqs'/)
 })
 
+// Con `SEED_PASSWORD` olvidada, el panel de producción quedaba con una contraseña que
+// venía escrita en este repositorio, que es público.
+test('el seed no trae ninguna contraseña fija', async () => {
+  const { bp, modules, wirings } = await preparar('ejemplo-completo')
+  const out = seedScript(bp, modules, wirings)
+
+  assert.match(out, /process\.env\.SEED_PASSWORD \|\| randomBytes\(/)
+  assert.doesNotMatch(out, /SEED_PASSWORD \|\| '/)
+})
+
 // ── lo que se lee ───────────────────────────────────────────────────────────────────────
 
 test('el README y la guía hablan de esta web, no de la plantilla', async () => {

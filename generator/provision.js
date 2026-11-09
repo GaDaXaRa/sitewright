@@ -50,6 +50,10 @@ ${'─'.repeat(14 + name.length)}
    vercel --prod --yes
    curl -sI https://${id}.vercel.app | head -1     # comprueba que responde
 
+   Hasta el paso 5 el panel no tiene usuarios, y en una web desplegada nadie puede crear
+   el primero desde el navegador: el proxy cierra esa puerta, o se la quedaría quien
+   llegara antes. /admin da 404 hasta que se siembra.
+
 4. Almacén de imágenes:
 
    vercel blob create-store ${id}-media --access public --region fra1 --yes
@@ -63,7 +67,7 @@ ${'─'.repeat(14 + name.length)}
    producción empuja el esquema y deja una marca de modo dev que bloquea el siguiente
    \`migrate\` durante el build:
 
-   DATABASE_URL=<la de main> SEED_EMAIL=<correo> SEED_PASSWORD=<contraseña> npm run seed
+   DATABASE_URL=<la de main> SEED_EMAIL=<correo> npm run seed   # imprime la contraseña
    DATABASE_URL=<la de main> node scripts/fix-prod-migration.mjs
 
 6. Repositorio y despliegue por push. Dos permisos que no se pueden conceder desde aquí:
