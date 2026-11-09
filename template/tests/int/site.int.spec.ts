@@ -3,7 +3,7 @@ import { site } from '@/site.config'
 
 /**
  * `SITE_URL` decides which domain the site declares as its own: canonical, sitemap,
- * `robots`, the JSON-LD `@id`s and the middleware redirect. In Organic Yoga it pointed at
+ * `robots`, the JSON-LD `@id`s and the proxy redirect. In Organic Yoga it pointed at
  * the throwaway *.vercel.app subdomain for weeks, telling Google the good version of the
  * site was the disposable one.
  *

@@ -28,7 +28,7 @@ const CANONICAL_IS_PUBLIC = canonical.protocol === 'https:' && !/^localhost|^127
  * Only in production: preview deployments also live under *.vercel.app, and redirecting
  * them would leave no way to review a deploy before publishing it.
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   if (process.env.VERCEL_ENV !== 'production') return NextResponse.next()
 
   if (!CANONICAL_IS_PUBLIC) return NextResponse.next()
