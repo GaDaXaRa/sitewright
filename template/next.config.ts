@@ -30,10 +30,12 @@ const cabecerasDeSeguridad = [
   // ningún formulario puede mandar lo que se escribe en él a otro dominio.
   {
     key: 'Content-Security-Policy',
-    value: "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'",
+    value: "frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'",
   },
-  // Lo mismo para navegadores que no entienden `frame-ancestors`.
-  { key: 'X-Frame-Options', value: 'DENY' },
+  // Lo mismo para navegadores que no entienden `frame-ancestors`. `SAMEORIGIN` y no
+  // `DENY` porque el propio panel enseña la web en un marco («Estilo de la web»); otro
+  // dominio sigue sin poder meterla en el suyo, que es de lo que protege.
+  { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
   // La web no usa ninguna de las tres; negarlas evita que nada las pida en su nombre.
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
 ]

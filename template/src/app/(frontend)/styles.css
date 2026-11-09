@@ -81,6 +81,152 @@
   --font-body: var(--font-body-google), system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
+/* ── estilos del panel ───────────────────────────────────────────────────────────────────
+   La dueña de la web elige el estilo en su panel («Estilo de la web») y el layout lo pone
+   en <html data-estilo>. Cada bloque redefine la personalidad entera, así que cambiar de
+   estilo no necesita desplegar nada. Los escribe el generador, con el peso de los
+   titulares ajustado a las letras que descarga esta web. */
+:root[data-estilo='nocturno'] {
+  --radius: 2px;
+  --radius-lg: 6px;
+  --radius-btn: 2px;
+  --section-pad: clamp(56px, 9vw, 112px);
+  --head-gap: clamp(28px, 5vw, 48px);
+  --display-weight: 400;
+  --display-case: uppercase;
+  --display-tracking: -0.02em;
+  --display-leading: 1.02;
+  --hero-size: clamp(40px, 9.5vw, 124px);
+  --hero-leading: 0.88;
+  --hero-tracking: -0.035em;
+  --h2-size: clamp(30px, 5.5vw, 54px);
+  --label-case: uppercase;
+  --label-spread: 1;
+  --card-bg: transparent;
+  --card-border: transparent;
+  --card-border-width: 0px;
+  --card-pad: 0px;
+  --card-shadow: none;
+  --grain: none;
+  --reveal: none;
+  --reveal-distance: 0px;
+  --reveal-scale: 1;
+  --intro: none;
+}
+
+:root[data-estilo='editorial'] {
+  --radius: 0px;
+  --radius-lg: 0px;
+  --radius-btn: 0px;
+  --section-pad: clamp(72px, 12vw, 168px);
+  --head-gap: clamp(36px, 6vw, 72px);
+  --display-weight: 400;
+  --display-case: none;
+  --display-tracking: -0.015em;
+  --display-leading: 1.08;
+  --hero-size: clamp(42px, 8vw, 108px);
+  --hero-leading: 0.98;
+  --hero-tracking: -0.025em;
+  --h2-size: clamp(30px, 5vw, 52px);
+  --label-case: uppercase;
+  --label-spread: 1.5;
+  --card-bg: transparent;
+  --card-border: var(--line);
+  --card-border-width: 1px;
+  --card-pad: clamp(14px, 2vw, 20px);
+  --card-shadow: none;
+  --grain: none;
+  --reveal: reveal;
+  --reveal-distance: 18px;
+  --reveal-scale: 1;
+  --intro: none;
+}
+
+:root[data-estilo='cartel'] {
+  --radius: 0px;
+  --radius-lg: 0px;
+  --radius-btn: 0px;
+  --section-pad: clamp(44px, 7vw, 88px);
+  --head-gap: clamp(22px, 4vw, 36px);
+  --display-weight: 600;
+  --display-case: uppercase;
+  --display-tracking: -0.03em;
+  --display-leading: 0.95;
+  --hero-size: clamp(48px, 11vw, 164px);
+  --hero-leading: 0.82;
+  --hero-tracking: -0.05em;
+  --h2-size: clamp(36px, 7vw, 76px);
+  --label-case: uppercase;
+  --label-spread: 1.2;
+  --card-bg: transparent;
+  --card-border: transparent;
+  --card-border-width: 0px;
+  --card-pad: 0px;
+  --card-shadow: none;
+  --grain: block;
+  --reveal: reveal;
+  --reveal-distance: 56px;
+  --reveal-scale: 0.96;
+  --intro: intro;
+}
+
+:root[data-estilo='sereno'] {
+  --radius: 12px;
+  --radius-lg: 22px;
+  --radius-btn: 999px;
+  --section-pad: clamp(72px, 12vw, 168px);
+  --head-gap: clamp(36px, 6vw, 72px);
+  --display-weight: 600;
+  --display-case: none;
+  --display-tracking: -0.01em;
+  --display-leading: 1.12;
+  --hero-size: clamp(36px, 6.5vw, 80px);
+  --hero-leading: 1.02;
+  --hero-tracking: -0.02em;
+  --h2-size: clamp(28px, 4.5vw, 44px);
+  --label-case: none;
+  --label-spread: 0.15;
+  --card-bg: var(--surface);
+  --card-border: transparent;
+  --card-border-width: 0px;
+  --card-pad: clamp(14px, 2vw, 20px);
+  --card-shadow: 0 1px 2px rgb(0 0 0 / 0.06), 0 18px 40px -18px rgb(0 0 0 / 0.35);
+  --grain: none;
+  --reveal: reveal;
+  --reveal-distance: 18px;
+  --reveal-scale: 1;
+  --intro: none;
+}
+
+:root[data-estilo='cercano'] {
+  --radius: 12px;
+  --radius-lg: 22px;
+  --radius-btn: 999px;
+  --section-pad: clamp(56px, 9vw, 112px);
+  --head-gap: clamp(28px, 5vw, 48px);
+  --display-weight: 400;
+  --display-case: none;
+  --display-tracking: -0.015em;
+  --display-leading: 1.08;
+  --hero-size: clamp(42px, 8vw, 108px);
+  --hero-leading: 0.98;
+  --hero-tracking: -0.025em;
+  --h2-size: clamp(30px, 5vw, 52px);
+  --label-case: uppercase;
+  --label-spread: 1.5;
+  --card-bg: var(--surface);
+  --card-border: transparent;
+  --card-border-width: 0px;
+  --card-pad: clamp(14px, 2vw, 20px);
+  --card-shadow: 0 1px 2px rgb(0 0 0 / 0.06), 0 18px 40px -18px rgb(0 0 0 / 0.35);
+  --grain: none;
+  --reveal: reveal;
+  --reveal-distance: 18px;
+  --reveal-scale: 1;
+  --intro: none;
+}
+/* ── fin de los estilos del panel ── */
+
 *,
 *::before,
 *::after {

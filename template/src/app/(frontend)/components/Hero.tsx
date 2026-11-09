@@ -1,6 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { isHeroLayout } from '@/lib/estilos'
 
 type Props = {
   eyebrow?: string | null
@@ -23,7 +24,6 @@ type Props = {
   layout?: string | null
 }
 
-const LAYOUTS = ['foto', 'partida', 'enmarcada', 'tipografica']
 
 /**
  * The cover: the one section every site has.
@@ -49,7 +49,7 @@ export default function Hero({
 }: Props) {
   // Un valor que esta versión no conoce —un ajuste guardado por otra más nueva— cae en la
   // de siempre en vez de dejar la portada sin estilo.
-  const composition = layout && LAYOUTS.includes(layout) ? layout : 'foto'
+  const composition = isHeroLayout(layout) ? layout : 'foto'
   // La tipográfica es la única que prescinde de la foto aunque la haya: su gracia es la letra.
   const image = composition === 'tipografica' ? null : imageUrl
   // Sólo cuando la foto va **detrás** del texto hace falta tratarla y cambiar la tinta.

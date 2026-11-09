@@ -59,7 +59,8 @@ Es su paleta en los cinco estilos —`nocturno`, `editorial`, `cartel`, `sereno`
 hoja de verdad. Publícalo como artifact para que lo vean. Lo que elijan va a
 `design.style`: `{ "preset": "sereno", "hero": "partida" }`, y si quieren un eje distinto
 del estilo (`shape`, `density`, `type`, `surface`, `motion`), se pone suelto encima. La
-portada es sólo la de partida: luego la cambian en el panel según la foto que tengan.
+estilo y la portada son sólo los de partida: en su panel, «Estilo de la web» enseña su web
+real en cada uno y los cambia sin desplegar. Díselo al entregar.
 
 **5 · Datos duros.** Dominio, titular legal, NIF, domicilio, correo de contacto, redes.
 → `identity`, `legal`. Sin `legal.holder` no se puede generar: es lo que hace legales las

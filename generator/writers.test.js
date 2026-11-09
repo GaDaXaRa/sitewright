@@ -146,6 +146,14 @@ test('el panel arranca con la portada que pide el blueprint', async () => {
   )
 })
 
+test('el panel arranca con el estilo que se eligió en la entrevista', async () => {
+  const { bp, modules, wirings } = await preparar('ejemplo-solista')
+  assert.match(
+    siteSettings(plantilla('src/globals/SiteSettings.ts'), bp, modules, wirings),
+    /name: 'stylePreset',[\s\S]*?defaultValue: 'sereno'/,
+  )
+})
+
 test('la portada recibe la composición que se eligió en el panel', async () => {
   const { bp, modules, wirings, order } = await preparar('ejemplo-completo')
   assert.match(homePage(bp, modules, wirings, order), /layout=\{settings\.heroLayout\}/)

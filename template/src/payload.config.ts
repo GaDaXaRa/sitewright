@@ -56,8 +56,14 @@ export default buildConfig({
           path: '/guia',
           meta: { title: 'Cómo se maneja esto' },
         },
+        // El probador de estilos: la web real en cada estilo, y el botón para quedarse uno.
+        estilo: {
+          Component: '@/components/admin/Estilo#default',
+          path: '/estilo',
+          meta: { title: 'Estilo de la web' },
+        },
       },
-      afterNavLinks: ['@/components/admin/GuiaLink#default'],
+      afterNavLinks: ['@/components/admin/EstiloLink#default', '@/components/admin/GuiaLink#default'],
     },
   },
   // Cada módulo aporta la suya desde el manifiesto.

@@ -2,6 +2,7 @@ import type { GlobalConfig } from 'payload'
 import { revalidateSiteGlobal } from '../collections/hooks/revalidate'
 import { site } from '../site.config'
 import { BANNER_OFF_WARNING } from 'sitewright-core'
+import { HERO_LAYOUTS, STYLES } from '../lib/estilos'
 
 /**
  * Site-wide settings: identity, home cover, contact, social links and legal data.
@@ -69,6 +70,24 @@ export const SiteSettings: GlobalConfig = {
     },
     {
       type: 'collapsible',
+      label: 'Aspecto',
+      admin: { initCollapsed: true },
+      fields: [
+        {
+          name: 'stylePreset',
+          label: 'Estilo de la web',
+          type: 'select',
+          defaultValue: 'nocturno',
+          options: STYLES.map(({ id, label }) => ({ label, value: id })),
+          admin: {
+            description:
+              'Cambia a la vez las esquinas, el aire, la letra de los titulares y el movimiento. Para probarlos sobre la web antes de elegir, usa «Estilo de la web» en el menú.',
+          },
+        },
+      ],
+    },
+    {
+      type: 'collapsible',
       label: 'Portada',
       admin: { initCollapsed: true },
       fields: [
@@ -77,12 +96,7 @@ export const SiteSettings: GlobalConfig = {
           label: 'Cómo se compone la portada',
           type: 'select',
           defaultValue: 'foto',
-          options: [
-            { label: 'Foto de fondo, con el texto encima', value: 'foto' },
-            { label: 'Texto a un lado y foto al otro', value: 'partida' },
-            { label: 'Foto enmarcada, con aire alrededor', value: 'enmarcada' },
-            { label: 'Sólo el título, sin foto', value: 'tipografica' },
-          ],
+          options: HERO_LAYOUTS.map(({ id, label }) => ({ label, value: id })),
           admin: {
             description:
               'Una foto vertical o con mucho detalle luce más al lado del texto que debajo. Si todavía no hay una buena, «Sólo el título» deja la portada limpia en vez de con una foto floja.',

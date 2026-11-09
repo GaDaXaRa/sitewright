@@ -4,6 +4,7 @@ import { Public_Sans } from 'next/font/google'
 import { SITE_URL } from '@/lib/site'
 import { buildIcons, needsCookieBanner } from 'sitewright-core'
 import { loadSettings } from '@/lib/data'
+import { isStyle } from '@/lib/estilos'
 import { site } from '@/site.config'
 import { ConsentProvider } from 'sitewright-core/ui'
 import { ConsentedAnalytics } from 'sitewright-core/ui'
@@ -48,7 +49,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const settings = await loadSettings()
 
   return (
-    <html lang="es" className={`${display.variable} ${body.variable}`}>
+    // The style chosen in the panel. Each one is a block of tokens in the stylesheet, so
+    // switching needs no deploy: saving the settings revalidates every page.
+    <html
+      lang="es"
+      className={`${display.variable} ${body.variable}`}
+      data-estilo={isStyle(settings?.stylePreset) ? settings.stylePreset : undefined}
+    >
       <body>
         <ConsentProvider
         storageKey={site.id}
