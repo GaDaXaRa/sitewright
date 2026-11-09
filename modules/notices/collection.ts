@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { revalidateHomeAfterChange, revalidateHomeAfterDelete } from '@/collections/hooks/revalidate'
+import { activeOrSignedIn } from '@/collections/access'
 
 /**
  * The notice the client wants seen on arrival. Only the first active, in-date one shows.
@@ -25,7 +26,7 @@ export function noticesCollection({
       description:
         'Mensajes que aparecen en una ventana al entrar en la web. Solo se muestra el primero activo y en fecha.',
     },
-    access: { read: () => true },
+    access: { read: activeOrSignedIn },
     hooks: {
       afterChange: [revalidateHomeAfterChange],
       afterDelete: [revalidateHomeAfterDelete],
