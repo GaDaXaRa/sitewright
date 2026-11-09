@@ -1,5 +1,6 @@
 import type { CollectionConfig, Field } from 'payload'
 import { revalidator } from '@/collections/hooks/revalidate'
+import { activeOrSignedIn } from '@/collections/access'
 
 /**
  * El cuadrante semanal: clases, turnos o actividades que se repiten.
@@ -28,7 +29,7 @@ export function timetableCollection({
       defaultColumns: ['title', ...(linkedTo ? ['belongsTo'] : []), 'days', 'startTime', 'active'],
       group: 'Contenido',
     },
-    access: { read: () => true },
+    access: { read: activeOrSignedIn },
     defaultSort: 'startTime',
     hooks: { afterChange: [revalidation.afterChange], afterDelete: [revalidation.afterDelete] },
     fields: [

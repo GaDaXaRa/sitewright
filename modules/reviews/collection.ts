@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { revalidateHomeAfterChange, revalidateHomeAfterDelete } from '@/collections/hooks/revalidate'
+import { activeOrSignedIn } from '@/collections/access'
 
 /**
  * What other people say: clients, press, promoters, members.
@@ -19,7 +20,7 @@ export function reviewsCollection({
       defaultColumns: ['author', 'source', 'order', 'active'],
       group: 'Contenido',
     },
-    access: { read: () => true },
+    access: { read: activeOrSignedIn },
     defaultSort: 'order',
     hooks: {
       afterChange: [revalidateHomeAfterChange],

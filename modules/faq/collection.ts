@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { revalidator } from '@/collections/hooks/revalidate'
+import { activeOrSignedIn } from '@/collections/access'
 
 /**
  * Frequently asked questions: the module that pays off most in GEO, because it answers in
@@ -22,7 +23,7 @@ export function faqCollection({
       defaultColumns: ['question', 'order', 'active'],
       group: 'Contenido',
     },
-    access: { read: () => true },
+    access: { read: activeOrSignedIn },
     defaultSort: 'order',
     hooks: { afterChange: [revalidation.afterChange], afterDelete: [revalidation.afterDelete] },
     fields: [

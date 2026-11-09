@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { revalidator } from '@/collections/hooks/revalidate'
+import { activeOrSignedIn } from '@/collections/access'
 
 /**
  * Quién apoya, patrocina o programa: la tira de logos.
@@ -23,7 +24,7 @@ export function partnersCollection({
       defaultColumns: ['name', 'order', 'active'],
       group: 'Contenido',
     },
-    access: { read: () => true },
+    access: { read: activeOrSignedIn },
     defaultSort: 'order',
     hooks: { afterChange: [revalidation.afterChange], afterDelete: [revalidation.afterDelete] },
     fields: [

@@ -1,5 +1,6 @@
 import type { CollectionConfig, CollectionSlug, Field } from 'payload'
 import { revalidator } from '@/collections/hooks/revalidate'
+import { activeOrSignedIn } from '@/collections/access'
 
 /**
  * What things cost: rates, passes, membership fees, booking prices.
@@ -36,7 +37,7 @@ export function pricingCollection({
       defaultColumns: ['name', 'price', 'period', 'active'],
       group: 'Contenido',
     },
-    access: { read: () => true },
+    access: { read: activeOrSignedIn },
     defaultSort: 'order',
     hooks: { afterChange: [revalidation.afterChange], afterDelete: [revalidation.afterDelete] },
     fields: [
