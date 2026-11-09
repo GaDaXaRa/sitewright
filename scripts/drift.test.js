@@ -4,7 +4,16 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import test from 'node:test'
 
-import { classify, hashOf, readSeal, siteDrift, whatToCopy, writeSeal, writtenPairs } from './lib/drift.mjs'
+import {
+  classify,
+  hashOf,
+  readSeal,
+  siteDrift,
+  whatToCopy,
+  whatToRemove,
+  writeSeal,
+  writtenPairs,
+} from './lib/drift.mjs'
 
 /**
  * Lo que decide si se pisa el trabajo de alguien.
@@ -303,4 +312,51 @@ test('no se sella lo que npm y la clienta mueven por su cuenta', () => {
   } finally {
     limpia()
   }
+})
+
+/**
+ * Lo que la fábrica ya no entrega y estorba si se queda: Next 16 no arranca con
+ * `middleware.ts` y `proxy.ts` a la vez, y `sync-site` traía el segundo sin quitar el primero.
+ */
+test('lo retirado que sigue como se entregó se puede quitar', () => {
+  const { raiz, sitio, escribe, limpia } = escenario()
+  try {
+    escribe(sitio, 'src/middleware.ts', 'entregado\n')
+    escribe(sitio, '.sitewright-sync.json', JSON.stringify({ files: { 'src/middleware.ts': hashOf(join(sitio, 'src/middleware.ts')) } }))
+
+    const d = siteDrift(raiz, sitio)
+    assert.deepEqual(d.retire.map((p) => p.rel), ['src/middleware.ts'])
+    assert.deepEqual(d.retiredOwn, [])
+  } finally {
+    limpia()
+  }
+})
+
+test('lo retirado que alguien tocó, o sin sello, es suyo', () => {
+  const { raiz, sitio, escribe, limpia } = escenario()
+  try {
+    escribe(sitio, 'src/middleware.ts', 'entregado\n')
+    escribe(sitio, '.sitewright-sync.json', JSON.stringify({ files: { 'src/middleware.ts': hashOf(join(sitio, 'src/middleware.ts')) } }))
+    escribe(sitio, 'src/middleware.ts', 'con una regla propia\n')
+    escribe(sitio, 'tests/int/middleware.int.spec.ts', 'sin sello\n')
+
+    const d = siteDrift(raiz, sitio)
+    assert.deepEqual(d.retire, [])
+    assert.deepEqual(
+      d.retiredOwn.map((p) => p.rel),
+      ['src/middleware.ts', 'tests/int/middleware.int.spec.ts'],
+    )
+  } finally {
+    limpia()
+  }
+})
+
+test('quitar sigue la misma puerta que pisar', () => {
+  const retirados = { retire: [{ rel: 'entregado' }], retiredOwn: [{ rel: 'suyo' }] }
+  const quita = (o) => whatToRemove(retirados, o).remove.map((p) => p.rel)
+
+  assert.deepEqual(quita({}), [])
+  assert.deepEqual(quita({ force: true }), [])
+  assert.deepEqual(quita({ apply: true }), ['entregado'])
+  assert.deepEqual(quita({ apply: true, force: true }), ['entregado', 'suyo'])
 })

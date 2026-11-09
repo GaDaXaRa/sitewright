@@ -56,6 +56,16 @@ export const PER_SITE = [
   'public/icon-512.png',
 ]
 
+/**
+ * Lo que el chasis entregaba y ya no, y que **estorba** si se queda.
+ *
+ * Que la fábrica deje de entregar un fichero no lo borra de las webs que ya lo tienen, y
+ * casi siempre da igual. Con estos no: Next 16 no arranca con `middleware.ts` y `proxy.ts`
+ * a la vez, y `sync-site` traía el segundo sin quitar el primero. Se borran sólo si siguen
+ * siendo lo que la fábrica entregó; si alguien los tocó, se dice y se dejan.
+ */
+export const RETIRED = ['src/middleware.ts', 'tests/int/middleware.int.spec.ts']
+
 /** Si un fichero del chasis viaja igual a todas las webs. */
 export function isShared(relativePath) {
   return !WRITTEN.includes(relativePath) && !PER_SITE.includes(relativePath)
