@@ -4,10 +4,10 @@
 // `sync-core` trae el núcleo, que va por npm; esto trae lo que se copió el día que la web
 // nació y desde entonces nadie volvía a tocar. Sin `--apply` no escribe nada: enseña qué
 // cambiaría, porque copiar encima de una web viva no es algo que se haga a ciegas.
-import { copyFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs'
 import { dirname, isAbsolute, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { BLUEPRINT, SEAL, isCoreOnly, siteDrift, whatToCopy, writeSeal } from './lib/drift.mjs'
+import { BLUEPRINT, SEAL, isCoreOnly, siteDrift, whatToCopy, whatToRemove, writeSeal } from './lib/drift.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -46,7 +46,10 @@ if (isCoreOnly(site)) {
   Si esta web sí salió del generador y ha perdido su blueprint, devuélvele su
   ${BLUEPRINT} antes de nada.`)
 }
-const { checked, modules, pairs, behind, customised, unknown, missing } = siteDrift(root, site)
+const { checked, modules, pairs, behind, customised, unknown, missing, retire, retiredOwn } = siteDrift(
+  root,
+  site,
+)
 
 console.log(`\n  ${name}  ${site}`)
 console.log(`  ${checked} ficheros compartidos · ${modules.length} módulos: ${modules.join(', ')}\n`)
@@ -56,13 +59,14 @@ const { copy: aCopiar, respected, seals } = whatToCopy(
   { behind, customised, unknown, missing },
   { apply, force },
 )
+const { remove: aBorrar, kept } = whatToRemove({ retire, retiredOwn }, { apply, force })
 const traibles = [...behind, ...missing]
 // Lo que es de esta web se enseña **siempre**, también con `--force`: es justo cuando hay
 // que ver qué se está a punto de pisar. `respected` es otra cosa —lo que al final no se
 // tocó— y sólo sirve para contarlo al terminar.
 const propios = [...customised, ...unknown]
 
-if (!traibles.length && !customised.length && !unknown.length) {
+if (!traibles.length && !customised.length && !unknown.length && !retire.length && !retiredOwn.length) {
   console.log('  Todo lo que viaja igual a todas las webs está al día.')
   if (seals) {
     const sellados = writeSeal(site, pairs)
@@ -74,6 +78,10 @@ if (!traibles.length && !customised.length && !unknown.length) {
 
 for (const { rel } of behind) console.log(`  se ha quedado atrás  ${rel}`)
 for (const { rel } of missing) console.log(`  falta                ${rel}`)
+for (const { rel } of retire) console.log(`  sobra                ${rel}`)
+for (const { rel } of retiredOwn) {
+  console.log(`  SOBRA, PERO ES SUYO  ${rel}   (la fábrica ya no lo entrega: muévelo a mano o usa --force)`)
+}
 
 if (propios.length) {
   console.log('')
@@ -99,11 +107,14 @@ for (const { from, to } of aCopiar) {
   mkdirSync(dirname(to), { recursive: true })
   copyFileSync(from, to)
 }
+for (const { path } of aBorrar) rmSync(path)
 
 const sellados = writeSeal(site, pairs)
 
 console.log(`\n  ${plural(aCopiar.length, 'fichero copiado', 'ficheros copiados')}${
   respected.length ? `, y ${plural(respected.length, 'respetado', 'respetados')}` : ''
+}${aBorrar.length ? `, ${plural(aBorrar.length, 'retirado', 'retirados')}` : ''}${
+  kept.length ? ` (${plural(kept.length, 'retirado se queda', 'retirados se quedan')} por ser suyos)` : ''
 }. Sello al día: ${sellados} ficheros.
 
   Queda por hacer, y conviene hacerlo antes de subir nada:

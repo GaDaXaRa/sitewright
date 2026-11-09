@@ -14,7 +14,7 @@ import { createHash } from 'node:crypto'
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, relative } from 'node:path'
-import { MODULE_SKIP, TEMPLATE_SKIP, WRITTEN, isShared } from '../../generator/generated.js'
+import { MODULE_SKIP, RETIRED, TEMPLATE_SKIP, WRITTEN, isShared } from '../../generator/generated.js'
 
 /**
  * El sello: qué le entregó la fábrica a esta web la última vez, fichero por fichero.
@@ -138,9 +138,40 @@ export function siteDrift(root, site) {
     else unknown.push(pair)
   }
 
+  // Lo retirado se borra con el mismo criterio con que se pisa: sólo si sigue siendo lo
+  // entregado. `retire` es lo que se puede quitar; `retiredOwn`, lo que alguien tocó aquí.
+  const retire = []
+  const retiredOwn = []
+  for (const rel of RETIRED) {
+    const path = join(site, rel)
+    if (!existsSync(path)) continue
+    if (classify(hashOf(path), seal[rel]) === 'behind') retire.push({ rel, path })
+    else retiredOwn.push({ rel, path })
+  }
+
   // `differ` sigue siendo todo lo que difiere, para quien sólo quiera contarlo.
   const differ = [...behind, ...customised, ...unknown]
-  return { checked: pairs.length, modules: installed, pairs, differ, behind, customised, unknown, missing }
+  return {
+    checked: pairs.length,
+    modules: installed,
+    pairs,
+    differ,
+    behind,
+    customised,
+    unknown,
+    missing,
+    retire,
+    retiredOwn,
+  }
+}
+
+/**
+ * Qué se borra de una web viva: lo mismo que `whatToCopy`, con la otra operación que puede
+ * destruir trabajo. Sin `--apply` nada; lo que alguien tocó, sólo con `--force`.
+ */
+export function whatToRemove({ retire = [], retiredOwn = [] }, { apply = false, force = false } = {}) {
+  if (!apply) return { remove: [], kept: retiredOwn }
+  return { remove: force ? [...retire, ...retiredOwn] : retire, kept: force ? [] : retiredOwn }
 }
 
 /**
