@@ -83,6 +83,11 @@ jobs:
       # en el mismo commit — el trabajo se caía hasta que alguien publicara. Probaba una
       # mezcla que no es ningún commit.
       - run: npm ci --prefix ../core && npm run build --prefix ../core
+      # Enlazado así hay dos Payload: el de la plantilla y el de desarrollo del núcleo.
+      # TypeScript sólo los trata como uno si coinciden en versión **y** en sus
+      # compañeras —graphql incluida—; si no, los tipos que el núcleo devuelve no encajan
+      # en la configuración de la plantilla. Si este trabajo falla con dos rutas de
+      # `payload` en el error, iguala graphql en los dos package-lock.
       - run: npm install --no-audit --no-fund --no-save "file:$GITHUB_WORKSPACE/core"
       # Los tipos de Payload no están versionados —los genera cada sitio— así que aquí
       # hay que escribirlos antes de comprobarlos. No hace falta base de datos: sólo se
