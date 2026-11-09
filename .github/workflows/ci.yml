@@ -72,6 +72,11 @@ jobs:
           cache: npm
           cache-dependency-path: template/package-lock.json
       - run: npm ci
+      # Lo que la plantilla clava es lo que hereda cada web nueva. Next 16.3.0 y Payload
+      # 3.88.0 llevaban avisos críticos publicados y nada lo decía: la plantilla los seguía
+      # entregando. Sólo lo que llega a producción y sólo lo grave, para que la puerta no se
+      # acabe apagando por ruido de herramientas de desarrollo.
+      - run: npm audit --omit=dev --audit-level=high
       # Contra el núcleo de **este commit**, no contra el publicado. Es la misma corrección
       # que ya llevaban los sitios generados, y aquí faltaba: la plantilla instalaba del
       # registro, así que un cambio en el núcleo y su uso en la plantilla no podían entrar
