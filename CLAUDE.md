@@ -22,8 +22,12 @@ el comando que las comprueba: si no hay comando, no hay regla, hay buena intenci
 2. **Antes de tocar una web ya hecha, `npm run doctor -- ../<sitio>`**: dice qué núcleo
    tiene, cuántas versiones se está perdiendo, qué hay en medio, **qué ficheros de la
    fábrica no son los suyos** y **en qué se diferencia de lo que el generador escribiría
-   hoy** —esto último regenerándola desde el `sitewright.json` que lleva dentro—. Ninguna
-   se actualiza sola y hasta ahora nadie llevaba esa cuenta.
+   hoy** —esto último regenerándola desde el `sitewright.json` que lleva dentro—, y **qué
+   dependencias clava por debajo de la plantilla y qué avisos de seguridad tienen**. Ninguna
+   se actualiza sola y hasta ahora nadie llevaba esa cuenta: en noviembre de 2026 las dos
+   webs seguían con un Next y un Payload con avisos críticos publicados. Las dependencias
+   no las trae ningún `sync`: se igualan a mano a las de la plantilla, y la CI de cada web
+   falla si `npm audit` encuentra algo alto o crítico.
 3. **Poner una web al día son tres comandos, y hacen cosas distintas.**
    `npm run sync-core -- ../<sitio>` trae el núcleo, que va por npm: el guion borra la
    dependencia —npm no refresca una `file:` que conserva su versión— y compara el hash de
@@ -43,7 +47,9 @@ el comando que las comprueba: si no hay comando, no hay regla, hay buena intenci
    con el hash de lo que la fábrica le entregó, así que «este fichero no es el de la
    fábrica» se parte en dos —se ha quedado atrás, o alguien lo tocó aquí— y sólo lo primero
    se aplica solo. Lo segundo pide `--force`, escrito a propósito. Sin sello no se pisa
-   nada: no saber si alguien lo tocó no es permiso para pisarlo. Y la libertad de editar no
+   nada: no saber si alguien lo tocó no es permiso para pisarlo. Lo que la fábrica deja de
+   entregar y estorba si se queda —`middleware.ts` al pasar a `proxy.ts`— se declara en
+   `RETIRED` de `generator/generated.js`, y `sync-site` lo borra con la misma regla. Y la libertad de editar no
    es teórica —`schedule/Row.tsx` y `faq/Section.tsx` se han tocado en webs vivas—, que es
    la razón por la que los módulos se copian y no se empaquetan.
    Lo que `sync-written` no puede hacer solo lo dice al terminar: un módulo nuevo trae una

@@ -11,6 +11,9 @@ personales. La referencia de calidad es [organicyoga.es](https://www.organicyoga
 - **Cómo funciona por dentro** → [documentación navegable](https://claude.ai/code/artifact/9a5f1f1d-6e5b-4b03-93f1-7548ba17f3af) — cada pieza, y qué se rompió para que exista cada regla
 - **Plan de la v1** → [docs/plan-v1.md](docs/plan-v1.md)
 - **Estado**: v1.4. Dos webs en producción sobre esta arquitectura, una de ellas de cliente.
+- **Aspecto**: paleta, dos tipografías y un estilo (`design.style`): cinco ejes y cinco
+  estilos con nombre, más cuatro portadas que se cambian desde el panel.
+  `node generator/probador.js --blueprint <ruta>` los enseña con la paleta de esa web.
 
 ## Operaciones
 
