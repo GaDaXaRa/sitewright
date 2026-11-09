@@ -100,6 +100,11 @@ export default buildConfig({
     // `enabled: false` → images are written to local disk.
     vercelBlobStorage({
       enabled: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
+      // The plugin adds its own columns to `media`, but only when it is enabled — so the
+      // schema had a token in production and none in CI, and `schema:check` compared the
+      // migrations against a schema production does not have. With Payload 3.9x that hid a
+      // real column (`_objectKey`). Payload v4 makes this the default.
+      alwaysInsertFields: true,
       collections: {
         media: {
           // Without this, every image is requested from a Payload function that goes and
