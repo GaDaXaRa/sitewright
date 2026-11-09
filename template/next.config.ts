@@ -25,7 +25,13 @@ const cabecerasDeSeguridad = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   // Al salir del sitio se manda el origen, nunca la ruta completa.
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-  { key: 'Content-Security-Policy', value: "frame-ancestors 'none'" },
+  // Además de `frame-ancestors`, las tres directivas que no necesitan nonces: sin
+  // `<object>` ni `<embed>`, un `<base>` inyectado no puede desviar las rutas relativas, y
+  // ningún formulario puede mandar lo que se escribe en él a otro dominio.
+  {
+    key: 'Content-Security-Policy',
+    value: "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'",
+  },
   // Lo mismo para navegadores que no entienden `frame-ancestors`.
   { key: 'X-Frame-Options', value: 'DENY' },
   // La web no usa ninguna de las tres; negarlas evita que nada las pida en su nombre.
