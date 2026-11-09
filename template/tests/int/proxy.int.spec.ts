@@ -1,10 +1,10 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
 import { NextRequest } from 'next/server'
-import { config } from '@/middleware'
+import { config } from '@/proxy'
 
 const VERCEL = 'sitio-abc123.vercel.app'
 // Fijado aquí y no leído del sitio: con el dominio todavía pendiente, la dirección resuelta
-// es `localhost`, y lo que se prueba —a dónde manda el middleware— no existiría.
+// es `localhost`, y lo que se prueba —a dónde manda el proxy— no existiría.
 const MARCA = 'www.ejemplo.es'
 
 // Simula una petición entrante con el Host que se quiera probar.
@@ -17,11 +17,11 @@ function enProduccion(valor: string | undefined) {
   else process.env.VERCEL_ENV = valor
 }
 
-/** El middleware, releído con el dominio de marca puesto. */
+/** El proxy, releído con el dominio de marca puesto. */
 async function conDominio() {
   vi.resetModules()
   process.env.NEXT_PUBLIC_SITE_URL = `https://${MARCA}`
-  return (await import('@/middleware')).middleware
+  return (await import('@/proxy')).proxy
 }
 
 describe('Redirección al dominio de marca', () => {
@@ -69,7 +69,7 @@ describe('Redirección al dominio de marca', () => {
     enProduccion('production')
     vi.resetModules()
     process.env.NEXT_PUBLIC_SITE_URL = 'https://sitio.vercel.app'
-    const { middleware: recargado } = await import('@/middleware')
+    const { proxy: recargado } = await import('@/proxy')
 
     const res = recargado(peticion('sitio.vercel.app', '/pagina'))
 
@@ -79,7 +79,7 @@ describe('Redirección al dominio de marca', () => {
   })
 
   // Una petición sin Host (una sonda, un cliente mal hecho) no puede tumbar el sitio:
-  // el middleware se ejecuta en todas las rutas.
+  // el proxy se ejecuta en todas las rutas.
   it('aguanta una petición sin cabecera Host', async () => {
     enProduccion('production')
     const res = (await conDominio())(new NextRequest(new URL(`https://${MARCA}/pagina`)))
@@ -87,7 +87,7 @@ describe('Redirección al dominio de marca', () => {
     expect(res.headers.get('location')).toBeNull()
   })
 
-  // El middleware corre en todas las peticiones que case el matcher: si dejase de
+  // El proxy corre en todas las peticiones que case el matcher: si dejase de
   // excluir los estáticos, cada imagen y cada fichero de Next pasarían por aquí.
   it('se aplica a las páginas y no a los recursos internos de Next', () => {
     const casa = (ruta: string) => new RegExp(`^${config.matcher[0]}$`).test(ruta)
