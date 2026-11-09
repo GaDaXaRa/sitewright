@@ -64,6 +64,10 @@ export default buildConfig({
   collections: [Users, Media, ...moduleCollections(modules)],
   globals: [SiteSettings],
   editor: lexicalEditor(),
+  // Nothing uses it: the site reads through the Local API and the panel through REST. Left
+  // on, it was a second public door into every collection, and the one several of Payload's
+  // access-control advisories went through.
+  graphQL: { disable: true },
   // The admin panel is in Spanish: the people who use it are not developers.
   i18n: {
     supportedLanguages: { es },
