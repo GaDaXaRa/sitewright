@@ -12,7 +12,8 @@ personales. La referencia de calidad es [organicyoga.es](https://www.organicyoga
 - **Plan de la v1** → [docs/plan-v1.md](docs/plan-v1.md)
 - **Estado**: v1.4. Dos webs en producción sobre esta arquitectura, una de ellas de cliente.
 - **Aspecto**: paleta, dos tipografías y un estilo (`design.style`): cinco ejes y cinco
-  estilos con nombre, más cuatro portadas que se cambian desde el panel.
+  estilos con nombre, más cuatro portadas. La dueña de la web prueba los dos sobre su web real
+  y los cambia desde el panel («Estilo de la web»), sin desplegar.
   `node generator/probador.js --blueprint <ruta>` los enseña con la paleta de esa web.
 
 ## Operaciones

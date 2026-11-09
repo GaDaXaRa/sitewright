@@ -4,7 +4,17 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
 
-import { AXES, PRESETS, applyStyle, displayWeight, resolveStyle, styleErrors, styleTokens } from './lib/style.js'
+import {
+  AXES,
+  HERO_LAYOUTS,
+  PRESETS,
+  applyStyle,
+  displayWeight,
+  panelStyles,
+  resolveStyle,
+  styleErrors,
+  styleTokens,
+} from './lib/style.js'
 import { applyPalette } from './lib/design.js'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
@@ -20,7 +30,9 @@ const fuentes = { display: { family: 'Fraunces', weights: ['400', '700'] }, body
 // Las webs que ya existen no llevan `style`. Si el estilo por defecto no fuera exactamente la
 // plantilla, `sync-written` les cambiaría la cara sin que nadie lo hubiera pedido.
 test('sin estilo, la hoja sale tal cual: ninguna web cambia de cara', () => {
-  assert.equal(applyStyle(hoja, { fonts: { display: 'Anton' } }), hoja)
+  // Las letras de la propia plantilla: Public Sans para todo, en 400, 500 y 600.
+  const plantilla = { display: { family: 'Public Sans', weights: ['400', '500', '600'] } }
+  assert.equal(applyStyle(hoja, { fonts: plantilla }), hoja)
 })
 
 test('cada eje de cada estilo existe', () => {
@@ -57,10 +69,15 @@ test('un eje suelto se impone al estilo de partida', () => {
 
 test('el bloque se sustituye entero y la hoja no gana ni pierde nada más', () => {
   const out = applyStyle(hoja, { style: { preset: 'editorial' }, fonts: fuentes })
-  const fuera = (css) => css.replace(/\/\* ── personalidad[\s\S]*?── fin de la personalidad ── \*\//, '')
+  // Los dos bloques que escribe el generador: la personalidad y los estilos del panel.
+  const fuera = (css) =>
+    css
+      .replace(/\/\* ── personalidad[\s\S]*?── fin de la personalidad ── \*\//, '')
+      .replace(/\/\* ── estilos del panel[\s\S]*?── fin de los estilos del panel ── \*\//, '')
 
   assert.equal(fuera(out), fuera(hoja))
   assert.equal(out.match(/── personalidad/g).length, 1)
+  assert.equal(out.match(/── estilos del panel/g).length, 1)
 })
 
 test('el peso de los titulares es uno de los que se descargan', () => {
@@ -106,4 +123,46 @@ test('el probador enseña los cinco estilos y no rompe su propio script', async 
   for (const preset of Object.keys(PRESETS)) assert.match(html, new RegExp(`data-preset="${preset}"`))
   assert.equal(html.match(/<\/script>/g).length, 1)
   assert.doesNotMatch(html, /<b>roto/)
+})
+
+// ── los estilos que se eligen en el panel ──────────────────────────────────────────────
+
+const bloque = (css, preset) => {
+  const m = css.match(new RegExp(`:root\\[data-estilo='${preset}'\\] \\{([^}]*)\\}`))
+  return m ? cssTokens(`${m[1]}`) : null
+}
+
+test('la hoja trae un bloque por estilo, completo', () => {
+  const out = applyStyle(hoja, { fonts: fuentes })
+  for (const preset of Object.keys(PRESETS)) {
+    const tokens = bloque(out, preset)
+    assert.ok(tokens, preset)
+    // Un bloque al que le faltase un token dejaría el del estilo de partida.
+    assert.deepEqual(Object.keys(tokens).sort(), Object.keys(styleTokens()).sort(), preset)
+  }
+})
+
+// Si el blueprint pidió «nocturno con movimiento», elegir «nocturno» en el panel —que es
+// lo que ya está puesto— no puede quitarle el movimiento.
+test('el estilo del blueprint conserva en el panel sus ejes sueltos', () => {
+  const out = applyStyle(hoja, { style: { preset: 'nocturno', motion: 'sutil' }, fonts: fuentes })
+  assert.equal(bloque(out, 'nocturno').reveal, 'reveal')
+  assert.equal(bloque(out, 'editorial').reveal, 'reveal')
+  assert.equal(bloque(out, 'sereno')['radius-btn'], '999px')
+})
+
+test('el peso de cada estilo se ajusta a las letras de esa web', () => {
+  assert.match(panelStyles({}, ['400', '700']), /data-estilo='cartel'\] \{[^}]*--display-weight: 700;/)
+})
+
+// El panel enseña la lista de `template/src/lib/estilos.ts`; la hoja la escribe el
+// generador. Si se separan, la dueña elige un estilo que no tiene bloque y no pasa nada.
+test('el panel y el generador tienen los mismos estilos y portadas', () => {
+  const lista = readFileSync(join(ROOT, 'template/src/lib/estilos.ts'), 'utf8')
+  const ids = (nombre) => {
+    const trozo = lista.slice(lista.indexOf(`export const ${nombre}`))
+    return [...trozo.slice(0, trozo.indexOf('] as const')).matchAll(/id: '([a-z]+)'/g)].map((m) => m[1])
+  }
+  assert.deepEqual(ids('STYLES'), Object.keys(PRESETS))
+  assert.deepEqual(ids('HERO_LAYOUTS'), HERO_LAYOUTS)
 })

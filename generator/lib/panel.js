@@ -22,6 +22,16 @@ export function siteSettings(template, bp, modules, wirings) {
       'la portada de partida',
     )
   }
+  // Y el estilo: el que se eligió en la entrevista es el que la web trae puesto.
+  const preset = bp.design?.style?.preset
+  if (preset && preset !== 'nocturno') {
+    template = replaceOrDie(
+      template,
+      /(name: 'stylePreset',[\s\S]*?defaultValue: )'nocturno'/,
+      `$1'${preset}'`,
+      'el estilo de partida',
+    )
+  }
   const fields = wirings
     .filter((w) => w.settingsFields)
     .map((w) => w.settingsFields(modules[w.id], bp))

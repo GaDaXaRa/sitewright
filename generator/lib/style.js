@@ -159,6 +159,29 @@ export function styleTokens(style, displayWeights) {
 }
 
 const BLOCK = /(  \/\* ── personalidad ─+[\s\S]*?\*\/\n)[\s\S]*?(  \/\* ── fin de la personalidad ── \*\/)/
+const PANEL = /(\/\* ── estilos del panel ─+[\s\S]*?\*\/\n)[\s\S]*?(\/\* ── fin de los estilos del panel ── \*\/)/
+
+const declare = (tokens, indent = '  ') =>
+  Object.entries(tokens)
+    .map(([token, value]) => `${indent}--${token}: ${value};`)
+    .join('\n')
+
+/**
+ * Los cinco estilos, uno por bloque, para que la dueña elija en su panel sin desplegar.
+ *
+ * El layout pone `data-estilo` en `<html>` y cada bloque redefine la personalidad entera.
+ * El estilo que eligió el blueprint lleva también sus ejes sueltos: si no, elegirlo en el
+ * panel —que es lo que ya está elegido— perdería el movimiento o la forma que se pidieron.
+ */
+export function panelStyles(style = {}, displayWeights) {
+  const own = style.preset ?? DEFAULT_PRESET
+  return Object.keys(PRESETS)
+    .map((preset) => {
+      const tokens = styleTokens(preset === own ? style : { preset }, displayWeights)
+      return `:root[data-estilo='${preset}'] {\n${declare(tokens)}\n}`
+    })
+    .join('\n\n')
+}
 
 /**
  * Escribe la personalidad en la hoja, sustituyendo el bloque entero.
@@ -168,10 +191,18 @@ const BLOCK = /(  \/\* ── personalidad ─+[\s\S]*?\*\/\n)[\s\S]*?(  \/\* �
  */
 export function applyStyle(css, design) {
   const weights = typeof design.fonts?.display === 'object' ? design.fonts.display.weights : undefined
-  const lines = Object.entries(styleTokens(design.style, weights))
-    .map(([token, value]) => `  --${token}: ${value};`)
-    .join('\n')
-  return replaceOrDie(css, BLOCK, (_, head, tail) => `${head}${lines}\n${tail}`, 'la personalidad del diseño')
+  const root = replaceOrDie(
+    css,
+    BLOCK,
+    (_, head, tail) => `${head}${declare(styleTokens(design.style, weights))}\n${tail}`,
+    'la personalidad del diseño',
+  )
+  return replaceOrDie(
+    root,
+    PANEL,
+    (_, head, tail) => `${head}${panelStyles(design.style, weights)}\n${tail}`,
+    'los estilos que se eligen en el panel',
+  )
 }
 
 /** Lo que se le dice a quien escribe mal un eje, con lo que sí vale. */
