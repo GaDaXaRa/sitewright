@@ -48,6 +48,19 @@ enséñasela escrita: "fondo crema, tinta casi negra, un verde para los botones"
 **Mide el contraste antes de proponer nada**: un gris elegido a ojo suspende el AA más veces
 de las que pasa, y la auditoría lo va a cazar de todas formas.
 
+Con la paleta y las letras escritas, **que elijan el estilo con los ojos, no con palabras**:
+
+```bash
+node generator/probador.js --blueprint generator/blueprints/<id>.json --out probador.html
+```
+
+Es su paleta en los cinco estilos —`nocturno`, `editorial`, `cartel`, `sereno`,
+`cercano`— y las cuatro portadas —`foto`, `partida`, `enmarcada`, `tipografica`—, con la
+hoja de verdad. Publícalo como artifact para que lo vean. Lo que elijan va a
+`design.style`: `{ "preset": "sereno", "hero": "partida" }`, y si quieren un eje distinto
+del estilo (`shape`, `density`, `type`, `surface`, `motion`), se pone suelto encima. La
+portada es sólo la de partida: luego la cambian en el panel según la foto que tengan.
+
 **5 · Datos duros.** Dominio, titular legal, NIF, domicilio, correo de contacto, redes.
 → `identity`, `legal`. Sin `legal.holder` no se puede generar: es lo que hace legales las
 páginas legales.

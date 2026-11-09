@@ -107,8 +107,8 @@ export function extraColours(css, extras, palette) {
 
   return replaceOrDie(
     css,
-    /\n\n  --radius:/,
-    `\n\n  /* Los colores propios de este diseño, con la tinta que se lee sobre cada uno. */\n${lines.join('\n')}\n\n  --radius:`,
+    /\n\n  \/\* ── personalidad/,
+    `\n\n  /* Los colores propios de este diseño, con la tinta que se lee sobre cada uno. */\n${lines.join('\n')}\n\n  /* ── personalidad`,
     'los colores propios del diseño',
   )
 }

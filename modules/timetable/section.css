@@ -32,8 +32,8 @@
   gap: 2px;
   font-family: var(--font-display);
   font-size: 15px;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  letter-spacing: calc(0.02em * var(--label-spread));
+  text-transform: var(--label-case);
   color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
@@ -63,8 +63,8 @@
   gap: 6px 14px;
   margin-top: 8px !important;
   font-size: 13px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: calc(0.08em * var(--label-spread));
+  text-transform: var(--label-case);
 }
 
 .class-level {

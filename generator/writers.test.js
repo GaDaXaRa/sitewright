@@ -131,6 +131,26 @@ test('los ajustes del sitio traen los campos que aporta cada módulo', async () 
   assert.match(out, /name: 'about'/)
 })
 
+test('el panel arranca con la portada que pide el blueprint', async () => {
+  const { bp, modules, wirings } = await preparar('ejemplo-completo')
+  const conPortada = { ...bp, design: { ...bp.design, style: { hero: 'partida' } } }
+
+  assert.match(
+    siteSettings(plantilla('src/globals/SiteSettings.ts'), conPortada, modules, wirings),
+    /name: 'heroLayout',[\s\S]*?defaultValue: 'partida'/,
+  )
+  // Sin pedirla, la de siempre: el fichero no cambia.
+  assert.match(
+    siteSettings(plantilla('src/globals/SiteSettings.ts'), bp, modules, wirings),
+    /name: 'heroLayout',[\s\S]*?defaultValue: 'foto'/,
+  )
+})
+
+test('la portada recibe la composición que se eligió en el panel', async () => {
+  const { bp, modules, wirings, order } = await preparar('ejemplo-completo')
+  assert.match(homePage(bp, modules, wirings, order), /layout=\{settings\.heroLayout\}/)
+})
+
 test('el seed escribe los ejemplos de cada módulo activo', async () => {
   const { bp, modules, wirings } = await preparar('ejemplo-completo')
   const out = seedScript(bp, modules, wirings)

@@ -21,6 +21,8 @@ reciben el blueprint y devuelven texto — sin leer el disco ni escribir nada.
 | `lib/panel.js` | `SiteSettings.ts` y `scripts/seed.ts` |
 | `lib/docs.js` | El README y el CLAUDE.md de la web, desde `templates/` |
 | `lib/design.js` | La paleta, los colores propios y las tipografías |
+| `lib/style.js` | La personalidad: cinco ejes (forma, densidad, letra, superficie, movimiento), cinco estilos que los combinan y la portada de partida |
+| `probador.js` | Una página con la paleta de un blueprint en todos los estilos y portadas, para elegir con los ojos |
 | `lib/text.js` | `replaceOrDie` y los ayudantes que usan todos |
 
 Estaban las novecientas líneas dentro de `generate.js`, que se ejecuta al importarlo: **nada

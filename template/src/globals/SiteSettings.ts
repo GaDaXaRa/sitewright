@@ -73,6 +73,22 @@ export const SiteSettings: GlobalConfig = {
       admin: { initCollapsed: true },
       fields: [
         {
+          name: 'heroLayout',
+          label: 'Cómo se compone la portada',
+          type: 'select',
+          defaultValue: 'foto',
+          options: [
+            { label: 'Foto de fondo, con el texto encima', value: 'foto' },
+            { label: 'Texto a un lado y foto al otro', value: 'partida' },
+            { label: 'Foto enmarcada, con aire alrededor', value: 'enmarcada' },
+            { label: 'Sólo el título, sin foto', value: 'tipografica' },
+          ],
+          admin: {
+            description:
+              'Una foto vertical o con mucho detalle luce más al lado del texto que debajo. Si todavía no hay una buena, «Sólo el título» deja la portada limpia en vez de con una foto floja.',
+          },
+        },
+        {
           name: 'heroImage',
           label: 'Imagen de fondo de la portada',
           type: 'upload',

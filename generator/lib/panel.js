@@ -11,6 +11,17 @@ import { replaceOrDie } from './text.js'
 // ── globals/SiteSettings.ts ─────────────────────────────────────────────────────────────
 
 export function siteSettings(template, bp, modules, wirings) {
+  // La portada de partida la dice el blueprint; luego es de la clienta, que la cambia en el
+  // panel según la foto que tenga.
+  const hero = bp.design?.style?.hero
+  if (hero && hero !== 'foto') {
+    template = replaceOrDie(
+      template,
+      /(name: 'heroLayout',[\s\S]*?defaultValue: )'foto'/,
+      `$1'${hero}'`,
+      'la portada de partida',
+    )
+  }
   const fields = wirings
     .filter((w) => w.settingsFields)
     .map((w) => w.settingsFields(modules[w.id], bp))
