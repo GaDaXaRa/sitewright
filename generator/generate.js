@@ -12,6 +12,7 @@ import { homePage, siteConfig, siteModules } from './lib/site.js'
 import { seedScript, siteSettings } from './lib/panel.js'
 import { siteGuide, siteReadme } from './lib/docs.js'
 import { applyFonts, applyPalette, moduleStyles, nameStylesheet } from './lib/design.js'
+import { applyStyle } from './lib/style.js'
 
 /**
  * From a blueprint to a site on disk.
@@ -156,7 +157,11 @@ writing(() => {
   write(
     'src/app/(frontend)/styles.css',
     nameStylesheet(
-      moduleStyles(applyPalette(read('src/app/(frontend)/styles.css'), bp.design), join(ROOT, 'modules'), modules),
+      moduleStyles(
+        applyStyle(applyPalette(read('src/app/(frontend)/styles.css'), bp.design), bp.design),
+        join(ROOT, 'modules'),
+        modules,
+      ),
       bp.identity.name,
     ),
   )

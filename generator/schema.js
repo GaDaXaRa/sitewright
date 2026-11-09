@@ -10,6 +10,8 @@
  * of a person, not halfway through writing files into a directory.
  */
 
+import { styleErrors, styleTokens } from './lib/style.js'
+
 export const MODULE_IDS = [
   'about',
   'catalog',
@@ -63,8 +65,8 @@ const RESERVED_TOKENS = [
   'on-photo-alt',
   'logo-invert',
   'logo-box-blend',
-  'radius',
-  'radius-lg',
+  // La personalidad: los escribe `lib/style.js`, y un color propio con su nombre lo taparía.
+  ...Object.keys(styleTokens()),
   'maxw',
   'narrow',
   'gutter',
@@ -213,6 +215,7 @@ export function validateBlueprint(blueprint) {
   if (design.sections !== undefined && (!Array.isArray(design.sections) || design.sections.some((id) => typeof id !== 'string'))) {
     errors.push('design.sections: tiene que ser una lista de módulos')
   }
+  errors.push(...styleErrors(design.style))
   const fonts = design.fonts ?? {}
   required(fonts.display, 'design.fonts.display', errors)
   required(fonts.body, 'design.fonts.body', errors)

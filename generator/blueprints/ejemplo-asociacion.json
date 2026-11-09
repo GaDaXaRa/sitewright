@@ -73,6 +73,7 @@
     }
   },
   "design": {
+    "style": { "preset": "cercano" },
     "scheme": "light",
     "altExample": "El grupo de teatro ensayando en el local",
     "palette": {

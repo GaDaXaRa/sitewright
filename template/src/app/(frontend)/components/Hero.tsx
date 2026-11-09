@@ -19,7 +19,11 @@ type Props = {
   textColour?: string | null
   /** Buttons under the title. The first one is the loud one. */
   actions?: { href: string; label: string }[]
+  /** Cómo se compone: foto de fondo, foto al lado, foto enmarcada o sólo letra. */
+  layout?: string | null
 }
+
+const LAYOUTS = ['foto', 'partida', 'enmarcada', 'tipografica']
 
 /**
  * The cover: the one section every site has.
@@ -41,7 +45,21 @@ export default function Hero({
   shade,
   textColour,
   actions = [],
+  layout,
 }: Props) {
+  // Un valor que esta versión no conoce —un ajuste guardado por otra más nueva— cae en la
+  // de siempre en vez de dejar la portada sin estilo.
+  const composition = layout && LAYOUTS.includes(layout) ? layout : 'foto'
+  // La tipográfica es la única que prescinde de la foto aunque la haya: su gracia es la letra.
+  const image = composition === 'tipografica' ? null : imageUrl
+  // Sólo cuando la foto va **detrás** del texto hace falta tratarla y cambiar la tinta.
+  // Partida, el texto va sobre el fondo de la web y se lee con sus colores de siempre.
+  const behind = Boolean(image) && composition !== 'partida'
+  // La palabra más larga del título, para que la hoja limite el tamaño a lo que cabe: a
+  // tamaño de cartel, «Sandunguera» se salía por la derecha. Sin JavaScript, con el ancho
+  // del contenedor (`cqi`) dividido entre las letras.
+  const longest = Math.max(4, ...(title ?? '').split(/\s+/).map((word) => word.length))
+
   const position = textPosition || 'left'
   const height = textHeight || 'bottom'
   const objectPosition = `${focalX ?? 50}% ${focalY ?? 50}%`
@@ -51,19 +69,25 @@ export default function Hero({
   const ink = textColour === 'dark' ? 'ink-dark' : 'ink-light'
 
   return (
-    <header className={`hero text-${position} height-${height} shade-${veil} ${ink} ${imageUrl ? 'hero-has-image' : ''}`} id="inicio">
-      {imageUrl ? (
+    <header
+      className={`hero layout-${composition} text-${position} height-${height} shade-${veil} ${ink} ${behind ? 'hero-has-image' : ''} ${image ? 'hero-with-media' : ''}`}
+      id="inicio"
+      style={{ '--title-chars': longest } as React.CSSProperties}
+    >
+      {image ? (
         // The cover image is the largest element on the page (LCP): served through
         // next/image with `priority` so it starts loading immediately.
-        <Image
-          src={imageUrl}
-          alt={imageAlt || ''}
-          fill
-          priority
-          sizes="100vw"
-          className="hero-img"
-          style={{ objectPosition }}
-        />
+        <div className="hero-media">
+          <Image
+            src={image}
+            alt={imageAlt || ''}
+            fill
+            priority
+            sizes={composition === 'partida' ? '(max-width: 760px) 100vw, 50vw' : '100vw'}
+            className="hero-img"
+            style={{ objectPosition }}
+          />
+        </div>
       ) : (
         <div className="hero-bg" />
       )}

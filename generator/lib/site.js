@@ -241,6 +241,7 @@ ${overlays.map((w) => `      ${w.overlayRender()}`).join('\n')}
         textHeight={settings.heroTextHeight}
         shade={settings.heroShade}
         textColour={settings.heroTextColour}
+        layout={settings.heroLayout}
 ${cta ? `        actions={[{ href: ${sourceString(cta.href)}, label: ${sourceString(cta.label)} }]}\n` : ''}      />
 
 ${sectioned.map((w) => `      ${w.sectionRender(modules[w.id], bp)}`).join('\n\n')}

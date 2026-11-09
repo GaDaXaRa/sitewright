@@ -59,6 +59,7 @@ export default async function HomePage() {
         focalY={mediaFocal(settings?.heroImage).y}
         textPosition={settings?.heroTextPosition}
         textHeight={settings?.heroTextHeight}
+        layout={settings?.heroLayout}
       />
 
       <Footer settings={settings} links={[]} />

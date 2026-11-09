@@ -37,6 +37,7 @@
     }
   },
   "design": {
+    "style": { "preset": "editorial", "hero": "partida" },
     "scheme": "light",
     "altExample": "Ilustración a doble página para una revista",
     "palette": {

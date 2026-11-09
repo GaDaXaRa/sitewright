@@ -44,6 +44,7 @@
     }
   },
   "design": {
+    "style": { "preset": "sereno", "hero": "tipografica" },
     "scheme": "dark",
     "altExample": "Concierto en una sala pequeña, guitarra y pedalera",
     "palette": {
