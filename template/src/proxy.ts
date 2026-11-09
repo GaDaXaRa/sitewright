@@ -15,6 +15,16 @@ const CANONICAL_HOST = canonical.host
 const CANONICAL_IS_PUBLIC = canonical.protocol === 'https:' && !/^localhost|^127\./.test(CANONICAL_HOST)
 
 /**
+ * Payload lets whoever arrives first create the first user while the users table is empty.
+ *
+ * A deployed site always gets its first user from the seed, through the Local API, so on
+ * Vercel this door has no legitimate use. It did have an illegitimate one: provisioning
+ * deploys before it seeds, and in between `/admin` offered the panel to anyone who found the
+ * address. Previews too, because they are public addresses as well.
+ */
+const FIRST_USER = /^\/(?:admin\/create-first-user|api\/users\/first-register)\/?$/
+
+/**
  * Sends anyone arriving through a Vercel subdomain to the brand domain.
  *
  * The site answers on both, and the *.vercel.app one cannot be removed or redirected from
@@ -29,6 +39,10 @@ const CANONICAL_IS_PUBLIC = canonical.protocol === 'https:' && !/^localhost|^127
  * them would leave no way to review a deploy before publishing it.
  */
 export function proxy(request: NextRequest) {
+  if (process.env.VERCEL_ENV && FIRST_USER.test(request.nextUrl.pathname)) {
+    return new NextResponse(null, { status: 404 })
+  }
+
   if (process.env.VERCEL_ENV !== 'production') return NextResponse.next()
 
   if (!CANONICAL_IS_PUBLIC) return NextResponse.next()
